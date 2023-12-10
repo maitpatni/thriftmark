@@ -113,7 +113,7 @@ const ProductCard: FC<ProductProps> = ({
         className={cn(
           'w-full overflow-hidden',
           {
-            'ltr:pl-0 rtl:pr-0 ltr:lg:pl-2.5 ltr:xl:pl-4 rtl:lg:pr-2.5 rtl:xl:pr-4 ltr:pr-2.5 ltr:xl:pr-4 rtl:pl-2.5 rtl:xl:pl-4':
+            'ltr:pl-3 rtl:pr-0 ltr:lg:pl-2.5 ltr:xl:pl-4 rtl:lg:pr-2.5 rtl:xl:pr-4 ltr:pr-2.5 ltr:xl:pr-4 rtl:pl-2.5 rtl:xl:pl-4':
               variant === 'grid' || variant === 'gridSmall',
             'ltr:pl-0 rtl:pr-0': variant === 'gridSlim',
             'px-4 lg:px-5 2xl:px-4': variant === 'listSmall',
