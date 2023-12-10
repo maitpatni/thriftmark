@@ -43,3 +43,6 @@ packages/cloud
 .docz
 .now
 .vercel
+
+# Ignore Zone.Identifier files
+**/*Zone.Identifier
