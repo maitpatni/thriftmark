@@ -31,7 +31,7 @@ export default function Home() {
       </div>
       
       <div className="relative bg-cover py-12 mt-[-15px] mb-12"
-        style={{ backgroundImage: `url("/assets/images/homepage/home-page-section-2.png")` }}>
+        style={{ backgroundImage: `url("/assets/images/homepage/home-page-section-2-v2.png")` }}>
         <div className="container-full-width mx-auto px-5">
           <h2 className="text-white text-center text-5xl md:text-6xl lg:text-[65px] leading-none mb-8">ThriftEasy</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -95,7 +95,7 @@ export default function Home() {
                   </svg>
                   </div>
                   <input
-                  className="block p-1 pl-10 w-full text-sm text-gray-900 bg-[#FFF8EB] rounded-lg border-0 focus:ring-blue-500 focus:border-blue-500 sm:p-3 sm:pl-10 lg:text-base"
+                  className="block sm:m-auto p-1 pl-10 w-full text-sm text-gray-900 bg-[#FFF8EB] rounded-lg border-0 focus:ring-blue-500 focus:border-blue-500 sm:p-3 sm:pl-10 lg:text-base"
                   placeholder="Enter your email"
                   type="email"
                   id="email"
@@ -103,7 +103,7 @@ export default function Home() {
                   />
                   </div>
                   <div className="w-full sm:w-auto sm:ml-4">
-                  <button type="submit" className="w-full sm:w-auto p-1 px-2 sm:py-3 sm:px-5 text-xs font-semibold text-center text-white border border-white rounded-lg hover:bg-white hover:text-primary-700 focus:ring-4 focus:ring-primary-200 focus:outline-none transition ease-in-out duration-150"> Submit </button>
+                  <button type="submit" className="w-full sm:w-auto mt-2 sm:m-auto p-1 px-2 sm:py-3 sm:px-5 text-xs font-semibold text-center text-white border border-white rounded-lg hover:bg-white hover:text-primary-700 focus:ring-4 focus:ring-primary-200 focus:outline-none transition ease-in-out duration-150"> Submit </button>
                   </div>
                   </div>
                   <div className="text-xs leading-3 sm:leading-4 md:leading-5 sm:text-base md:text-lg xl:text-xl text-center text-white">
