@@ -40,6 +40,10 @@ class ImportDemoData extends Command
         $permissions_sql = file_get_contents($permissions_path);
         DB::statement($permissions_sql);
 
+        $roles_path = public_path('sql/roles.sql');
+        $roles_sql = file_get_contents($roles_path);
+        DB::statement($roles_sql);
+
         $types_path = public_path('sql/types.sql');
         $types_sql = file_get_contents($types_path);
         DB::statement($types_sql);
@@ -64,6 +68,14 @@ class ImportDemoData extends Command
         $model_has_permissions_path = public_path('sql/model_has_permissions.sql');
         $model_has_permissions_sql = file_get_contents($model_has_permissions_path);
         DB::statement($model_has_permissions_sql);
+
+        $model_has_roles_path = public_path('sql/model_has_roles.sql');
+        $model_has_roles_sql = file_get_contents($model_has_roles_path);
+        DB::statement($model_has_roles_sql);
+
+        $role_has_permissions_path = public_path('sql/role_has_permissions.sql');
+        $role_has_permissions_sql = file_get_contents($role_has_permissions_path);
+        DB::statement($role_has_permissions_sql);
 
         $shops_path = public_path('sql/shops.sql');
         $shops_sql = file_get_contents($shops_path);
@@ -157,13 +169,25 @@ class ImportDemoData extends Command
         $withdraws_sql = file_get_contents($withdraws_path);
         DB::statement($withdraws_sql);
 
-        $questions_path = public_path('sql/orders.sql');
-        $questions_sql = file_get_contents($questions_path);
-        DB::statement($questions_sql);
+        $orders_path = public_path('sql/orders.sql');
+        $orders_sql = file_get_contents($orders_path);
+        DB::statement($orders_sql);
 
-        $questions_path = public_path('sql/order_product.sql');
-        $questions_sql = file_get_contents($questions_path);
-        DB::statement($questions_sql);
+        $order_product_path = public_path('sql/order_product.sql');
+        $order_product_sql = file_get_contents($order_product_path);
+        DB::statement($order_product_sql);
+
+        // $flash_sale_path = public_path('sql/flash_sales.sql');
+        // $flash_sale_sql = file_get_contents($flash_sale_path);
+        // DB::statement($flash_sale_sql);
+
+        // $flash_sale_products_path = public_path('sql/flash_sale_products.sql');
+        // $flash_sale_products_sql = file_get_contents($flash_sale_products_path);
+        // DB::statement($flash_sale_products_sql);
+
+        // $terms_path = public_path('sql/terms_and_conditions.sql');
+        // $terms_sql = file_get_contents($terms_path);
+        // DB::statement($terms_sql);
 
         $this->info('Seed completed successfully!');
     }

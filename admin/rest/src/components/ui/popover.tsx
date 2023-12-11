@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import { Popover, Transition } from '@headlessui/react';
-import { Fragment } from 'react';
 import cn from 'classnames';
 import { ToggleIcon, ToggleIconVertical } from '@/components/icons/toggle-icon';
 import {
@@ -9,7 +8,7 @@ import {
   autoUpdate,
   useFloating,
   shift,
-} from '@floating-ui/react-dom-interactions';
+} from '@floating-ui/react';
 
 interface PopOverProps {
   children: any;
@@ -24,7 +23,7 @@ const PopOver = ({
   popOverPanelClass,
   iconStyle = 'horizontal',
 }: PopOverProps) => {
-  const { x, y, reference, floating, strategy, update, refs } = useFloating({
+  const { x, y, strategy, update, refs } = useFloating({
     strategy: 'fixed',
     placement: 'bottom',
     middleware: [offset(0), flip(), shift()],
@@ -43,9 +42,9 @@ const PopOver = ({
       <Popover.Button
         className={cn(
           'p-2 text-base opacity-80 transition duration-200 hover:text-heading',
-          popOverButtonClass
+          popOverButtonClass,
         )}
-        ref={reference}
+        ref={refs.setReference}
       >
         {iconStyle === 'horizontal' ? (
           <ToggleIcon width={20} />
@@ -54,7 +53,7 @@ const PopOver = ({
         )}
       </Popover.Button>
       <div
-        ref={floating}
+        ref={refs.setFloating}
         style={{
           position: strategy,
           top: y ?? '',
@@ -65,7 +64,7 @@ const PopOver = ({
         <Popover.Panel
           className={cn(
             'w-[18rem] max-w-[20rem] overflow-hidden rounded bg-[#F7F8F9] px-4 shadow-translatePanel sm:px-0',
-            popOverPanelClass
+            popOverPanelClass,
           )}
         >
           {children}

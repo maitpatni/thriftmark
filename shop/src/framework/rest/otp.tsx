@@ -13,8 +13,13 @@ import { PhoneNumberStatus } from "@type/index";
 interface OTPProps {
   phoneNumber: string | undefined;
   onVerify: (values: { phone_number: string }) => void;
+  variant?: 'inline' | 'default';
 }
-export const OTP: React.FC<OTPProps> = ({ phoneNumber, onVerify }) => {
+export const OTP: React.FC<OTPProps> = ({
+  phoneNumber,
+  onVerify,
+  variant = 'default',
+}) => {
   const { t } = useTranslation('common');
   const [otpState] = useAtom(optAtom);
 
@@ -26,7 +31,7 @@ export const OTP: React.FC<OTPProps> = ({ phoneNumber, onVerify }) => {
     serverError,
     setServerError,
   } = useSendOtpCode({
-    verifyOnly: true
+    verifyOnly: true,
   });
 
   function onSendCodeSubmission({ phone_number }: { phone_number: string }) {
@@ -47,21 +52,20 @@ export const OTP: React.FC<OTPProps> = ({ phoneNumber, onVerify }) => {
     <>
       {otpState?.step === PhoneNumberStatus.NUMBER && (
         <>
-          {
-            serverError && (
-              <Alert
-                variant="error"
-                message={serverError && t(serverError)}
-                className="mb-4"
-                closeable={true}
-                onClose={() => setServerError(null)}
-              />
-            )
-          }
+          {serverError && (
+            <Alert
+              variant="error"
+              message={serverError && t(serverError)}
+              className="mb-4"
+              closeable={true}
+              onClose={() => setServerError(null)}
+            />
+          )}
           <PhoneNumberForm
             onSubmit={onSendCodeSubmission}
             isLoading={isLoading}
             phoneNumber={phoneNumber}
+            variant={variant}
           />
         </>
       )}

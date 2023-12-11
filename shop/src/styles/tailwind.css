@@ -4,9 +4,45 @@
 
 /* Write your own custom base styles here */
 @layer base {
+  :root {
+    /*
+    * border color 200
+    */
+    --color-border-200: 229, 231, 235;
+
+    /*
+    Pending
+    */
+    --color-pending: 201, 161, 22;
+
+    /*
+    Processing
+    */
+    --color-processing: 158, 117, 0;
+
+    /*
+    Complete
+    */
+    --color-complete: 0, 161, 127;
+
+    /*
+    Canceled
+    */
+    --color-canceled: 227, 110, 1;
+
+    /*
+    Failed
+    */
+    --color-failed: 238, 43, 0;
+
+    /*
+    Out for delivery
+    */
+    --color-out-for-delivery: 126, 173, 66;
+  }
   html {
     -webkit-tap-highlight-color: transparent;
-background-color: #FFF8EB;
+    background-color: #FFF8EB;
   }
   html,
   body {

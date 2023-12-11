@@ -5,6 +5,8 @@ import { IoChatbubbleEllipsesOutline } from 'react-icons/io5';
 import cn from 'classnames';
 import { useTranslation } from 'next-i18next';
 import { siteSettings } from '@settings/site.settings';
+import { useRouter } from 'next/router';
+import { ROUTES } from '@lib/routes';
 
 const data = {
   title: 'support-heading',
@@ -20,6 +22,7 @@ interface Props {
 const Support: React.FC<Props> = ({ className }) => {
   const { title, description, supportImage, buttonText } = data;
   const { t } = useTranslation('common');
+  const { push } = useRouter();
   return (
     <div
       className={cn(
@@ -45,16 +48,19 @@ const Support: React.FC<Props> = ({ className }) => {
           />
         </div>
       </div>
-      <Button>
-        <a
-          href={siteSettings?.chatButtonUrl ? siteSettings?.chatButtonUrl : '#'}
-          target="_blank"
-          rel="noreferrer"
-          className="flex"
-        >
+      <Button
+        onClick={() =>
+          push(
+            siteSettings?.chatButtonUrl
+              ? siteSettings?.chatButtonUrl
+              : ROUTES.HOME
+          )
+        }
+      >
+        <span className="flex">
           {t(`${buttonText}`)}
           <IoChatbubbleEllipsesOutline className="text-lg ltr:ml-2 rtl:mr-2 md:text-xl" />
-        </a>
+        </span>
       </Button>
     </div>
   );

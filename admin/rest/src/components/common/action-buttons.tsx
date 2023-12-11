@@ -9,22 +9,27 @@ import { CheckMarkCircle } from '@/components/icons/checkmark-circle';
 import { useModalAction } from '@/components/ui/modal/modal.context';
 import { CloseFillIcon } from '@/components/icons/close-fill';
 import { AdminIcon } from '@/components/icons/admin-icon';
+import { EyeIcon } from '@/components/icons/category/eyes-icon';
 
 type Props = {
   id: string;
   editModalView?: string | any;
   deleteModalView?: string | any;
   editUrl?: string;
+  previewUrl?: string;
+  enablePreviewMode?: boolean;
   detailsUrl?: string;
   isUserActive?: boolean;
   userStatus?: boolean;
   isShopActive?: boolean;
   approveButton?: boolean;
+  termApproveButton?: boolean;
   showAddWalletPoints?: boolean;
   changeRefundStatus?: boolean;
   showMakeAdminButton?: boolean;
   showReplyQuestion?: boolean;
   customLocale?: string;
+  isTermsApproved?: boolean;
 };
 
 const ActionButtons = ({
@@ -32,16 +37,20 @@ const ActionButtons = ({
   editModalView,
   deleteModalView,
   editUrl,
+  previewUrl,
+  enablePreviewMode = false,
   detailsUrl,
   userStatus = false,
   isUserActive = false,
   isShopActive,
   approveButton = false,
+  termApproveButton = false,
   showAddWalletPoints = false,
   changeRefundStatus = false,
   showMakeAdminButton = false,
   showReplyQuestion = false,
-  customLocale
+  customLocale,
+  isTermsApproved,
 }: Props) => {
   const { t } = useTranslation();
   const { openModal } = useModalAction();
@@ -78,12 +87,20 @@ const ActionButtons = ({
     }
   }
 
+  function handleTermsStatus(status: boolean) {
+    if (status === true) {
+      openModal('TERM_APPROVE_VIEW', id);
+    } else {
+      openModal('TERM_DISAPPROVE_VIEW', id);
+    }
+  }
+
   function handleReplyQuestion() {
     openModal('REPLY_QUESTION', id);
   }
 
   return (
-    <div className="gap-8 inline-flex w-auto items-center">
+    <div className="inline-flex w-auto items-center gap-3">
       {showReplyQuestion && (
         <button
           onClick={handleReplyQuestion}
@@ -98,7 +115,7 @@ const ActionButtons = ({
           className="text-accent transition duration-200 hover:text-accent-hover focus:outline-none"
           title={t('common:text-make-admin')}
         >
-          <AdminIcon width={18} />
+          <AdminIcon width={17} />
         </button>
       )}
       {showAddWalletPoints && (
@@ -107,7 +124,7 @@ const ActionButtons = ({
           className="text-accent transition duration-200 hover:text-accent-hover focus:outline-none"
           title={t('common:text-add-wallet-points')}
         >
-          <WalletPointsIcon width={22} />
+          <WalletPointsIcon width={18} />
         </button>
       )}
 
@@ -120,15 +137,7 @@ const ActionButtons = ({
           <CheckMarkCircle width={20} />
         </button>
       )}
-      {deleteModalView && (
-        <button
-          onClick={handleDelete}
-          className="text-red-500 transition duration-200 hover:text-red-600 focus:outline-none"
-          title={t('common:text-delete')}
-        >
-          <TrashIcon width={16} />
-        </button>
-      )}
+
       {editModalView && (
         <button
           onClick={handleEditModal}
@@ -145,7 +154,7 @@ const ActionButtons = ({
             className="text-accent transition duration-200 hover:text-accent-hover focus:outline-none"
             title={t('common:text-approve-shop')}
           >
-            <CheckMarkCircle width={20} />
+            <CheckMarkCircle width={16} />
           </button>
         ) : (
           <button
@@ -153,7 +162,25 @@ const ActionButtons = ({
             className="text-red-500 transition duration-200 hover:text-red-600 focus:outline-none"
             title={t('common:text-disapprove-shop')}
           >
-            <CloseFillIcon width={20} />
+            <CloseFillIcon width={16} />
+          </button>
+        ))}
+      {termApproveButton &&
+        (!isTermsApproved ? (
+          <button
+            onClick={() => handleTermsStatus(true)}
+            className="text-accent transition duration-200 hover:text-accent-hover focus:outline-none"
+            title={t('common:text-approve-shop')}
+          >
+            <CheckMarkCircle width={16} />
+          </button>
+        ) : (
+          <button
+            onClick={() => handleTermsStatus(false)}
+            className="text-red-500 transition duration-200 hover:text-red-600 focus:outline-none"
+            title={t('common:text-disapprove-shop')}
+          >
+            <CloseFillIcon width={17} />
           </button>
         ))}
       {userStatus && (
@@ -164,7 +191,7 @@ const ActionButtons = ({
               className="text-red-500 transition duration-200 hover:text-red-600 focus:outline-none"
               title={t('common:text-ban-user')}
             >
-              <BanUser width={20} />
+              <BanUser width={16} />
             </button>
           ) : (
             <button
@@ -172,7 +199,7 @@ const ActionButtons = ({
               className="text-accent transition duration-200 hover:text-accent focus:outline-none"
               title={t('common:text-activate-user')}
             >
-              <CheckMarkCircle width={20} />
+              <CheckMarkCircle width={16} />
             </button>
           )}
         </>
@@ -183,18 +210,41 @@ const ActionButtons = ({
           className="text-base transition duration-200 hover:text-heading"
           title={t('common:text-edit')}
         >
-          <EditIcon width={16} />
+          <EditIcon width={15} />
         </Link>
+      )}
+      {enablePreviewMode && (
+        <>
+          {previewUrl && (
+            <Link
+              href={previewUrl}
+              className="text-base transition duration-200 hover:text-heading"
+              title={t('common:text-preview')}
+              target="_blank"
+            >
+              <EyeIcon width={18} />
+            </Link>
+          )}
+        </>
       )}
       {detailsUrl && (
         <Link
           href={detailsUrl}
-          className="ml-2 text-base transition duration-200 hover:text-heading"
+          className="text-base transition duration-200 hover:text-heading"
           title={t('common:text-view')}
           locale={customLocale}
         >
-          <Eye width={24} />
+          <Eye className="h-5 w-5" />
         </Link>
+      )}
+      {deleteModalView && (
+        <button
+          onClick={handleDelete}
+          className="text-red-500 transition duration-200 hover:text-red-600 focus:outline-none"
+          title={t('common:text-delete')}
+        >
+          <TrashIcon width={14} />
+        </button>
       )}
     </div>
   );

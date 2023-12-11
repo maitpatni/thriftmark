@@ -51,34 +51,34 @@ class MessageRepository extends BaseRepository
                 'user' => false,
                 'shop' => false
             ];
-            if($request->user()->id == $conversation->user_id) {
+            if ($request->user()->id == $conversation->user_id) {
                 $authorize['user'] = true;
                 $type =  "shop";
             }
-            if(in_array($conversation->shop_id, $request->user()->shops()->pluck('id')->toArray()) ||
-                $conversation->shop_id === $request->user()->shop_id) {
+            if (
+                in_array($conversation->shop_id, $request->user()->shops()->pluck('id')->toArray()) ||
+                $conversation->shop_id === $request->user()->shop_id
+            ) {
                 $authorize['shop'] = true;
                 $type =  "user";
             }
-            if( false === $authorize['user'] && false === $authorize['shop']) {
+            if (false === $authorize['user'] && false === $authorize['shop']) {
                 throw new MarvelException(NOT_AUTHORIZED);
             }
 
             $message = $this->create([
                 'body'              => $request->message,
                 'conversation_id'   => $conversation_id,
-                'user_id'           => $request->user()->id
+                'user_id'           => $request->user()->id,
             ]);
 
             $message->conversation->update(['updated_at' => now()]);
 
-            event(new MessageSent($message, $conversation, $type));
+            event(new MessageSent($message, $conversation, $type, $request->user()));
 
             return $message;
-
         } catch (\Exception $e) {
             throw new MarvelException(NOT_AUTHORIZED);
         }
     }
-
 }

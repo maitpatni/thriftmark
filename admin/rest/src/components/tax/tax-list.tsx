@@ -6,6 +6,7 @@ import { useTranslation } from 'next-i18next';
 import { useIsRTL } from '@/utils/locals';
 import { useState } from 'react';
 import TitleWithSort from '@/components/ui/title-with-sort';
+import { NoDataFound } from '@/components/icons/no-data-found';
 
 export type IProps = {
   taxes: Tax[] | undefined;
@@ -15,7 +16,6 @@ export type IProps = {
 const TaxList = ({ taxes, onSort, onOrder }: IProps) => {
   const { t } = useTranslation();
   const { alignLeft } = useIsRTL();
-
   const [sortingObj, setSortingObj] = useState<{
     sort: SortOrder;
     column: string | null;
@@ -41,11 +41,22 @@ const TaxList = ({ taxes, onSort, onOrder }: IProps) => {
 
   const columns = [
     {
-      title: t('table:table-item-id'),
+      title: (
+        <TitleWithSort
+          title={t('table:table-item-id')}
+          ascending={
+            sortingObj.sort === SortOrder.Asc && sortingObj.column === 'id'
+          }
+          isActive={sortingObj.column === 'id'}
+        />
+      ),
+      className: 'cursor-pointer',
       dataIndex: 'id',
       key: 'id',
-      align: 'center' as AlignType,
-      width: 62,
+      align: alignLeft,
+      width: 130,
+      onHeaderCell: () => onHeaderClick('id'),
+      render: (id: number) => `#${t('table:table-item-id')}: ${id}`,
     },
     {
       title: (
@@ -131,10 +142,18 @@ const TaxList = ({ taxes, onSort, onOrder }: IProps) => {
   ];
   return (
     <div className="mb-8 overflow-hidden rounded shadow">
-      {/* @ts-ignore */}
       <Table
+        //@ts-ignore
         columns={columns}
-        emptyText={t('table:empty-table-data')}
+        emptyText={() => (
+          <div className="flex flex-col items-center py-7">
+            <NoDataFound className="w-52" />
+            <div className="mb-1 pt-6 text-base font-semibold text-heading">
+              {t('table:empty-table-data')}
+            </div>
+            <p className="text-[13px]">{t('table:empty-table-sorry-text')}</p>
+          </div>
+        )}
         data={taxes}
         rowKey="id"
         scroll={{ x: 900 }}

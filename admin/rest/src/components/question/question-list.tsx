@@ -16,12 +16,15 @@ import { useState } from 'react';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
+import { NoDataFound } from '@/components/icons/no-data-found';
 import { siteSettings } from '@/settings/site.settings';
 import { useRouter } from 'next/router';
 import TitleWithSort from '@/components/ui/title-with-sort';
 import QuestionCard from './question-card';
 import { LikeIcon } from '@/components/icons/like-icon';
 import { DislikeIcon } from '@/components/icons/dislike-icon';
+import Link from 'next/link';
+import { Routes } from '@/config/routes';
 
 export type IProps = {
   questions: Question[] | undefined;
@@ -39,6 +42,10 @@ const QuestionList = ({
 }: IProps) => {
   const { t } = useTranslation();
   const { alignLeft } = useIsRTL();
+  const router = useRouter();
+  const {
+    query: { shop },
+  } = router;
 
   const [sortingObj, setSortingObj] = useState<{
     sort: SortOrder;
@@ -63,21 +70,52 @@ const QuestionList = ({
     },
   });
 
-  const columns = [
+  let columns = [
+    {
+      title: (
+        <TitleWithSort
+          title={t('table:table-item-id')}
+          ascending={
+            sortingObj.sort === SortOrder.Asc && sortingObj.column === 'id'
+          }
+          isActive={sortingObj.column === 'id'}
+        />
+      ),
+      className: 'cursor-pointer',
+      dataIndex: 'id',
+      key: 'id',
+      align: alignLeft,
+      width: 120,
+      onHeaderCell: () => onHeaderClick('id'),
+      render: (id: number) => `#${t('table:table-item-id')}: ${id}`,
+    },
     {
       title: t('table:table-item-image'),
       dataIndex: 'product',
       key: 'product-image',
       align: alignLeft,
-      width: 100,
+      width: 250,
       render: (product: Product) => (
-        <Image
-          src={product?.image?.thumbnail ?? siteSettings.product.placeholder}
-          alt={product?.name}
-          width={60}
-          height={60}
-          className="overflow-hidden rounded"
-        />
+        <div className="flex items-center">
+          <div className="relative aspect-square h-14 w-14 shrink-0 overflow-hidden rounded border border-border-200/80 bg-gray-100 me-2.5">
+            <Image
+              src={
+                product?.image?.thumbnail ?? siteSettings.product.placeholder
+              }
+              alt={product?.name}
+              fill
+              priority={true}
+              sizes="(max-width: 768px) 100vw"
+            />
+          </div>
+          <Link
+            href={`${process.env.NEXT_PUBLIC_SHOP_URL}/products/${product?.slug}`}
+          >
+            <span className="truncate whitespace-nowrap font-medium">
+              {product?.name}
+            </span>
+          </Link>
+        </div>
       ),
     },
     {
@@ -86,34 +124,19 @@ const QuestionList = ({
       // dataIndex: "question",
       key: 'question',
       align: alignLeft,
-      width: 450,
+      width: 350,
       render: (record: any, id: string) => (
         <QuestionCard record={record} id={id} />
       ),
     },
     {
-      title: t('table:table-item-customer-name'),
+      title: t('table:table-item-customer'),
       dataIndex: 'user',
       key: 'user',
       align: alignLeft,
       width: 150,
-      render: (user: User) => <span>{user?.name}</span>,
-    },
-    {
-      title: t('table:table-item-product-name'),
-      dataIndex: 'product',
-      key: 'product-image',
-      align: alignLeft,
-      width: 300,
-      render: (product: Product) => (
-        <a
-          href={process.env.NEXT_PUBLIC_SHOP_URL + '/products/' + product?.slug}
-          className="transition-colors hover:text-accent"
-          target="_blank"
-          rel="noreferrer"
-        >
-          {product?.name}
-        </a>
+      render: (user: User) => (
+        <span>{user?.name ? user?.name : t('common:text-guest')}</span>
       ),
     },
     {
@@ -121,7 +144,7 @@ const QuestionList = ({
       // dataIndex: "product",
       key: 'feedbacks',
       align: alignLeft,
-      width: 200,
+      width: 150,
       render: (record: any) => (
         <div className="flex items-center space-x-4">
           <span className="flex items-center text-xs tracking-wider text-gray-400 transition">
@@ -151,6 +174,7 @@ const QuestionList = ({
       dataIndex: 'created_at',
       key: 'created_at',
       align: alignLeft,
+      width: 150,
       onHeaderCell: () => onHeaderClick('created_at'),
       render: (date: string) => {
         dayjs.extend(relativeTime);
@@ -168,7 +192,7 @@ const QuestionList = ({
       dataIndex: 'id',
       key: 'actions',
       align: 'right',
-      width: 150,
+      width: 120,
       render: function Render(_: any, id: string) {
         const {
           query: { shop },
@@ -184,16 +208,28 @@ const QuestionList = ({
     },
   ];
 
+  if (shop) {
+    columns = columns?.filter((column) => column?.key !== 'actions');
+  }
+
   return (
     <>
       <div className="mb-6 overflow-hidden rounded shadow">
         <Table
           //@ts-ignore
           columns={columns}
-          emptyText={t('table:empty-table-data')}
+          emptyText={() => (
+            <div className="flex flex-col items-center py-7">
+              <NoDataFound className="w-52" />
+              <div className="mb-1 pt-6 text-base font-semibold text-heading">
+                {t('table:empty-table-data')}
+              </div>
+              <p className="text-[13px]">{t('table:empty-table-sorry-text')}</p>
+            </div>
+          )}
           data={questions}
           rowKey="id"
-          scroll={{ x: 1000 }}
+          scroll={{ x: 1200 }}
         />
       </div>
 

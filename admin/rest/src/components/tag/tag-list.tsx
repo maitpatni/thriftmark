@@ -8,6 +8,7 @@ import TitleWithSort from '@/components/ui/title-with-sort';
 import { MappedPaginatorInfo, Tag } from '@/types';
 import { Config } from '@/config';
 import Link from '@/components/ui/link';
+import { NoDataFound } from '@/components/icons/no-data-found';
 import { Routes } from '@/config/routes';
 import LanguageSwitcher from '@/components/ui/lang-action/action';
 import * as categoriesIcon from '@/components/icons/category';
@@ -29,8 +30,6 @@ const TagList = ({
   paginatorInfo,
 }: IProps) => {
   const { t } = useTranslation();
-  const rowExpandable = (record: any) => record.children?.length;
-
   const { alignLeft, alignRight } = useIsRTL();
 
   const [sortingObj, setSortingObj] = useState<{
@@ -58,11 +57,22 @@ const TagList = ({
 
   const columns = [
     {
-      title: t('table:table-item-id'),
+      title: (
+        <TitleWithSort
+          title={t('table:table-item-id')}
+          ascending={
+            sortingObj.sort === SortOrder.Asc && sortingObj.column === 'id'
+          }
+          isActive={sortingObj.column === 'id'}
+        />
+      ),
+      className: 'cursor-pointer',
       dataIndex: 'id',
       key: 'id',
       align: alignLeft,
-      width: 90,
+      width: 150,
+      onHeaderCell: () => onHeaderClick('id'),
+      render: (id: number) => `#${t('table:table-item-id')}: ${id}`,
     },
     {
       title: (
@@ -78,6 +88,7 @@ const TagList = ({
       dataIndex: 'name',
       key: 'name',
       align: alignLeft,
+      width: 250,
       onHeaderCell: () => onHeaderClick('name'),
     },
     {
@@ -85,6 +96,7 @@ const TagList = ({
       dataIndex: 'slug',
       key: 'slug',
       align: 'center',
+      width: 250,
       ellipsis: true,
     },
     {
@@ -112,6 +124,7 @@ const TagList = ({
       dataIndex: 'slug',
       key: 'actions',
       align: alignRight,
+      width: 250,
       render: (slug: string, record: Tag) => (
         <LanguageSwitcher
           slug={slug}
@@ -129,15 +142,19 @@ const TagList = ({
         <Table
           //@ts-ignore
           columns={columns}
-          emptyText={t('table:empty-table-data')}
+          emptyText={() => (
+            <div className="flex flex-col items-center py-7">
+              <NoDataFound className="w-52" />
+              <div className="mb-1 pt-6 text-base font-semibold text-heading">
+                {t('table:empty-table-data')}
+              </div>
+              <p className="text-[13px]">{t('table:empty-table-sorry-text')}</p>
+            </div>
+          )}
           //@ts-ignore
           data={tags}
           rowKey="id"
           scroll={{ x: 1000 }}
-          expandable={{
-            expandedRowRender: () => '',
-            rowExpandable: rowExpandable,
-          }}
         />
       </div>
 

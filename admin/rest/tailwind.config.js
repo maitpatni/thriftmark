@@ -1,4 +1,3 @@
-//read from env for specific product
 function withOpacity(variableName) {
   return ({ opacityValue }) => {
     if (opacityValue !== undefined) {
@@ -19,11 +18,13 @@ module.exports = {
       fontFamily: {
         body: ['Open Sans', 'system-ui', 'sans-serif'],
         heading: ['Open Sans', 'system-ui', 'sans-serif'],
-      },
+              },
       colors: {
         light: withOpacity('--color-light'),
         dark: withOpacity('--color-dark'),
         accent: withOpacity('--color-accent'),
+        'muted-black': withOpacity('--color-muted-black'),
+        'base-dark': withOpacity('--text-base-dark'),
         'accent-hover': withOpacity('--color-accent-hover'),
         'accent-300': withOpacity('--color-accent-300'),
         'accent-400': withOpacity('--color-accent-400'),
@@ -110,7 +111,13 @@ module.exports = {
         cardAction:
           '0 0 0 1px #8898aa1a, 0 15px 35px #31315d1a, 0 5px 15px #00000014',
         chat: '0px 1px 2px rgba(0, 0, 0, 0.08)',
+        box: '0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05)',
         promptSuggestion: '0px 2px 6px rgba(59, 74, 92, 0.1)',
+        avatar: '0px 1px 2px rgba(0, 0, 0, 0.12)',
+        shopLogo: '2px 4px 16px rgba(0, 0, 0, 0.08)',
+      },
+      dropShadow: {
+        shopLogo: '2px 4px 16px rgba(0, 0, 0, 0.08)',
       },
       gridTemplateColumns: {
         fit: 'repeat(auto-fit, minmax(0, 1fr))',

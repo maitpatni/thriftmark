@@ -11,6 +11,7 @@ use Marvel\Database\Repositories\TagRepository;
 use Marvel\Exceptions\MarvelException;
 use Marvel\Http\Requests\TagCreateRequest;
 use Marvel\Http\Requests\TagUpdateRequest;
+use Marvel\Http\Resources\TagResource;
 use Prettus\Validator\Exceptions\ValidatorException;
 
 
@@ -32,7 +33,9 @@ class TagController extends CoreController
     {
         $language = $request->language ?? DEFAULT_LANGUAGE;
         $limit = $request->limit ?   $request->limit : 15;
-        return $this->repository->where('language', $language)->with(['type'])->paginate($limit);
+        $tags = $this->repository->where('language', $language)->with(['type'])->paginate($limit);
+        $data = TagResource::collection($tags)->response()->getData(true);
+        return formatAPIResourcePaginate($data);
     }
 
     /**
@@ -66,9 +69,11 @@ class TagController extends CoreController
             $language = $request->language ?? DEFAULT_LANGUAGE;
             if (is_numeric($params)) {
                 $params = (int) $params;
-                return $this->repository->where('id', $params)->with(['type'])->firstOrFail();
+                $tag = $this->repository->where('id', $params)->with(['type'])->firstOrFail();
+                return new TagResource($tag);
             }
-            return $this->repository->where('slug', $params)->where('language', $language)->with(['type'])->firstOrFail();
+            $tag = $this->repository->where('slug', $params)->where('language', $language)->with(['type'])->firstOrFail();
+            return new TagResource($tag);
         } catch (MarvelException $th) {
             throw new MarvelException(COULD_NOT_CREATE_THE_RESOURCE);
         }

@@ -14,6 +14,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { shippingValidationSchema } from './shipping-validation-schema';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
+import StickyFooterPanel from '@/components/ui/sticky-footer-panel';
 
 const defaultValues = {
   name: '',
@@ -36,6 +37,7 @@ export default function CreateOrUpdateShippingForm({ initialValues }: IProps) {
     formState: { errors },
   } = useForm<ShippingInput>({
     shouldUnregister: true,
+    //@ts-ignore
     resolver: yupResolver(shippingValidationSchema),
     defaultValues: initialValues ?? defaultValues,
   });
@@ -56,7 +58,7 @@ export default function CreateOrUpdateShippingForm({ initialValues }: IProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="my-5 flex flex-wrap sm:my-8">
+      <div className="flex flex-wrap my-5 sm:my-8">
         <Description
           title={t('form:item-description')}
           details={`${
@@ -111,25 +113,31 @@ export default function CreateOrUpdateShippingForm({ initialValues }: IProps) {
         </Card>
       </div>
 
-      <div className="mb-4 text-end">
-        {initialValues && (
-          <Button
-            variant="outline"
-            onClick={router.back}
-            className="me-4"
-            type="button"
-          >
-            {t('form:button-label-back')}
-          </Button>
-        )}
+      <StickyFooterPanel className="z-0">
+        <div className="text-end">
+          {initialValues && (
+            <Button
+              variant="outline"
+              onClick={router.back}
+              className="text-sm me-4 md:text-base"
+              type="button"
+            >
+              {t('form:button-label-back')}
+            </Button>
+          )}
 
-        <Button loading={creating || updating} disabled={creating || updating}>
-          {initialValues
-            ? t('form:button-label-update')
-            : t('form:button-label-add')}{' '}
-          {t('form:button-label-shipping')}
-        </Button>
-      </div>
+          <Button
+            loading={creating || updating}
+            disabled={creating || updating}
+            className="text-sm md:text-base"
+          >
+            {initialValues
+              ? t('form:button-label-update')
+              : t('form:button-label-add')}{' '}
+            {t('form:button-label-shipping')}
+          </Button>
+        </div>
+      </StickyFooterPanel>
     </form>
   );
 }

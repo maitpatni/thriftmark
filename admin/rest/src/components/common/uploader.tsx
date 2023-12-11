@@ -24,7 +24,7 @@ export default function Uploader({
   multiple,
   acceptFile,
   helperText,
-  maxSize
+  maxSize,
 }: any) {
   const { t } = useTranslation();
   const [files, setFiles] = useState<Attachment[]>(getPreviewImage(value));
@@ -33,10 +33,10 @@ export default function Uploader({
   const { getRootProps, getInputProps } = useDropzone({
     ...(!acceptFile
       ? {
-        accept: {
-          'image/*': ['.jpg', '.jpeg', '.png', '.webp',],
-        },
-      }
+          accept: {
+            'image/*': ['.jpg', '.jpeg', '.png', '.webp'],
+          },
+        }
       : { ...ACCEPTED_FILE_TYPES }),
     multiple,
     onDrop: async (acceptedFiles) => {
@@ -172,14 +172,14 @@ export default function Uploader({
               </p>
             </div>
           )}
-          {multiple ? (
-            <button
-              className="absolute top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-xs text-light shadow-xl outline-none end-1"
-              onClick={() => handleDelete(file.thumbnail)}
-            >
-              <CloseIcon width={10} height={10} />
-            </button>
-          ) : null}
+          {/* {multiple ? (
+          ) : null} */}
+          <button
+            className="absolute top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-xs text-light shadow-xl outline-none end-1"
+            onClick={() => handleDelete(file.thumbnail)}
+          >
+            <CloseIcon width={10} height={10} />
+          </button>
         </div>
       );
     }

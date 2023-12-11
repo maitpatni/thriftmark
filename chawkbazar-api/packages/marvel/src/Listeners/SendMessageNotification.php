@@ -33,24 +33,24 @@ class SendMessageNotification implements ShouldQueue
     {
         $participant = Participant::where('message_id', $event->message->id)->first();
 
-        if(null === $participant->last_read) {
+        if (null === $participant->last_read) {
             if (0 === $participant->notify) {
-                if('user' == $event->type) {
+                if ('user' == $event->type) {
                     $user = User::findOrFail($event->conversation->user_id);
-                    $notification = isset($user->profile->notifications) ?$user->profile->notifications : null;
-                    if(empty($notification)) {
+                    $notification = isset($user->profile->notifications) ? $user->profile->notifications : null;
+                    if (empty($notification)) {
                         $notification['enable'] = 1;
                         $notification['email'] = $user->email;
                     }
                 } else {
                     $shop = Shop::findOrFail($event->conversation->shop_id);
                     $notification = json_decode($shop->notifications, true);
-                    if(empty($notification)) {
+                    if (empty($notification)) {
                         $notification['enable'] = 1;
                         $notification['email'] = $shop->owner->email;
                     }
                 }
-                if(1 == $notification["enable"]) {
+                if (1 == $notification["enable"]) {
                     Notification::route('mail', [
                         $notification["email"],
                     ])->notify(new MessageReminder($participant));
@@ -58,10 +58,7 @@ class SendMessageNotification implements ShouldQueue
                     $participant->notify = 1;
                     $participant->save();
                 }
-
             }
         }
-
-
     }
 }

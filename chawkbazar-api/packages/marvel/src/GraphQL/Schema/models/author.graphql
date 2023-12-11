@@ -3,7 +3,7 @@ extend type Query {
         text: String @where(operator: "like", key: "name")
         is_approved: Boolean @eq
         language: String @eq
-        orderBy: _ @orderBy(columns: ["updated_at", "created_at", "name"])
+        orderBy: _ @orderBy(columns: ["updated_at", "created_at", "name", "id"])
     ): [Author!]! @paginate(defaultCount: 15)
     topAuthors(limit: Int = 15, language: String): [Author!]!
         @field(resolver: "AuthorQuery@topAuthor")

@@ -3,8 +3,9 @@ import Loader from '@/components/ui/loader/loader';
 import { useTranslation } from 'next-i18next';
 import { useMeQuery } from '@/data/user';
 import ShopCard from '@/components/shop/shop-card';
-import { NoShop } from '@/components/icons/no-shop';
 import { adminOnly, getAuthCredentials, hasAccess } from '@/utils/auth-utils';
+import NotFound from '@/components/ui/not-found';
+import { isEmpty } from 'lodash';
 
 const ShopList = () => {
   const { t } = useTranslation();
@@ -17,7 +18,7 @@ const ShopList = () => {
   return (
     <>
       {permission ? (
-        <div className="mb-5 border-b border-dashed border-border-base pb-8 sm:mb-8">
+        <div className="mb-5 border-b border-dashed border-border-base pb-5 md:mb-8 md:pb-7 ">
           <h1 className="text-lg font-semibold text-heading">
             {t('common:sidebar-nav-item-my-shops')}
           </h1>
@@ -25,23 +26,24 @@ const ShopList = () => {
       ) : (
         ''
       )}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 3xl:grid-cols-5">
-        {data?.shops?.map((myShop: any, idx: number) => (
-          <ShopCard shop={myShop} key={idx} />
-        ))}
-      </div>
-      {!data?.managed_shop && !data?.shops?.length ? (
-        <div className="flex flex-col items-center w-full p-10">
-          <div className="relative h-auto min-h-[180px] w-[300px] sm:min-h-[370px] sm:w-[490px]">
-            <NoShop />
-          </div>
-          <span className="mt-6 text-lg font-semibold text-center text-body-dark sm:mt-10">
-            {t('common:text-no-shop')}
-          </span>
+      {!isEmpty(data?.shops) ? (
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 2xl:grid-cols-3 3xl:grid-cols-4">
+          {data?.shops?.map((myShop: any, idx: number) => (
+            <ShopCard shop={myShop} key={idx} />
+          ))}
         </div>
+      ) : (
+        ''
+      )}
+      {!data?.managed_shop && !data?.shops?.length ? (
+        <NotFound
+          image="/no-shop-found.svg"
+          text="text-no-shop-found"
+          className="mx-auto w-7/12"
+        />
       ) : null}
       {!!data?.managed_shop ? (
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 3xl:grid-cols-5">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 2xl:grid-cols-3 3xl:grid-cols-4">
           <ShopCard shop={data?.managed_shop} />
         </div>
       ) : null}

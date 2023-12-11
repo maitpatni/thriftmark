@@ -16,6 +16,8 @@ use Marvel\Enums\StoreNoticeType;
 use Marvel\Exceptions\MarvelException;
 use Marvel\Http\Requests\StoreNoticeRequest;
 use Marvel\Http\Requests\StoreNoticeUpdateRequest;
+use Marvel\Http\Resources\GetSingleStoreNoticeResource;
+use Marvel\Http\Resources\StoreNoticeResource;
 use Prettus\Validator\Exceptions\ValidatorException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -38,13 +40,12 @@ class StoreNoticeController extends CoreController
     public function index(Request $request)
     {
         try {
-            if (!$request->user() && !$request['shop_id']) {
-                throw new AuthorizationException(NOT_AUTHORIZED);
-            }
             $limit = $request->limit ? $request->limit : 15;
-            return $this->fetchStoreNotices($request)->paginate($limit);
+            $storeNotices = $this->fetchStoreNotices($request)->paginate($limit);
+            $data = StoreNoticeResource::collection($storeNotices)->response()->getData(true);
+            return formatAPIResourcePaginate($data);
         } catch (MarvelException $th) {
-            throw new MarvelException(SOMETHING_WENT_WRONG);
+            throw new MarvelException(SOMETHING_WENT_WRONG, $th->getMessage());
         }
     }
 
@@ -55,7 +56,7 @@ class StoreNoticeController extends CoreController
      */
     public function fetchStoreNotices(Request $request)
     {
-        return $this->repository->fetchStoreNotices($request);
+        return $this->repository->whereNotNull('id');
     }
 
     /**
@@ -111,7 +112,9 @@ class StoreNoticeController extends CoreController
     public function show(Request $request, $id)
     {
         try {
-            return $this->repository->findOrFail($id);
+            $storeNotice = $this->repository->findOrFail($id);
+            // return $storeNotice;
+            return new GetSingleStoreNoticeResource($storeNotice);
         } catch (MarvelException $th) {
             throw new MarvelException(SOMETHING_WENT_WRONG);
         }

@@ -63,7 +63,7 @@ const ContactGrid = ({ contact, label, count, className, userId, profileId }: Co
 
       <div className={classNames('w-full')}>
         <PhoneInput
-          country="in"
+          country="us"
           value={contactNumber}
           disabled={true}
           inputClass="!p-0 ltr:!pr-4 rtl:!pl-4 ltr:!pl-14 rtl:!pr-14 !flex !items-center !w-full !appearance-none !transition !duration-300 !ease-in-out !text-heading !text-sm focus:!outline-none focus:!ring-0 !border !border-gray-400 !rounded focus:!border-heading !h-12"

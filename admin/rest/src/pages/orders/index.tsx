@@ -17,6 +17,7 @@ import { useShopQuery } from '@/data/shop';
 import { Menu, Transition } from '@headlessui/react';
 import classNames from 'classnames';
 import { DownloadIcon } from '@/components/icons/download-icon';
+import PageHeading from '@/components/common/page-heading';
 
 export default function Orders() {
   const router = useRouter();
@@ -83,59 +84,57 @@ export default function Orders() {
     <>
       <Card className="mb-8 flex flex-col items-center justify-between md:flex-row">
         <div className="mb-4 md:mb-0 md:w-1/4">
-          <h1 className="text-lg font-semibold text-heading">
-            {t('form:input-label-orders')}
-          </h1>
+          <PageHeading title={t('form:input-label-orders')} />
         </div>
 
-        <div className="flex w-full flex-col items-center ms-auto md:w-1/2 md:flex-row">
+        <div className="flex w-full flex-row items-center md:w-1/2">
           <Search
             onSearch={handleSearch}
+            className="w-full"
             placeholderText={t('form:input-placeholder-search-tracking-number')}
           />
-        </div>
-
-        <Menu
-          as="div"
-          className="relative inline-block ltr:text-left rtl:text-right"
-        >
-          <Menu.Button className="group p-2">
-            <MoreIcon className="w-3.5 text-body" />
-          </Menu.Button>
-          <Transition
-            as={Fragment}
-            enter="transition ease-out duration-100"
-            enterFrom="transform opacity-0 scale-95"
-            enterTo="transform opacity-100 scale-100"
-            leave="transition ease-in duration-75"
-            leaveFrom="transform opacity-100 scale-100"
-            leaveTo="transform opacity-0 scale-95"
+          <Menu
+            as="div"
+            className="relative inline-block ltr:text-left rtl:text-right"
           >
-            <Menu.Items
-              as="ul"
-              className={classNames(
-                'shadow-700 absolute z-50 mt-2 w-52 overflow-hidden rounded border border-border-200 bg-light py-2 focus:outline-none ltr:right-0 ltr:origin-top-right rtl:left-0 rtl:origin-top-left'
-              )}
+            <Menu.Button className="group p-2">
+              <MoreIcon className="w-3.5 text-body" />
+            </Menu.Button>
+            <Transition
+              as={Fragment}
+              enter="transition ease-out duration-100"
+              enterFrom="transform opacity-0 scale-95"
+              enterTo="transform opacity-100 scale-100"
+              leave="transition ease-in duration-75"
+              leaveFrom="transform opacity-100 scale-100"
+              leaveTo="transform opacity-0 scale-95"
             >
-              <Menu.Item>
-                {({ active }) => (
-                  <button
-                    onClick={handleExportOrder}
-                    className={classNames(
-                      'flex w-full items-center space-x-3 px-5 py-2.5 text-sm font-semibold capitalize transition duration-200 hover:text-accent focus:outline-none rtl:space-x-reverse',
-                      active ? 'text-accent' : 'text-body'
-                    )}
-                  >
-                    <DownloadIcon className="w-5 shrink-0" />
-                    <span className="whitespace-nowrap">
-                      {t('common:text-export-orders')}
-                    </span>
-                  </button>
+              <Menu.Items
+                as="ul"
+                className={classNames(
+                  'shadow-700 absolute z-50 mt-2 w-52 overflow-hidden rounded border border-border-200 bg-light py-2 focus:outline-none ltr:right-0 ltr:origin-top-right rtl:left-0 rtl:origin-top-left'
                 )}
-              </Menu.Item>
-            </Menu.Items>
-          </Transition>
-        </Menu>
+              >
+                <Menu.Item>
+                  {({ active }) => (
+                    <button
+                      onClick={handleExportOrder}
+                      className={classNames(
+                        'flex w-full items-center space-x-3 px-5 py-2.5 text-sm font-semibold capitalize transition duration-200 hover:text-accent focus:outline-none rtl:space-x-reverse',
+                        active ? 'text-accent' : 'text-body'
+                      )}
+                    >
+                      <DownloadIcon className="w-5 shrink-0" />
+                      <span className="whitespace-nowrap">
+                        {t('common:text-export-orders')}
+                      </span>
+                    </button>
+                  )}
+                </Menu.Item>
+              </Menu.Items>
+            </Transition>
+          </Menu>
+        </div>
       </Card>
 
       <OrderList

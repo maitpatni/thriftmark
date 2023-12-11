@@ -100,4 +100,12 @@ class Category extends Model
     {
         return $this->hasOne('Marvel\Database\Models\Category', 'id', 'parent')->with('parent');
     }
+    
+    /**
+     * @return HasOne
+     */
+    public function parentCategory()
+    {
+        return $this->hasOne('Marvel\Database\Models\Category', 'id', 'parent')->with('parentCategory');
+    }
 }

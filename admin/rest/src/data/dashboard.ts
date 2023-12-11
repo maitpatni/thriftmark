@@ -15,3 +15,43 @@ export function usePopularProductsQuery(options: Partial<ProductQueryOptions>) {
       productClient.popular(Object.assign({}, pageParam, queryKey[1]))
   );
 }
+
+export function useLowProductStockQuery(options: Partial<ProductQueryOptions>) {
+  return useQuery<Product[], Error>(
+    [API_ENDPOINTS.LOW_STOCK_PRODUCTS_ANALYTICS, options],
+    ({ queryKey, pageParam }) =>
+      productClient.lowStock(Object.assign({}, pageParam, queryKey[1]))
+  );
+}
+
+export function useProductByCategoryQuery(
+  options: Partial<ProductQueryOptions>
+) {
+  return useQuery<Product[], Error>(
+    [API_ENDPOINTS.CATEGORY_WISE_PRODUCTS, options],
+    ({ queryKey, pageParam }) =>
+      productClient.productByCategory(Object.assign({}, pageParam, queryKey[1]))
+  );
+}
+
+export function useMostSoldProductByCategoryQuery(
+  options: Partial<ProductQueryOptions>
+) {
+  return useQuery<Product[], Error>(
+    [API_ENDPOINTS.CATEGORY_WISE_PRODUCTS_SALE, options],
+    ({ queryKey, pageParam }) =>
+      productClient.mostSoldProductByCategory(
+        Object.assign({}, pageParam, queryKey[1])
+      )
+  );
+}
+
+export function useTopRatedProductsQuery(
+  options: Partial<ProductQueryOptions>
+) {
+  return useQuery<Product[], Error>(
+    [API_ENDPOINTS.TOP_RATED_PRODUCTS, options],
+    ({ queryKey, pageParam }) =>
+      productClient.topRated(Object.assign({}, pageParam, queryKey[1]))
+  );
+}

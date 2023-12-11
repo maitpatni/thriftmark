@@ -3,13 +3,13 @@ import LinkButton from '@/components/ui/link-button';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { MapPin } from '@/components/icons/map-pin';
-import { PhoneIcon } from '@/components/icons/phone';
+import { MapPinIconWithPlatform } from '@/components/icons/map-pin';
+import { PhoneIconNew } from '@/components/icons/phone';
 import Loader from '@/components/ui/loader/loader';
 import dayjs from 'dayjs';
 import { CheckMarkFill } from '@/components/icons/checkmark-circle-fill';
 import { CloseFillIcon } from '@/components/icons/close-fill';
-import { EditIcon } from '@/components/icons/edit';
+import { EditFillIcon } from '@/components/icons/edit';
 import { formatAddress } from '@/utils/format-address';
 import {
   adminAndOwnerOnly,
@@ -32,12 +32,27 @@ import { DollarIcon } from '@/components/icons/shops/dollar';
 import ReadMore from '@/components/ui/truncate';
 import { useMeQuery } from '@/data/user';
 import { Routes } from '@/config/routes';
-import AccessDeniedPage from '@/components/common/access-denied';
+// import AccessDeniedPage from '@/components/common/access-denied';
+// import OwnerLayout from '@/components/layouts/owner';
+import ShopAvatar from '@/components/shop/shop-avatar';
+import Link from '@/components/ui/link';
+import { ExternalLinkIcon } from '@/components/icons/external-link';
+import { EmailAtIcon } from '@/components/icons/email';
+import { useFormatPhoneNumber } from '@/utils/format-phone-number';
+import Alert from '@/components/ui/alert';
+import PaymentInfoList from '@/components/shop-single/payment-info';
+import { PaymentInfo } from '@/types';
+import {
+  ContentListVertical,
+  ContentListHorizontal,
+} from '@/components/shop-single/content-list';
+import ShortDescription from '@/components/shop-single/short-description';
+import { IconCard } from '@/components/icons/shop-single/icon-card';
 
 export default function ShopPage() {
   const router = useRouter();
   const { t } = useTranslation();
-  const { permissions } = getAuthCredentials();
+  const { permissions, role } = getAuthCredentials();
   const { data: me } = useMeQuery();
   const {
     query: { shop },
@@ -60,6 +75,11 @@ export default function ShopPage() {
       amount: data?.balance?.current_balance!,
     }
   );
+
+  const phoneNumber = useFormatPhoneNumber({
+    customer_contact: data?.settings?.contact as string,
+  });
+
   if (loading) return <Loader text={t('common:text-loading')} />;
   if (error) return <ErrorMessage message={error.message} />;
   const {
@@ -73,8 +93,8 @@ export default function ShopPage() {
     balance,
     address,
     created_at,
-    settings,
     slug,
+    owner,
     id: shop_id,
   } = data ?? {};
 
@@ -87,252 +107,174 @@ export default function ShopPage() {
   }
 
   return (
-    <div className="grid grid-cols-12 gap-6">
+    <div className="-m-5 md:-m-8">
       {!is_active && (
-        <div className="col-span-12 rounded-lg bg-red-500 px-5 py-4 text-sm text-light">
-          {t('common:text-permission-message')}
-        </div>
+        <Alert
+          className="mb-4"
+          message={t('common:text-permission-message')}
+          variant="error"
+        />
       )}
-      {/* about Shop */}
-      <div className="order-2 col-span-12 sm:col-span-6 xl:order-1 xl:col-span-4 3xl:col-span-3">
-        <div className="flex flex-col items-center rounded bg-white px-6 py-8">
-          <div className="relative mb-5 h-36 w-36 rounded-full">
-            <div className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-full border border-gray-100">
-              <Image
-                src={logo?.thumbnail ?? '/avatar-placeholder.svg'}
-                fill
-                sizes="(max-width: 768px) 100vw"
-                alt={String(name)}
-                className="object-contain"
-              />
-            </div>
-
-            {is_active ? (
-              <div className="absolute bottom-4 h-5 w-5 overflow-hidden rounded-full bg-light end-2">
-                <CheckMarkFill width={20} className="text-accent me-2" />
+      <div className="relative h-[20rem] bg-white lg:h-[37.5rem]">
+        <Image
+          src={cover_image?.original ?? '/shop-fallback-cover-photo.png'}
+          // fill
+          height={600}
+          width={1200}
+          sizes="(max-width: 768px) 100vw"
+          alt={Object(name)}
+          className="h-full w-full object-cover"
+        />
+      </div>
+      <div className="relative z-10 px-4 lg:px-6 xl:px-10">
+        <div className="-mt-16 flex flex-wrap gap-6 lg:-mt-[6.0625rem] 2xl:flex-nowrap">
+          <div className="shrink-0">
+            <ShopAvatar
+              is_active={is_active}
+              name={name}
+              logo={logo}
+              size="medium"
+            />
+          </div>
+          <div className="flex w-full flex-wrap justify-between self-end 2xl:flex-1">
+            <div className="flex-auto pr-5 xl:flex-1">
+              <div className="mb-3 flex items-center gap-2 text-2xl">
+                {name ? (
+                  <h1 className="font-semibold leading-none text-muted-black">
+                    {name}
+                  </h1>
+                ) : (
+                  ''
+                )}
+                <Link
+                  href={Routes.visitStore(`shops/${slug as string}`)}
+                  target="_blank"
+                  className="text-[#666666] transition-colors duration-300 hover:text-opacity-60"
+                >
+                  <ExternalLinkIcon />
+                </Link>
               </div>
-            ) : (
-              <div className="absolute bottom-4 h-5 w-5 overflow-hidden rounded-full bg-light end-2">
-                <CloseFillIcon width={20} className="text-red-500 me-2" />
+              <div className="flex flex-col space-y-3 divide-[#E7E7E7] leading-none xl:flex-row xl:space-y-0 xl:space-x-5 xl:divide-x">
+                {owner?.email ? (
+                  <ContentListHorizontal
+                    content={owner?.email}
+                    isLink
+                    link={`mailto:${owner?.email}`}
+                  >
+                    <EmailAtIcon />
+                  </ContentListHorizontal>
+                ) : (
+                  ''
+                )}
+
+                {!isEmpty(formatAddress(address!)) ? (
+                  <ContentListHorizontal
+                    content={formatAddress(address!) as string}
+                    className="xl:pl-5"
+                    link={`https://www.google.com/maps/place/${formatAddress(
+                      address!
+                    )}`}
+                    isLink
+                  >
+                    <MapPinIconWithPlatform />
+                  </ContentListHorizontal>
+                ) : (
+                  ''
+                )}
+
+                {phoneNumber ? (
+                  <ContentListHorizontal
+                    content={phoneNumber}
+                    isLink
+                    className="xl:pl-5"
+                    link={`tel:${phoneNumber}`}
+                  >
+                    <PhoneIconNew />
+                  </ContentListHorizontal>
+                ) : (
+                  ''
+                )}
+              </div>
+            </div>
+            {hasAccess(adminAndOwnerOnly, permissions) && (
+              <div className="self-end pt-4 xl:pt-0">
+                <Link
+                  className="inline-flex items-center gap-1 rounded-full bg-accent px-[0.625rem] py-[0.5625rem] text-xs font-medium text-white hover:bg-accent-hover"
+                  href={`/${shop}/edit`}
+                >
+                  <EditFillIcon />
+                  {t('common:text-edit-shop')}
+                </Link>
               </div>
             )}
           </div>
-
-          <h1 className="mb-2 text-xl font-semibold text-heading">{name}</h1>
-          <p className="text-center text-sm text-body">
-            <ReadMore character={70}>{description!}</ReadMore>
-          </p>
-
-          <div className="mt-5 flex w-full justify-start">
-            <span className="mt-0.5 text-muted-light me-2">
-              <MapPin width={16} />
-            </span>
-
-            <address className="flex flex-col text-sm not-italic text-body">
-              {!isEmpty(formatAddress(address!))
-                ? formatAddress(address!)
-                : t('common:text-no-address')}
-            </address>
-          </div>
-
-          <div className="mt-3 flex w-full justify-start">
-            <span className="mt-0.5 text-muted-light me-2">
-              <PhoneIcon width={16} />
-            </span>
-            <a href={`tel:${settings?.contact}`} className="text-sm text-body">
-              {settings?.contact
-                ? settings?.contact
-                : t('common:text-no-contact')}
-            </a>
-          </div>
-
-          <div className="mt-7 grid w-full grid-cols-1">
-            <a
-              href={`${process.env.NEXT_PUBLIC_SHOP_URL}/${locale}/shops/${slug}`}
-              target="_blank"
-              className="inline-flex h-12 flex-shrink-0 items-center justify-center rounded !bg-gray-100 px-5 py-0 !font-normal leading-none !text-heading outline-none transition duration-300 ease-in-out hover:!bg-accent hover:!text-light focus:shadow focus:outline-none focus:ring-1 focus:ring-accent-700"
-              rel="noreferrer"
-            >
-              {t('common:text-visit-shop')}
-            </a>
-          </div>
-        </div>
-      </div>
-
-      {/* Cover Photo */}
-      <div className="relative order-1 col-span-12 h-full min-h-[400px] overflow-hidden rounded bg-light xl:order-2 xl:col-span-8 3xl:col-span-9">
-        <Image
-          src={cover_image?.original ?? '/product-placeholder-borderless.svg'}
-          fill
-          sizes="(max-width: 768px) 100vw"
-          alt={Object(name)}
-          className="object-contain"
-        />
-
-        {hasAccess(adminAndOwnerOnly, permissions) && (
-          <LinkButton
-            size="small"
-            className="absolute top-3 bg-blue-500 shadow-sm hover:bg-blue-600 ltr:right-3 rtl:left-3"
-            href={`/${shop}/edit`}
-          >
-            <EditIcon className="w-4 me-2" /> {t('common:text-edit-shop')}
-          </LinkButton>
-        )}
-      </div>
-
-      {/* Mini Dashboard */}
-      <div className="order-4 col-span-12 xl:order-3 xl:col-span-9">
-        <div className="grid h-full grid-cols-1 gap-5 rounded bg-light p-4 md:grid-cols-3">
-          <div className="space-y-3">
-            <h2 className="text-lg font-semibold text-heading">
-              {t('common:text-products')}
-            </h2>
-
-            <div className="border border-gray-100">
-              <div className="flex items-center border-b border-gray-100 px-4 py-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#FC9EC6] p-3 text-light">
-                  <CubeIcon width={18} />
-                </div>
-
-                <div className="ms-3">
-                  <p className="mb-0.5 text-lg font-semibold text-sub-heading">
-                    {products_count}
-                  </p>
-                  <p className="mt-0 text-sm text-muted">
-                    {t('common:text-total-products')}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center px-4 py-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#6EBBFD] p-3 text-light">
-                  <OrdersIcon width={16} />
-                </div>
-
-                <div className="ms-3">
-                  <p className="mb-0.5 text-lg font-semibold text-sub-heading">
-                    {orders_count}
-                  </p>
-                  <p className="mt-0 text-sm text-muted">
-                    {t('common:text-total-orders')}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            <h2 className="text-lg font-semibold text-heading">
-              {t('common:text-revenue')}
-            </h2>
-
-            <div className="border border-gray-100">
-              <div className="flex items-center border-b border-gray-100 px-4 py-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#C7AF99] p-3 text-light">
-                  <PriceWalletIcon width={16} />
-                </div>
-
-                <div className="ms-3">
-                  <p className="mb-0.5 text-lg font-semibold text-sub-heading">
-                    {totalEarnings}
-                  </p>
-                  <p className="mt-0 text-sm text-muted">
-                    {t('common:text-gross-sales')}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center px-4 py-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#FFA7AE] p-3 text-light">
-                  <DollarIcon width={12} />
-                </div>
-
-                <div className="ms-3">
-                  <p className="mb-0.5 text-lg font-semibold text-sub-heading">
-                    {currentBalance}
-                  </p>
-                  <p className="mt-0 text-sm text-muted">
-                    {t('common:text-current-balance')}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            <h2 className="text-lg font-semibold text-heading">
-              {t('common:text-others')}
-            </h2>
-
-            <div className="border border-gray-100">
-              <div className="flex items-center border-b border-gray-100 px-4 py-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#D59066] p-3 text-light">
-                  <PercentageIcon width={16} />
-                </div>
-
-                <div className="ms-3">
-                  <p className="mb-0.5 text-lg font-semibold text-sub-heading">
-                    {`${balance?.admin_commission_rate ?? 0} %` ?? 'Not Set'}
-                  </p>
-                  <p className="mt-0 text-sm text-muted">
-                    {t('common:text-commission-rate')}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Misc. Information */}
-      <div className="order-3 col-span-12 rounded bg-light sm:col-span-6 xl:order-4 xl:col-span-3">
-        <div className="flex flex-col border-b border-gray-200 p-6 2xl:p-7">
-          <span className="mb-2 text-sm text-muted">
-            {t('common:text-registered-since')}
-          </span>
-          <span className="text-sm font-semibold text-sub-heading">
-            {dayjs(created_at).format('MMMM D, YYYY')}
-          </span>
         </div>
 
-        <div className="flex flex-col p-6 2xl:p-7">
-          <span className="mb-4 text-lg font-semibold text-sub-heading">
-            {t('common:text-payment-info')}
-          </span>
+        {/* shop payment info and description */}
+        <div className="my-10 flex flex-wrap items-stretch gap-4 lg:gap-6 xl:gap-10">
+          <div className="relative w-full shrink-0 overflow-hidden rounded-lg bg-white p-4 lg:w-[18rem] lg:p-6 xl:w-[22.375rem] xl:p-8">
+            <ContentListVertical
+              title={t('common:text-registered-since')}
+              content={dayjs(created_at).format('MMMM D, YYYY')}
+            />
 
-          <div className="flex flex-col space-y-3">
-            <p className="text-sm text-sub-heading">
-              <span className="block w-full text-muted">
-                {t('common:text-name')}:
-              </span>{' '}
-              <span className="font-semibold">
-                {balance?.payment_info?.name}
-              </span>
-            </p>
-            <p className="text-sm text-sub-heading">
-              <span className="block w-full text-muted">
-                {t('common:text-email')}:
-              </span>{' '}
-              <span className="font-semibold">
-                {balance?.payment_info?.email}
-              </span>
-            </p>
-            <p className="text-sm text-sub-heading">
-              <span className="block w-full text-muted">
-                {t('common:text-bank')}:
-              </span>{' '}
-              <span className="font-semibold">
-                {balance?.payment_info?.bank}
-              </span>
-            </p>
-            <p className="text-sm text-sub-heading">
-              <span className="block w-full text-muted">
-                {t('common:text-account-no')}:
-              </span>{' '}
-              <span className="font-semibold">
-                {balance?.payment_info?.account}
-              </span>
-            </p>
+            {description ? (
+              <div className="relative mt-5 pt-5 xl:mt-7 xl:pt-7">
+                <h2 className="mb-4 text-lg font-semibold text-muted-black xl:text-xl">
+                  {t('common:text-bio')}
+                </h2>
+
+                <ShortDescription content={description} character={90} />
+                <div className="absolute top-0 -left-8 w-[calc(100%+64px)] border-b border-dashed border-b-[#F0F0F0]" />
+              </div>
+            ) : (
+              ''
+            )}
+
+            <PaymentInfoList payment={balance?.payment_info as PaymentInfo} />
+          </div>
+
+          {/* Dashboard */}
+          <div className="w-full flex-1 rounded-lg bg-white p-4 lg:p-6 xl:p-7 2xl:p-10">
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 xl:gap-5 2xl:grid-cols-3 2xl:gap-7">
+              <IconCard
+                content={products_count?.toString() as string}
+                title={t('common:text-total-products')}
+                icon="ProductsIcon"
+              />
+              <IconCard
+                content={orders_count?.toString() as string}
+                title={t('common:text-total-orders')}
+                icon="OrdersIcon"
+                iconClassName="text-[#FF8D29]"
+                iconInnerClassName="bg-[#FFF0E2]"
+              />
+              {role !== 'staff' ? (
+                <>
+                  <IconCard
+                    content={`${balance?.admin_commission_rate ?? 0}%`}
+                    title={t('common:text-commission-rate')}
+                    icon="CommissionIcon"
+                    iconClassName="text-[#DF0D00]"
+                    iconInnerClassName="bg-[#FFF7F6]"
+                  />
+                  <IconCard
+                    content={totalEarnings as string}
+                    title={t('common:text-gross-sales')}
+                    icon="GrossSaleIcon"
+                    iconClassName="text-[#00AAFF]"
+                    iconInnerClassName="bg-[#EFFAFF]"
+                  />
+                  <IconCard
+                    content={currentBalance as string}
+                    title={t('common:text-current-balance')}
+                    icon="CurrentBalanceIcon"
+                    iconClassName="text-[#0017E1]"
+                    iconInnerClassName="bg-[#F0F2FF]"
+                  />
+                </>
+              ) : null}
+            </div>
           </div>
         </div>
       </div>

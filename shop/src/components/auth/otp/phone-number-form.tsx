@@ -4,6 +4,8 @@ import { Form } from '@components/ui/forms/form';
 import PhoneInput from '@components/ui/forms/phone-input';
 import * as yup from 'yup';
 import Button from '@components/ui/button';
+import classNames from 'classnames';
+import { twMerge } from 'tailwind-merge';
 
 type FormValues = {
   phone_number: string;
@@ -18,12 +20,14 @@ interface PhoneNumberFormProps {
   phoneNumber?: string;
   isLoading?: boolean;
   view?: 'login';
+  variant?: 'inline' | 'default';
 }
 export default function PhoneNumberForm({
   phoneNumber,
   onSubmit,
   isLoading,
   view,
+  variant = 'default',
 }: PhoneNumberFormProps) {
   const { t } = useTranslation('common');
 
@@ -46,28 +50,53 @@ export default function PhoneNumberForm({
               control={control}
               render={({ field }) => (
                 <PhoneInput
-                  country="in"
-                  inputClass="!p-0 ltr:!pr-4 rtl:!pl-4 ltr:!pl-14 rtl:!pr-14 !flex !items-center !w-full !appearance-none !transition !duration-300 !ease-in-out !text-heading !text-sm focus:!outline-none focus:!ring-0 !border !border-border-base ltr:!border-r-0 rtl:!border-l-0 !rounded ltr:!rounded-r-none rtl:!rounded-l-none focus:!border-accent !h-[52px]"
-                  dropdownClass="focus:!ring-0 !border !border-border-base !shadow-350"
+                  country="us"
+                  inputClass={twMerge(
+                    classNames(
+                      '!p-0 ltr:!pr-4 rtl:!pl-4 ltr:!pl-14 rtl:!pr-14 !flex !items-center !w-full !appearance-none !transition !duration-300 !ease-in-out !text-heading !text-sm focus:!outline-none focus:!ring-0 !border !border-gray-300 !rounded focus:!border-accent !h-[52px]',
+                      variant === 'default'
+                        ? 'ltr:!border-r-0 rtl:!border-l-0 ltr:!rounded-r-none rtl:!rounded-l-none'
+                        : '!h-12'
+                    )
+                  )}
+                  dropdownClass="focus:!ring-0 !border !border-gray-300 !shadow-350"
                   {...field}
+                  disabled={isLoading}
                 />
               )}
             />
-            <Button
-              className="!text-sm ltr:!rounded-l-none rtl:!rounded-r-none grow-0 shrink-0 basis-auto"
-              loading={isLoading}
-              disabled={isLoading}
-            >
-              {view === 'login' ? (
-                t('text-send-otp')
-              ) : (
-                <>
-                  {Boolean(phoneNumber) ? t('text-update') : t('text-add')}{' '}
-                  {t('nav-menu-contact')}
-                </>
-              )}
-            </Button>
+            {variant === 'default' ? (
+              <Button
+                className="!text-sm ltr:!rounded-l-none rtl:!rounded-r-none grow-0 shrink-0 basis-auto"
+                loading={isLoading}
+                disabled={isLoading}
+              >
+                {view === 'login' ? (
+                  t('text-send-otp')
+                ) : (
+                  <>
+                    {Boolean(phoneNumber) ? t('text-update') : t('text-add')}{' '}
+                    {t('nav-menu-contact')}
+                  </>
+                )}
+              </Button>
+            ) : (
+              ''
+            )}
           </div>
+          {variant === 'inline' ? (
+            <div className="text-right mt-6">
+              <Button
+                // className="!text-sm"
+                loading={isLoading}
+                disabled={isLoading}
+              >
+                {t('text-save')}
+              </Button>
+            </div>
+          ) : (
+            ''
+          )}
           {errors?.phone_number?.message && (
             <p className="mt-2 text-xs text-red-500 ltr:text-left rtl:text-right">
               {t(errors?.phone_number.message)}

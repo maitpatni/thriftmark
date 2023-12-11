@@ -8,3 +8,52 @@ export const MapPin = ({ ...props }) => {
     </svg>
   );
 };
+
+
+export const MapPinIcon: React.FC<React.SVGAttributes<{}>> = (props) => {
+  return (
+    <svg
+      width="1em"
+      height="1em"
+      viewBox="0 0 16 16"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <path
+        opacity={0.2}
+        d="M8 1.5a5 5 0 00-5 5c0 4.5 5 8 5 8s5-3.5 5-8a5 5 0 00-5-5zm0 7a2 2 0 110-4 2 2 0 010 4z"
+        fill="currentColor"
+      />
+      <path
+        d="M8 4a2.5 2.5 0 100 5 2.5 2.5 0 000-5zm0 4a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm0-7a5.506 5.506 0 00-5.5 5.5c0 1.963.907 4.043 2.625 6.016.772.891 1.64 1.694 2.59 2.393a.5.5 0 00.574 0c.948-.7 1.816-1.502 2.586-2.393C12.591 10.543 13.5 8.463 13.5 6.5A5.506 5.506 0 008 1zm0 12.875c-1.033-.813-4.5-3.797-4.5-7.375a4.5 4.5 0 019 0c0 3.577-3.467 6.563-4.5 7.375z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+};
+
+export const MapPinIconWithPlatform: React.FC<React.SVGAttributes<{}>> = (
+  props
+) => {
+  return (
+    <svg
+      width="1em"
+      height="1em"
+      viewBox="0 0 16 17"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <path
+        opacity={0.2}
+        d="M8 2a5 5 0 00-5 5c0 4.5 5 8 5 8s5-3.5 5-8a5 5 0 00-5-5zm0 7a2 2 0 110-4 2 2 0 010 4z"
+        fill="currentColor"
+      />
+      <path
+        d="M12.5 14.5H9.409c.519-.464 1.009-.96 1.466-1.484C12.591 11.043 13.5 8.963 13.5 7a5.5 5.5 0 00-11 0c0 1.963.907 4.043 2.625 6.016.457.525.947 1.02 1.466 1.484H3.5a.5.5 0 000 1h9a.5.5 0 000-1zM3.5 7a4.5 4.5 0 019 0c0 3.577-3.467 6.563-4.5 7.375C6.967 13.562 3.5 10.577 3.5 7zm7 0a2.5 2.5 0 10-5 0 2.5 2.5 0 005 0zm-4 0a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+};

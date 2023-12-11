@@ -7,3 +7,8 @@ export { BookIcon } from './book-icon';
 export { MedicineIcon } from './medicine-icon';
 export { Restaurant } from './restaurant-icon';
 export { Bakery } from './bakery-icon';
+export { BabyCare } from './baby-care-icon';
+export { Plant } from './plant-icon';
+export { MicroGreens } from './micro-greens-icon';
+export { HomeAppliance } from './home-appliance-icon';
+export { Gadgets } from './gadgets-icon';

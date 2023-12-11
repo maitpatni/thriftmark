@@ -44,7 +44,6 @@ class Openai extends Base implements AiInterface
 
             return ['status' => 'success', 'result' => $result->message->content];
         } catch (Exception $e) {
-            logger($e);
             throw new HttpException(400, SOMETHING_WENT_WRONG);
         }
     }

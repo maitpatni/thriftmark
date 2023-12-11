@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 trait PaymentTrait
 {
-
+    use OrderStatusManagerWithPaymentTrait;
     /**
      * attachPaymentIntent
      *
@@ -345,6 +345,9 @@ trait PaymentTrait
      */
     public function webhookSuccessResponse($order, $order_status, $payment_status)
     {
+        $isFinal = $this->checkOrderStatusIsFinal($order);
+        if ($isFinal) return;
+
         $order->order_status = $order_status;
         $order->payment_status = $payment_status;
         $order->save();

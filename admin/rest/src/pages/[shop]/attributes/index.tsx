@@ -23,6 +23,8 @@ import { useAttributesQuery } from '@/data/attributes';
 import { Config } from '@/config';
 import { useMeQuery } from '@/data/user';
 import { Routes } from '@/config/routes';
+import PageHeading from '@/components/common/page-heading';
+import cn from 'classnames';
 
 export default function AttributePage() {
   const router = useRouter();
@@ -72,29 +74,27 @@ export default function AttributePage() {
     <>
       <Card className="mb-8 flex flex-col items-center justify-between md:flex-row">
         <div className="mb-4 md:mb-0 md:w-1/4">
-          <h1 className="text-xl font-semibold text-heading">
-            {t('common:sidebar-nav-item-attributes')}
-          </h1>
+          <PageHeading title={t('common:sidebar-nav-item-attributes')} />
         </div>
 
         <div className="flex w-full flex-col items-center ms-auto md:w-3/4 md:flex-row xl:w-2/4">
-          {locale === Config.defaultLanguage && (
-            <LinkButton
-              href={`/${shop}/attributes/create`}
-              className="mt-5 h-12 w-full md:mt-0 md:w-auto md:ms-auto"
-            >
-              <span>
-                + {t('form:button-label-add')} {t('common:attribute')}
-              </span>
-            </LinkButton>
-          )}
+          <LinkButton
+            href={`/${shop}/attributes/create`}
+            className="mt-5 h-12 w-full md:mt-0 md:w-auto md:ms-auto"
+          >
+            <span>
+              + {t('form:button-label-add')} {t('common:attribute')}
+            </span>
+          </LinkButton>
 
           <Button onClick={handleImportModal} className="mt-5 w-full md:hidden">
             {t('common:text-export-import')}
           </Button>
           <button
             onClick={handleImportModal}
-            className="hidden h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gray-50 transition duration-300 ms-6 hover:bg-gray-100 md:flex"
+            className={cn(
+              'hidden h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gray-50 transition duration-300 ms-6 hover:bg-gray-100 md:flex'
+            )}
           >
             <MoreIcon className="w-3.5 text-body" />
           </button>

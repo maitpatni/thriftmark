@@ -19,6 +19,7 @@ import { useState } from 'react';
 import { SortOrder } from '@/types';
 import { Routes } from '@/config/routes';
 import { useMeQuery } from '@/data/user';
+import PageHeading from '@/components/common/page-heading';
 
 export default function WithdrawsPage() {
   const router = useRouter();
@@ -68,9 +69,7 @@ export default function WithdrawsPage() {
     <>
       <Card className="mb-8 flex flex-col items-center justify-between md:flex-row">
         <div className="mb-4 md:mb-0 md:w-1/4">
-          <h1 className="text-lg font-semibold text-heading">
-            {t('common:sidebar-nav-item-withdraws')}
-          </h1>
+          <PageHeading title={t('common:sidebar-nav-item-withdraws')} />
         </div>
 
         <LinkButton

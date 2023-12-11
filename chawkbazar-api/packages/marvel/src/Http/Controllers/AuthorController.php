@@ -13,6 +13,7 @@ use Marvel\Database\Repositories\AuthorRepository;
 use Marvel\Enums\Permission;
 use Marvel\Exceptions\MarvelException;
 use Marvel\Http\Requests\AuthorRequest;
+use Marvel\Http\Resources\AuthorResource;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class AuthorController extends CoreController
@@ -34,7 +35,9 @@ class AuthorController extends CoreController
     public function index(Request $request)
     {
         $limit = $request->limit ?   $request->limit : 15;
-        return $this->fetchAuthors($request)->paginate($limit);
+        $authors = $this->fetchAuthors($request)->paginate($limit);
+        $data = AuthorResource::collection($authors)->response()->getData(true);
+        return formatAPIResourcePaginate($data);
     }
 
     public function fetchAuthors(Request $request)
@@ -71,7 +74,8 @@ class AuthorController extends CoreController
     {
         try {
             $request->slug = $slug;
-            return $this->fetchAuthor($request);
+            $author = $this->fetchAuthor($request);
+            return new AuthorResource($author);
         } catch (MarvelException $th) {
             throw new MarvelException(NOT_FOUND);
         }

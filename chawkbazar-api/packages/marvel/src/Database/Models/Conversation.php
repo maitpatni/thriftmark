@@ -6,7 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class Conversation extends Model
 {
@@ -62,13 +62,16 @@ class Conversation extends Model
 
     public function getUnseenAttribute()
     {
-        $instance = $this->participants()->whereNull('last_read')->where('user_id', auth()->user()->id)->where('type', 'user')->count();
+        if (Auth::check()) {
+            $instance = $this->participants()->whereNull('last_read')->where('user_id', auth()->user()->id)->where('type', 'user')->count();
 
-        if( 0 == $instance) {
-            $instance = $this->participants()->whereNull('last_read')->whereIn('shop_id', auth()->user()->shops()->pluck('id'))->where('type', 'shop')->count();
+            if (0 == $instance) {
+                $instance = $this->participants()->whereNull('last_read')->whereIn('shop_id', auth()->user()->shops()->pluck('id'))->where('type', 'shop')->count();
+            }
+
+            return $instance;
+        } else {
+            return '0';
         }
-
-        return $instance;
     }
-
 }

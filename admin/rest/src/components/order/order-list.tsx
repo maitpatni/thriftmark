@@ -1,27 +1,23 @@
-import Pagination from '@/components/ui/pagination';
-import dayjs from 'dayjs';
-import { Table } from '@/components/ui/table';
 import ActionButtons from '@/components/common/action-buttons';
-import usePrice from '@/utils/use-price';
-import { formatAddress } from '@/utils/format-address';
-import relativeTime from 'dayjs/plugin/relativeTime';
-import utc from 'dayjs/plugin/utc';
-import timezone from 'dayjs/plugin/timezone';
-import { SortOrder, UserAddress } from '@/types';
-import { useTranslation } from 'next-i18next';
-import { useIsRTL } from '@/utils/locals';
-import { useState } from 'react';
-import TitleWithSort from '@/components/ui/title-with-sort';
-import { Order, MappedPaginatorInfo } from '@/types';
-import { useRouter } from 'next/router';
+import Avatar from '@/components/common/avatar';
+import { NoDataFound } from '@/components/icons/no-data-found';
 import StatusColor from '@/components/order/status-color';
 import Badge from '@/components/ui/badge/badge';
-import Button from '@/components/ui/button';
-import { Routes } from '@/config/routes';
-import { ChatIcon } from '@/components/icons/chat';
+import Pagination from '@/components/ui/pagination';
+import { Table } from '@/components/ui/table';
+import TitleWithSort from '@/components/ui/title-with-sort';
 import { useCreateConversations } from '@/data/conversations';
-import { SUPER_ADMIN } from '@/utils/constants';
+import { MappedPaginatorInfo, Order, Product, SortOrder } from '@/types';
 import { getAuthCredentials } from '@/utils/auth-utils';
+import { useIsRTL } from '@/utils/locals';
+import usePrice from '@/utils/use-price';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
+import { useTranslation } from 'next-i18next';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
 
 type IProps = {
   orders: Order[] | undefined;
@@ -42,7 +38,7 @@ const OrderList = ({
   const router = useRouter();
   const { t } = useTranslation();
   const rowExpandable = (record: any) => record.children?.length;
-  const { alignLeft } = useIsRTL();
+  const { alignLeft, alignRight } = useIsRTL();
   const { permissions } = getAuthCredentials();
   const { mutate: createConversations, isLoading: creating } =
     useCreateConversations();
@@ -84,46 +80,52 @@ const OrderList = ({
       title: t('table:table-item-tracking-number'),
       dataIndex: 'tracking_number',
       key: 'tracking_number',
-      align: 'center',
-      width: 150,
+      align: alignLeft,
+      width: 200,
     },
     {
-      title: t('table:table-item-delivery-fee'),
-      dataIndex: 'delivery_fee',
-      key: 'delivery_fee',
-      align: 'center',
-      render: function Render(value: any) {
-        const delivery_fee = value ? value : 0;
-        const { price } = usePrice({
-          amount: delivery_fee,
-        });
-        return <span>{price}</span>;
-      },
-    },
-    {
-      // title: t('table:table-item-total'),
       title: (
         <TitleWithSort
-          title={t('table:table-item-total')}
+          title={t('table:table-item-customer')}
           ascending={
-            sortingObj?.sort === SortOrder?.Asc &&
-            sortingObj?.column === 'total'
+            sortingObj.sort === SortOrder.Asc && sortingObj.column === 'name'
           }
-          isActive={sortingObj?.column === 'total'}
-          className="cursor-pointer"
+          isActive={sortingObj.column === 'name'}
         />
       ),
-      dataIndex: 'total',
-      key: 'total',
+      dataIndex: 'customer',
+      key: 'name',
+      align: alignLeft,
+      width: 250,
+      onHeaderCell: () => onHeaderClick('name'),
+      // render: (logo: any, record: any) => (
+      //   <Image
+      //     src={logo?.thumbnail ?? siteSettings.product.placeholder}
+      //     alt={record?.name}
+      //     width={42}
+      //     height={42}
+      //     className="overflow-hidden rounded"
+      //   />
+      // ),
+      render: (customer: any) => (
+        <div className="flex items-center">
+          {/* <Avatar name={customer.name} src={customer?.profile.avatar.thumbnail} /> */}
+          <Avatar name={customer?.name} />
+          <div className="flex flex-col whitespace-nowrap font-medium ms-2">
+            {customer?.name ? customer?.name : t('common:text-guest')}
+            <span className="text-[13px] font-normal text-gray-500/80">
+              {customer?.email}
+            </span>
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: t('table:table-item-products'),
+      dataIndex: 'products',
+      key: 'products',
       align: 'center',
-      width: 120,
-      onHeaderCell: () => onHeaderClick('total'),
-      render: function Render(value: any) {
-        const { price } = usePrice({
-          amount: value,
-        });
-        return <span className="whitespace-nowrap">{price}</span>;
-      },
+      render: (products: Product) => <span>{products.length}</span>,
     },
     {
       // title: t('table:table-item-order-date'),
@@ -154,29 +156,57 @@ const OrderList = ({
       },
     },
     {
+      title: t('table:table-item-delivery-fee'),
+      dataIndex: 'delivery_fee',
+      key: 'delivery_fee',
+      align: 'center',
+      render: function Render(value: any) {
+        const delivery_fee = value ? value : 0;
+        const { price } = usePrice({
+          amount: delivery_fee,
+        });
+        return <span>{price}</span>;
+      },
+    },
+    {
+      title: (
+        <TitleWithSort
+          title={t('table:table-item-total')}
+          ascending={
+            sortingObj?.sort === SortOrder?.Asc &&
+            sortingObj?.column === 'total'
+          }
+          isActive={sortingObj?.column === 'total'}
+          className="cursor-pointer"
+        />
+      ),
+      dataIndex: 'total',
+      key: 'total',
+      align: 'center',
+      width: 120,
+      onHeaderCell: () => onHeaderClick('total'),
+      render: function Render(value: any) {
+        const { price } = usePrice({
+          amount: value,
+        });
+        return <span className="whitespace-nowrap">{price}</span>;
+      },
+    },
+    {
       title: t('table:table-item-status'),
       dataIndex: 'order_status',
       key: 'order_status',
-      align: alignLeft,
+      align: 'center',
       render: (order_status: string) => (
         <Badge text={t(order_status)} color={StatusColor(order_status)} />
-      ),
-    },
-    {
-      title: t('table:table-item-shipping-address'),
-      dataIndex: 'shipping_address',
-      key: 'shipping_address',
-      align: alignLeft,
-      render: (shipping_address: UserAddress) => (
-        <div>{formatAddress(shipping_address)}</div>
       ),
     },
     {
       title: t('table:table-item-actions'),
       dataIndex: 'id',
       key: 'actions',
-      align: 'center',
-      width: 220,
+      align: alignRight,
+      width: 120,
       render: (id: string, order: Order) => {
         const currentButtonLoading = !!loading && loading === order?.shop_id;
         return (
@@ -190,7 +220,7 @@ const OrderList = ({
                   <button
                     onClick={() => onSubmit(order?.shop_id)}
                     disabled={currentButtonLoading}
-                    className="cursor-pointer text-accent transition-colors duration-300 hover:text-accent-hover"
+                    className="cursor-pointer text-accent transition-colors duration-300 me-1.5 hover:text-accent-hover"
                   >
                     <ChatIcon width="19" height="20" />
                   </button>
@@ -216,7 +246,15 @@ const OrderList = ({
         <Table
           //@ts-ignore
           columns={columns}
-          emptyText={t('table:empty-table-data')}
+          emptyText={() => (
+            <div className="flex flex-col items-center py-7">
+              <NoDataFound className="w-52" />
+              <div className="mb-1 pt-6 text-base font-semibold text-heading">
+                {t('table:empty-table-data')}
+              </div>
+              <p className="text-[13px]">{t('table:empty-table-sorry-text')}</p>
+            </div>
+          )}
           data={orders}
           rowKey="id"
           scroll={{ x: 1000 }}

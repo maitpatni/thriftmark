@@ -12,6 +12,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { Routes } from '@/config/routes';
 import { SortOrder } from '@/types';
 import { adminOnly } from '@/utils/auth-utils';
+import PageHeading from '@/components/common/page-heading';
 
 export default function TaxesPage() {
   const { t } = useTranslation();
@@ -32,11 +33,9 @@ export default function TaxesPage() {
 
   return (
     <>
-      <Card className="mb-8 flex flex-col items-center xl:flex-row">
+      <Card className="mb-8 flex flex-col items-center md:flex-row">
         <div className="mb-4 md:mb-0 md:w-1/4">
-          <h1 className="text-xl font-semibold text-heading">
-            {t('form:input-label-taxes')}
-          </h1>
+          <PageHeading title={t('form:input-label-taxes')} />
         </div>
 
         <div className="flex w-full flex-col items-center space-y-4 ms-auto md:flex-row md:space-y-0 xl:w-1/2">

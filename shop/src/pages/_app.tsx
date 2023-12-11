@@ -34,7 +34,7 @@ import { SettingsProvider } from '@contexts/settings.context';
 import { useSettings } from '@framework/settings';
 import type { NextPage } from 'next';
 import PrivateRoute from '@lib/private-route';
-import SocialLoginProvider from '../providers/social-login-provider';
+import SocialLoginProvider from '@providers/social-login-provider';
 import { SessionProvider } from 'next-auth/react';
 
 function handleExitComplete() {

@@ -1,13 +1,21 @@
-import Container from "@components/ui/container";
-import { getLayout } from "@components/layout/layout";
-// import PageHeader from "@components/ui/page-header";
 import ContactForm from "@components/common/form/contact-form";
+import Subscription from "@components/common/subscription";
+import { getLayout } from "@components/layout/layout";
+import Container from "@components/ui/container";
+import PageHeader from "@components/ui/page-header";
+import ContactInfoBlock from "@containers/contact-info";
+import { useContact } from '@framework/contact';
+import { ContactFormValues } from '@type/index';
 import { useTranslation } from "next-i18next";
-
-export { getStaticProps } from "@framework/common.ssr";
+export { getStaticProps } from '@framework/common.ssr';
 
 export default function ContactUsPage() {
-  const { t } = useTranslation("common");
+  const { t } = useTranslation('common');
+  const { mutate, isLoading } = useContact();
+
+  async function onSubmit(values: ContactFormValues) {
+    await mutate(values);
+  }
   return (
     <>
       {/* <PageHeader pageHeader="text-page-contact-us" /> */}

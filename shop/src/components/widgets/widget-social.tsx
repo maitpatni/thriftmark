@@ -2,9 +2,10 @@ import type { FC } from 'react';
 import { useSettings } from '@contexts/settings.context';
 import Link from 'next/link';
 import { useTranslation } from 'next-i18next';
-import socialIcons from '../icons/social-icon';
+import socialIcons from '@components/icons/social-icon';
 import { Social } from '@type/index';
 import { getIcon } from '@lib/get-icon';
+import { extractEndpoint } from '@lib/use-url';
 
 const WidgetSocial: FC = () => {
   const { t } = useTranslation();
@@ -31,8 +32,9 @@ const WidgetSocial: FC = () => {
             <Link
               href={social.url ? social.url : '#!'}
               className="transition-colors duration-200 hover:text-black textWhiteOverride"
+              target='_blank'
             >
-              {social?.label ? social?.label : social?.url}
+              {extractEndpoint(social?.url)}
             </Link>
           </li>
         ))}

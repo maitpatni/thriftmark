@@ -16,6 +16,7 @@ final class PaymentStatus extends Enum
     public const SUCCESS                = 'payment-success';
     public const FAILED                 = 'payment-failed';
     public const REVERSAL               = 'payment-reversal';
+    public const REFUNDED               = 'payment-refunded';
     public const CASH_ON_DELIVERY       = 'payment-cash-on-delivery';
     public const CASH                   = 'payment-cash';
     public const WALLET                 = 'payment-wallet';

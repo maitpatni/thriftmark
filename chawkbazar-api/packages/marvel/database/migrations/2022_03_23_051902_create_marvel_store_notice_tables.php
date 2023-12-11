@@ -18,24 +18,12 @@ class CreateMarvelStoreNoticeTables extends Migration
 
         Schema::create('store_notices', function (Blueprint $table) {
             $table->id();
-            $table->enum('priority', [
-                StoreNoticePriority::HIGH,
-                StoreNoticePriority::MEDIUM,
-                StoreNoticePriority::LOW,
-            ]);
+            $table->enum('priority', StoreNoticePriority::getValues())->default(StoreNoticePriority::LOW);
             $table->text('notice');
             $table->text('description')->nullable();
             $table->dateTime('effective_from')->default(now());
             $table->dateTime('expired_at');
-            $table->enum(
-                'type',
-                [
-                    StoreNoticeType::ALL_VENDOR,
-                    StoreNoticeType::SPECIFIC_VENDOR,
-                    StoreNoticeType::ALL_SHOP,
-                    StoreNoticeType::SPECIFIC_SHOP,
-                ]
-            );
+            $table->enum('type', StoreNoticeType::getValues());
             $table->foreignId('created_by')->nullable()->references('id')->on('users');
             $table->foreignId('updated_by')->nullable()->references('id')->on('users');
             $table->timestamps();

@@ -12,6 +12,7 @@ extend type Query {
                     "minimum_cart_amount"
                     "expire_at"
                     "active_from"
+                    "id"
                 ]
             )
     ): [Coupon!]! @paginate(defaultCount: 15)

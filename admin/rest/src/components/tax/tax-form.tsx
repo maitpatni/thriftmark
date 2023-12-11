@@ -12,6 +12,7 @@ import {
 import { useTranslation } from 'next-i18next';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { taxValidationSchema } from './tax-validation-schema';
+import StickyFooterPanel from '@/components/ui/sticky-footer-panel';
 
 const defaultValues = {
   name: '',
@@ -34,6 +35,7 @@ export default function CreateOrUpdateTaxForm({ initialValues }: IProps) {
     formState: { errors },
   } = useForm<Tax>({
     shouldUnregister: true,
+    //@ts-ignore
     resolver: yupResolver(taxValidationSchema),
     defaultValues: initialValues ?? defaultValues,
   });
@@ -55,7 +57,7 @@ export default function CreateOrUpdateTaxForm({ initialValues }: IProps) {
   };
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="my-5 flex flex-wrap sm:my-8">
+      <div className="flex flex-wrap my-5 sm:my-8">
         <Description
           title={t('form:form-title-information')}
           details={`${
@@ -73,6 +75,7 @@ export default function CreateOrUpdateTaxForm({ initialValues }: IProps) {
             error={t(errors.name?.message!)}
             variant="outline"
             className="mb-5"
+            required
           />
           <Input
             label={t('form:input-label-tax-rate')}
@@ -81,6 +84,7 @@ export default function CreateOrUpdateTaxForm({ initialValues }: IProps) {
             error={t(errors.rate?.message!)}
             variant="outline"
             className="mb-5"
+            required
           />
           <Input
             label={t('form:input-label-country')}
@@ -113,25 +117,31 @@ export default function CreateOrUpdateTaxForm({ initialValues }: IProps) {
         </Card>
       </div>
 
-      <div className="mb-4 text-end">
-        {initialValues && (
-          <Button
-            variant="outline"
-            onClick={router.back}
-            className="me-4"
-            type="button"
-          >
-            {t('form:button-label-back')}
-          </Button>
-        )}
+      <StickyFooterPanel className="z-0">
+        <div className="text-end">
+          {initialValues && (
+            <Button
+              variant="outline"
+              onClick={router.back}
+              className="text-sm me-4 md:text-base"
+              type="button"
+            >
+              {t('form:button-label-back')}
+            </Button>
+          )}
 
-        <Button loading={creating || updating}>
-          {initialValues
-            ? t('form:button-label-update')
-            : t('form:button-label-add')}{' '}
-          {t('form:button-label-tax')}
-        </Button>
-      </div>
+          <Button
+            loading={creating || updating}
+            disabled={creating || updating}
+            className="text-sm md:text-base"
+          >
+            {initialValues
+              ? t('form:button-label-update')
+              : t('form:button-label-add')}{' '}
+            {t('form:button-label-tax')}
+          </Button>
+        </div>
+      </StickyFooterPanel>
     </form>
   );
 }

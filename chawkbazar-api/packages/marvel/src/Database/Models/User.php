@@ -57,7 +57,6 @@ class User extends Authenticatable implements MustVerifyEmail
         });
     }
 
-
     public function getEmailVerifiedAttribute(): bool
     {
         return $this->hasVerifiedEmail();
@@ -179,5 +178,25 @@ class User extends Authenticatable implements MustVerifyEmail
     public function payment_gateways(): HasMany
     {
         return $this->HasMany(PaymentGateway::class, 'user_id');
+    }
+
+    /**
+     * faqs
+     *
+     * @return HasMany
+     */
+    public function faqs(): HasMany
+    {
+        return $this->HasMany(Faqs::class);
+    }
+
+    /**
+     * terms and conditions
+     *
+     * @return HasMany
+     */
+    public function terms_and_conditions(): HasMany
+    {
+        return $this->HasMany(TermsAndConditions::class);
     }
 }

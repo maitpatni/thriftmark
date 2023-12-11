@@ -10,6 +10,7 @@ import {
   AttachmentInput,
   VariationOption,
   Variation,
+  AttributeValue,
 } from '@/types';
 import groupBy from 'lodash/groupBy';
 import orderBy from 'lodash/orderBy';
@@ -39,6 +40,9 @@ export type ProductFormValues = Omit<
   digital_file_input: AttachmentInput;
   is_digital: boolean;
   slug: string;
+  in_flash_sale: boolean;
+  variations?: AttributeValue[];
+  variation_options?: Variation[];
   // image: AttachmentInput;
 };
 
@@ -192,7 +196,11 @@ export function filterAttributes(attributes: any, variations: any) {
 export function getCartesianProduct(values: any) {
   const formattedValues = values
     ?.map((v: any) =>
-      v?.value?.map((a: any) => ({ name: v?.attribute?.name, value: a?.value }))
+      v?.value?.map((a: any) => ({
+        name: v?.attribute?.name,
+        value: a?.value,
+        id: a?.id,
+      }))
     )
     .filter((i: any) => i !== undefined);
   if (isEmpty(formattedValues)) return [];
@@ -231,6 +239,7 @@ export function getProductInputValues(
     digital_file_input,
     variation_options,
     variations,
+    in_flash_sale,
     ...simpleValues
   } = values;
   // const { locale } = useRouter();
@@ -240,6 +249,7 @@ export function getProductInputValues(
   return {
     ...simpleValues,
     is_digital,
+    in_flash_sale,
     // language: router.locale,
     author_id: author?.id,
     manufacturer_id: manufacturer?.id,

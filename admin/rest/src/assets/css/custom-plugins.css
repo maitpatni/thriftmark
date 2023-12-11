@@ -492,12 +492,14 @@ group
 
 .rc-table tr th,
 .rc-table tr td {
-  @apply border-0 border-b border-border-200 font-body;
+  @apply border-0 font-body;
+}
+.rc-table tr td {
+  @apply border-b border-dashed border-border-200;
 }
 
 .rc-table thead.rc-table-thead th {
-  @apply whitespace-nowrap border-border-200 px-3 py-3 font-body text-sm font-semibold text-heading first:ps-4 last:pe-4;
-  background-color: #f7f8f9;
+  @apply whitespace-nowrap bg-gray-50 px-3 py-3 font-body text-sm font-semibold text-heading first:rounded-tl first:rounded-bl first:ps-5 last:rounded-tr last:rounded-br last:pe-5;
 }
 
 .rc-table tr.rc-table-row:hover {
@@ -505,7 +507,7 @@ group
 }
 
 .rc-table tr.rc-table-row td {
-  @apply cursor-default px-3 py-4 font-body text-sm font-normal text-body first:ps-4 last:pe-4;
+  @apply cursor-default px-3 py-4 font-body text-sm font-normal text-body first:ps-5 last:pe-5;
 }
 .rc-table tr.rc-table-row td.rc-table-cell-row-hover {
   @apply bg-gray-100;
@@ -689,6 +691,36 @@ Overlay Scrollbar - os-theme-thin-dark
   transition: width 0.3s, margin-left 0.3s, background 0.2s;
 }
 
+.sidebar-scrollbar .os-theme-thin-dark > .os-scrollbar-vertical,
+.sidebar-scrollbar
+  .os-theme-thin-dark
+  > .os-scrollbar-vertical
+  > .os-scrollbar-track:before,
+.sidebar-scrollbar
+  .os-theme-thin-dark
+  > .os-scrollbar-vertical
+  > .os-scrollbar-track
+  > .os-scrollbar-handle:before {
+  @apply w-1;
+}
+.sidebar-scrollbar
+  .os-theme-thin-dark
+  > .os-scrollbar-horizontal
+  > .os-scrollbar-track:before,
+.sidebar-scrollbar
+  .os-theme-thin-dark
+  > .os-scrollbar-vertical
+  > .os-scrollbar-track:before {
+  @apply bg-transparent;
+}
+.sidebar-scrollbar
+  .os-theme-thin-dark
+  > .os-scrollbar
+  > .os-scrollbar-track
+  > .os-scrollbar-handle:before {
+  @apply bg-gray-200;
+}
+
 /* Check Box */
 .pb-checkbox {
   position: absolute;
@@ -805,6 +837,32 @@ input[type='number'].number-disable::-webkit-inner-spin-button {
   padding: 0 1px;
 }
 
+.before-border {
+  @apply before:absolute before:inset-y-0 before:left-0 before:my-auto before:h-9 before:w-[1px] before:bg-[#EEEEF1];
+}
+#sold-products-gallery {
+  @apply pb-8;
+}
+#sold-products-gallery .swiper-pagination {
+  @apply -bottom-1;
+}
+#sold-products-gallery .swiper-pagination .swiper-pagination-bullet {
+  @apply cursor-pointer rounded bg-accent;
+}
+#sold-products-gallery
+  .swiper-pagination
+  .swiper-pagination-bullet.swiper-pagination-bullet-active {
+  @apply w-4;
+}
+
+.custom-scrollbar-none::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+}
+.logo-field-area aside > div {
+  @apply px-4;
+}
+
 /* chat message bubble */
 /* .chat-messages .chat-message-item:not(:last-child) > h2,
 .chat-messages .chat-message-item:not(:first-child) > h2 {
@@ -836,3 +894,62 @@ input[type='number'].number-disable::-webkit-inner-spin-button {
 .chat-messages-reverse .chat-message-item:last-child > h2 {
   border-top-right-radius: 0px;
 } */
+
+.flash-sale-table.rc-table thead.rc-table-thead th {
+  @apply bg-[#F9F9F9] text-sm font-normal text-[#666];
+}
+.flash-sale-table.rc-table thead.rc-table-thead th,
+.flash-sale-table.rc-table tr.rc-table-row td {
+  @apply py-[0.5625rem] px-4;
+}
+.flash-sale-table.rc-table tr.rc-table-row td {
+  @apply py-5 text-sm font-medium text-muted-black;
+}
+.flash-sale-table.rc-table tr.rc-table-row:not(:last-child) td {
+  @apply border-b border-b-[#E5E5E5];
+}
+.flash-sale-table.rc-table table {
+  @apply border-separate;
+}
+
+.flash-sale-pagination.rc-pagination .rc-pagination-item {
+  @apply m-0 transition-colors hover:bg-accent-hover;
+}
+
+.flash-sale-pagination.rc-pagination .rc-pagination-next,
+.flash-sale-pagination.rc-pagination .rc-pagination-prev {
+  @apply !m-0;
+}
+
+.flash-sale-pagination.rc-pagination .rc-pagination-item,
+.flash-sale-pagination.rc-pagination .rc-pagination-next,
+.flash-sale-pagination.rc-pagination .rc-pagination-prev {
+  @apply rounded-full border-none bg-transparent text-sm font-medium text-[#666] transition-colors;
+}
+
+.flash-sale-pagination.rc-pagination {
+  @apply gap-1.5;
+}
+
+.flash-sale-pagination.rc-pagination
+  .rc-pagination-item.rc-pagination-item-active {
+  @apply bg-accent;
+}
+.flash-sale-pagination.rc-pagination .rc-pagination-next,
+.flash-sale-pagination.rc-pagination .rc-pagination-prev {
+  @apply bg-[#F9F9F9] text-[#929292];
+}
+.flash-sale-pagination.rc-pagination
+  .rc-pagination-next:not(.rc-pagination-disabled),
+.flash-sale-pagination.rc-pagination
+  .rc-pagination-prev:not(.rc-pagination-disabled) {
+  @apply transition-colors hover:bg-accent hover:text-white;
+}
+
+.flash-sale-pagination.rc-pagination .rc-pagination-item a {
+  @apply transition-colors;
+}
+
+.flash-sale-pagination.rc-pagination .rc-pagination-item:hover a {
+  @apply text-white;
+}

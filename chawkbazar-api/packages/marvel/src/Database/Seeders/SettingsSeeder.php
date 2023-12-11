@@ -7,6 +7,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Cache;
 
 
 class SettingsSeeder extends Seeder
@@ -22,20 +23,28 @@ class SettingsSeeder extends Seeder
         DB::table('settings')->insert([
             'options' => json_encode([
                 "seo" => [
-                    "ogImage" => null,
-                    "ogTitle" => null,
-                    "metaTags" => null,
-                    "metaTitle" => null,
-                    "canonicalUrl" => null,
-                    "ogDescription" => null,
-                    "twitterHandle" => null,
-                    "metaDescription" => null,
-                    "twitterCardType" => null
+                    'ogImage' => null,
+                    'ogTitle' => null,
+                    'metaTags' => null,
+                    'metaTitle' => null,
+                    'canonicalUrl' => null,
+                    'ogDescription' => null,
+                    'twitterHandle' => null,
+                    'metaDescription' => null,
+                    'twitterCardType' => null
                 ],
                 "logo" => [
+
                     "id" => "258",
                     "original" => "https://chawkbazarlaravel.s3.ap-southeast-1.amazonaws.com/258/logo-final2x.png",
-                    "thumbnail" => "https://chawkbazarlaravel.s3.ap-southeast-1.amazonaws.com/258/conversions/logo-final2x-thumbnail.jpg"
+                    "thumbnail" => "https://chawkbazarlaravel.s3.ap-southeast-1.amazonaws.com/258/conversions/logo-final2x-thumbnail.jpg",
+                    'file_name' => 'logo-final2x.png'
+                ],
+                "collapseLogo" => [
+                    'thumbnail' => 'https://pickbazarlaravel.s3.ap-southeast-1.amazonaws.com/2283/conversions/Pickbazar-thumbnail.jpg',
+                    'original' => 'https://pickbazarlaravel.s3.ap-southeast-1.amazonaws.com/2283/Pickbazar.png',
+                    'id' => 2286,
+                    'file_name' => 'Pickbazar.png'
                 ],
                 "useOtp" => false,
                 "currency" => "USD",
@@ -66,25 +75,26 @@ class SettingsSeeder extends Seeder
                 "freeShipping" => false,
                 "signupPoints" => 100,
                 "siteSubtitle" => "Your next ecommerce",
-                "useGoogleMap" => true,
+                "useGoogleMap" => false,
                 "shippingClass" => "1",
                 "contactDetails" => [
                     "contact" => "+129290122122",
                     "socials" => [
                         [
-                            "url" => "https://www.facebook.com/",
+                            "url" => "https://www.facebook.com/redqinc",
                             "icon" => "FacebookIcon"
                         ],
                         [
-                            "url" => "https://twitter.com/home",
+                            "url" => "https://twitter.com/RedqTeam",
                             "icon" => "TwitterIcon"
                         ],
                         [
-                            "url" => null,
+                            "url" => "https://www.instagram.com/redqteam",
                             "icon" => "InstagramIcon"
                         ]
                     ],
                     "website" => "https://redq.io",
+                    "emailAddress" => "demo@demo.com",
                     "location" => [
                         "lat" => 42.9585979,
                         "lng" => -76.9087202,
@@ -106,7 +116,7 @@ class SettingsSeeder extends Seeder
                     "fractions" => 2
                 ],
                 "isProductReview" => false,
-                "useEnableGateway" => true,
+                "useEnableGateway" => false,
                 "useCashOnDelivery" => true,
                 "freeShippingAmount" => 0,
                 "minimumOrderAmount" => 0,
@@ -116,14 +126,19 @@ class SettingsSeeder extends Seeder
                 "defaultPaymentGateway" => "stripe",
                 "StripeCardOnly" => false,
                 "guestCheckout" => true,
-                ...$this->getSmsEmailEvents(),
                 "server_info" => server_environment_info(),
-                "useAi"         => true,
+                "useAi"         => false,
                 "defaultAi" => "openai",
                 "maxShopDistance" => 1000,
                 "mailchimpSubscribeText" => "Thank you for subscribing",
+                "siteLink" =>  "https://chawkbazar.redq.io/",
+                "copyrightText" =>  "Copyright © REDQ. All rights reserved worldwide.",
+                "externalText" =>  "REDQ",
+                "externalLink" =>  "https://redq.io",
+                ...$this->getSmsEmailEvents(),
+
             ]),
-            "language" => "en",
+            "language" => DEFAULT_LANGUAGE ?? "en",
             "created_at" => Carbon::now(),
             "updated_at" => Carbon::now(),
         ]);
@@ -132,7 +147,7 @@ class SettingsSeeder extends Seeder
     /**
      * The function returns an array of SMS and email events with their corresponding recipients and
      * event types.
-     * 
+     *
      * @return array An array containing events for SMS and email notifications for different user
      * roles (admin, vendor, and customer) related to order status changes, refunds, payments, creating
      * questions, creating reviews, and answering questions.
@@ -142,40 +157,47 @@ class SettingsSeeder extends Seeder
         return [
             "smsEvent" => [
                 "admin" => [
-                    "statusChangeOrder" => true,
-                    "refundOrder" => true,
-                    "paymentOrder" => true
+                    "statusChangeOrder" => false,
+                    "refundOrder" => false,
+                    "paymentOrder" => false
                 ],
                 "vendor" => [
-                    "statusChangeOrder" => true,
-                    "paymentOrder" => true,
-                    "refundOrder" => true
+                    "statusChangeOrder" => false,
+                    "paymentOrder" => false,
+                    "refundOrder" => false
                 ],
                 "customer" => [
-                    "statusChangeOrder" => true,
-                    "refundOrder" => true,
-                    "paymentOrder" => true
+                    "statusChangeOrder" => false,
+                    "refundOrder" => false,
+                    "paymentOrder" => false
                 ]
             ],
             "emailEvent" => [
                 "admin" => [
-                    "statusChangeOrder" => true,
-                    "refundOrder" => true,
-                    "paymentOrder" => true
+                    "statusChangeOrder" => false,
+                    "refundOrder" => false,
+                    "paymentOrder" => false
                 ],
                 "vendor" => [
-                    "createQuestion" => true,
-                    "statusChangeOrder" => true,
-                    "refundOrder" => true,
-                    "paymentOrder" => true,
-                    "createReview" => true
+                    "createQuestion" => false,
+                    "statusChangeOrder" => false,
+                    "refundOrder" => false,
+                    "paymentOrder" => false,
+                    "createReview" => false
                 ],
                 "customer" => [
-                    "statusChangeOrder" => true,
-                    "refundOrder" => true,
-                    "paymentOrder" => true,
-                    "answerQuestion" => true
+                    "statusChangeOrder" => false,
+                    "refundOrder" => false,
+                    "paymentOrder" => false,
+                    "answerQuestion" => false
                 ]
+            ],
+            "pushNotification" => [
+                "all" => [
+                    "order" => false,
+                    "message" => false,
+                    "storeNotice" => false
+                ],
             ],
         ];
     }

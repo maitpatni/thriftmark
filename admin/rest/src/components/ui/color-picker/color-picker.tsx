@@ -8,18 +8,19 @@ export interface Props extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   name: string;
   error?: string;
+  children?: React.ReactNode;
 }
 
 const ColorPicker = React.forwardRef<HTMLInputElement, Props>(
   (
     { className, label, name, error, inputClassName, children, ...rest },
-    ref
+    ref,
   ) => {
     return (
       <div className={className}>
         <label
           htmlFor={name}
-          className="block text-body-dark font-semibold text-sm leading-none mb-3"
+          className="block mb-3 text-sm font-semibold leading-none text-body-dark"
         >
           {label}
         </label>
@@ -39,10 +40,10 @@ const ColorPicker = React.forwardRef<HTMLInputElement, Props>(
           />
           {children}
         </div>
-        {error && <p className="my-2 text-xs text-end text-red-500">{error}</p>}
+        {error && <p className="my-2 text-xs text-red-500 text-end">{error}</p>}
       </div>
     );
-  }
+  },
 );
 
 ColorPicker.displayName = 'ColorPicker';

@@ -1,4 +1,4 @@
-import Router,{ useRouter } from 'next/router';
+import Router, { useRouter } from 'next/router';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'next-i18next';

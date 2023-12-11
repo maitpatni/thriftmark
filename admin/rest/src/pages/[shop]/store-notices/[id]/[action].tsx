@@ -13,7 +13,7 @@ import {
   hasAccess,
 } from '@/utils/auth-utils';
 import { useRouter } from 'next/router';
-import shop from '@/components/layouts/shop';
+// import shop from '@/components/layouts/shop';
 import { Routes } from '@/config/routes';
 import { useShopQuery } from '@/data/shop';
 import { useMeQuery } from '@/data/user';
@@ -46,7 +46,7 @@ export default function UpdateStoreNoticePage() {
   }
   return (
     <>
-      <div className="flex py-5 border-b border-dashed border-border-base sm:py-8">
+      <div className="flex border-b border-dashed border-border-base pb-5 md:pb-7">
         <h1 className="text-lg font-semibold text-heading">
           {t('form:form-title-edit-store-notice')}
         </h1>

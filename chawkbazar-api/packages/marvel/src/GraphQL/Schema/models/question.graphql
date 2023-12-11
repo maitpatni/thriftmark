@@ -8,7 +8,7 @@ extend type Query {
     ): [Question!]! @paginate(defaultCount: 15)
     all_questions(
         shop_id: ID @eq
-        orderBy: _ @orderBy(columns: ["created_at"])
+        orderBy: _ @orderBy(columns: ["created_at", "id"])
     ): [Question!]! @paginate(defaultCount: 15)
     myQuestions(
         orderBy: _ @orderBy(columns: ["created_at"])

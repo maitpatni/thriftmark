@@ -18,6 +18,8 @@ use Marvel\Enums\Permission;
 use Marvel\Enums\RefundStatus;
 use Marvel\Exceptions\MarvelException;
 use Marvel\Http\Requests\RefundRequest;
+use Marvel\Http\Resources\GetSingleRefundResource;
+use Marvel\Http\Resources\RefundResource;
 use Marvel\Traits\WalletsTrait;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -42,43 +44,44 @@ class RefundController extends CoreController
     public function index(Request $request)
     {
         $limit = $request->limit;
-        return $this->fetchRefunds($request)->paginate($limit)->withQueryString();
+        $refunds =  $this->fetchRefunds($request)->paginate($limit);
+        $data = RefundResource::collection($refunds)->response()->getData(true);
+        return formatAPIResourcePaginate($data);
     }
-
-    /**
-     * Fetch refunds
-     */
-    // public function fetchRefunds(Request $request)
-    // {
-    //     $language = $request->language ?? DEFAULT_LANGUAGE;
-    //     $user = $request->user();
-
-    //     $orderQuery = $this->repository->whereHas('order', function ($q) use ($language) {
-    //         $q->where('language', $language);
-    //     })->with(['order', 'shop', 'customer']);
-
-    //     if ($user && $user->hasPermissionTo(Permission::SUPER_ADMIN) && (!isset($request->shop_id) || $request->shop_id === 'undefined')) {
-    //         return $orderQuery->where('id', '!=', null)->where('shop_id', '=', null);
-    //     } else if ($this->repository->hasPermission($user, $request->shop_id)) {
-    //         return $orderQuery->where('shop_id', '=', $request->shop_id);
-    //     } else if ($user && $user->hasPermissionTo(Permission::CUSTOMER)) {
-    //         return $orderQuery->where('customer_id', $user->id)->where('shop_id', null);
-    //     }
-    //     throw new MarvelException(NOT_AUTHORIZED);
-    // }
 
     public function fetchRefunds(Request $request)
     {
         try {
+            $language = $request->language ?? DEFAULT_LANGUAGE;
             $user = $request->user();
-            if ($user && $user->hasPermissionTo(Permission::SUPER_ADMIN) && (!isset($request->shop_id) || $request->shop_id === 'undefined')) {
-                return $this->repository->with(['order', 'shop', 'customer'])->where('id', '!=', null)->where('shop_id', '=', null);
-            } else if ($this->repository->hasPermission($user, $request->shop_id)) {
-                return $this->repository->with(['order', 'shop', 'customer'])->where('shop_id', '=', $request->shop_id);
-            } else if ($user && $user->hasPermissionTo(Permission::CUSTOMER)) {
-                return $this->repository->with(['order', 'shop', 'customer'])->where('customer_id', $user->id)->where('shop_id', null);
+            if (!$user) {
+                throw new AuthorizationException(NOT_AUTHORIZED);
             }
-            throw new AuthorizationException(NOT_AUTHORIZED);
+
+            $orderQuery = $this->repository->whereHas('order', function ($q) use ($language) {
+                $q->where('language', $language);
+            });
+
+            switch ($user) {
+                case $user->hasPermissionTo(Permission::SUPER_ADMIN):
+                    if ((!isset($request->shop_id) || $request->shop_id === 'undefined')) {
+                        return $orderQuery->where('id', '!=', null)->where('shop_id', '=', null);
+                    }
+                    return $orderQuery->where('shop_id', '=', $request->shop_id);
+                    break;
+
+                case $this->repository->hasPermission($user, $request->shop_id):
+                    return $orderQuery->where('shop_id', '=', $request->shop_id);
+                    break;
+
+                case $user->hasPermissionTo(Permission::CUSTOMER):
+                    return $orderQuery->where('customer_id', $user->id)->where('shop_id', null);
+                    break;
+
+                default:
+                    return $orderQuery->where('customer_id', $user->id)->where('shop_id', null);
+                    break;
+            }
         } catch (MarvelException $th) {
             throw new MarvelException(SOMETHING_WENT_WRONG);
         }
@@ -112,7 +115,8 @@ class RefundController extends CoreController
     public function show($id)
     {
         try {
-            return $this->repository->with(['shop', 'order', 'customer'])->findOrFail($id);
+            $refund = $this->repository->with(['shop', 'order', 'customer', 'refund_policy','refund_reason'])->findOrFail($id);
+            return new GetSingleRefundResource($refund);
         } catch (MarvelException $e) {
             throw new MarvelException(NOT_FOUND);
         }
@@ -128,7 +132,7 @@ class RefundController extends CoreController
     public function update(Request $request, $id)
     {
         try {
-            $request->id = $id;
+            $request->merge(['id' => $id]);
             return $this->updateRefund($request);
         } catch (MarvelException $th) {
             throw new MarvelException(COULD_NOT_UPDATE_THE_RESOURCE);
@@ -184,7 +188,7 @@ class RefundController extends CoreController
     public function destroy(Request $request, $id)
     {
         try {
-            $request->id = $id;
+            $request->merge(['id' => $id]);
             return $this->deleteRefund($request);
         } catch (MarvelException $th) {
             throw new MarvelException(COULD_NOT_DELETE_THE_RESOURCE);

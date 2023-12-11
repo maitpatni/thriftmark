@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 use Marvel\Database\Models\Settings;
 use Marvel\Database\Repositories\ShopRepository;
+use Marvel\Enums\Role;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class ShopController extends CoreController
@@ -81,8 +82,10 @@ class ShopController extends CoreController
             $shop = $shop->with('balance');
         }
         try {
-            $shop = $shop->findOneByFieldOrFail('slug', $slug);
-            return $shop;
+            return match (true) {
+                is_numeric($slug) => $shop->where('id', $slug)->firstOrFail(),
+                is_string($slug)  => $shop->where('slug', $slug)->firstOrFail(),
+            };
         } catch (MarvelException $e) {
             throw new MarvelException(NOT_FOUND);
         }
@@ -163,6 +166,11 @@ class ShopController extends CoreController
             }
             $shop->is_active = true;
             $shop->save();
+
+            if (Product::count() > 0) {
+                Product::where('shop_id', '=', $id)->update(['status' => 'publish']);
+            }
+
             $balance = Balance::firstOrNew(['shop_id' => $id]);
             $balance->admin_commission_rate = $admin_commission_rate;
             $balance->save();
@@ -209,6 +217,7 @@ class ShopController extends CoreController
                 ]);
 
                 $user->givePermissionTo($permissions);
+                $user->assignRole(Role::STAFF);
 
                 return true;
             }
@@ -395,6 +404,22 @@ class ShopController extends CoreController
             return $near_shop;
         } catch (MarvelException $e) {
             throw new MarvelException(SOMETHING_WENT_WRONG);
+        }
+    }
+
+    /**
+     * newOrInActiveShops
+     *
+     * @param  Request $request
+     * @return Collection|Shop[]
+     */
+    public function newOrInActiveShops(Request $request)
+    {
+        try {
+            $limit = $request->limit ? $request->limit : 15;
+            return $this->repository->withCount(['orders', 'products'])->with(['owner.profile'])->where('is_active', '=', $request->is_active)->paginate($limit)->withQueryString();
+        } catch (MarvelException $e) {
+            throw new MarvelException(SOMETHING_WENT_WRONG, $e->getMessage());
         }
     }
 }

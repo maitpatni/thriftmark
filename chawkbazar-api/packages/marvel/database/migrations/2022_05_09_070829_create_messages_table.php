@@ -48,10 +48,10 @@ class CreateMessagesTable extends Migration
             $table->timestamps();
         });
 
-        Schema::table('user_profiles', function($table) {
+        Schema::table('user_profiles', function ($table) {
             $table->json('notifications')->after('contact')->nullable();
         });
-        Schema::table('shops', function($table) {
+        Schema::table('shops', function ($table) {
             $table->json('notifications')->after('settings')->nullable();
         });
     }
@@ -66,10 +66,10 @@ class CreateMessagesTable extends Migration
         Schema::dropIfExists('conversations');
         Schema::dropIfExists('messages');
         Schema::dropIfExists('participants');
-        Schema::table('user_profiles', function($table) {
+        Schema::table('user_profiles', function ($table) {
             $table->dropColumn('notifications');
         });
-        Schema::table('shops', function($table) {
+        Schema::table('shops', function ($table) {
             $table->dropColumn('notifications');
         });
     }

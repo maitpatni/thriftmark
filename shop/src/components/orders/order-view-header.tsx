@@ -73,7 +73,7 @@ export default function OrderViewHeader({
                 <Badge
                   text={t(order?.payment_status)}
                   color={StatusColor(order?.payment_status)}
-                  className="min-h-[2rem] flex items-center pb-2 text-sm font-semibold !leading-none xs:text-sm"
+                  className="min-h-[2rem] flex items-center text-sm font-semibold !leading-none xs:text-sm"
                 />
               )}
             </div>

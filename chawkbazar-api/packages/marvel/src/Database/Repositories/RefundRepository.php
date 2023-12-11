@@ -7,18 +7,32 @@ use Exception;
 use Marvel\Database\Models\Address;
 use Marvel\Database\Models\Order;
 use Marvel\Database\Models\Refund;
+use Marvel\Enums\OrderStatus;
+use Marvel\Enums\PaymentStatus;
 use Marvel\Enums\Permission;
+use Marvel\Enums\RefundStatus;
 use Marvel\Exceptions\MarvelException;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Prettus\Repository\Exceptions\RepositoryException;
 
 class RefundRepository extends BaseRepository
 {
+    protected $fieldSearchable = [
+        'title',
+        'order_id',
+        'description',
+        'refund_policy_id',
+        'refund_policy.slug',
+        'refund_reason.slug',
+    ];
+
     protected $dataArray = [
         'order_id',
         'images',
         'title',
-        'description'
+        'description',
+        'refund_policy_id',
+        'refund_reason_id'
     ];
     /**
      * Configure the Model
@@ -85,6 +99,12 @@ class RefundRepository extends BaseRepository
         $data = $request->only(['status']);
         $refund->update($data);
         $this->changeShopSpecificRefundStatus($refund->order_id, $data);
+
+        if ($refund['status'] == RefundStatus::APPROVED) {
+            $orderData['order_status'] = OrderStatus::REFUNDED;
+            $orderData['payment_status'] = PaymentStatus::REFUNDED;
+            $this->changeOrderStatus($refund->order_id, $orderData);
+        }
         return $refund;
     }
 
@@ -97,5 +117,12 @@ class RefundRepository extends BaseRepository
         }, $order->children->toArray());
 
         $this->whereIn('order_id',  $childOrderIds)->update($data);
+    }
+
+    private function changeOrderStatus($parentOrderId, array $data)
+    {
+        $parentOrder = Order::findOrFail($parentOrderId);
+        $parentOrder->update($data);
+        Order::where('parent_id', $parentOrder->id)->update($data);
     }
 }

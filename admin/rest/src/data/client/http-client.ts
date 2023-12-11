@@ -22,7 +22,7 @@ Axios.interceptors.request.use((config) => {
   if (cookies) {
     token = JSON.parse(cookies)['token'];
   }
-// @ts-ignore
+  // @ts-ignore
   config.headers = {
     ...config.headers,
     Authorization: `Bearer ${token}`,
@@ -60,6 +60,18 @@ interface SearchParamOptions {
   is_approved: boolean;
   tracking_number: string;
   notice: string;
+  notify_type: string;
+  faq_title: string;
+  is_active: boolean;
+  title: string;
+  status: string;
+  user_id: string;
+  target: string;
+  refund_reason: string;
+  shops: string;
+  'users.id': string;
+  product_type: string;
+  is_read: boolean;
 }
 
 export class HttpClient {
@@ -87,7 +99,15 @@ export class HttpClient {
     return Object.entries(params)
       .filter(([, value]) => Boolean(value))
       .map(([k, v]) =>
-        ['type', 'categories', 'tags', 'author', 'manufacturer'].includes(k)
+        [
+          'type',
+          'categories',
+          'tags',
+          'author',
+          'manufacturer',
+          'shops',
+          'refund_reason',
+        ].includes(k)
           ? `${k}.slug:${v}`
           : ['is_approved'].includes(k)
           ? formatBooleanSearchParam(k, v as boolean)

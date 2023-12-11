@@ -5,7 +5,7 @@ type EventOptions = {
   value: string;
 };
 
-type EventOptionsType = 'admin' | 'vendor' | 'customer';
+type EventOptionsType = 'admin' | 'vendor' | 'customer' | 'all';
 
 /**
  * Format form data before shift to API
@@ -17,11 +17,12 @@ export function formatEventOptions(data: EventOptions[]) {
     admin: {},
     vendor: {},
     customer: {},
+    all: {}
   };
 
   for (const singleData of data) {
     const value = singleData?.value;
-    const search = value?.match(/admin|vendor|customer/);
+    const search = value?.match(/admin|vendor|customer|all/);
 
     if (search) {
       const replaceValue = `^${search[0]}-`;

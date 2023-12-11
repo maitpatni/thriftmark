@@ -31,10 +31,15 @@ use Marvel\Enums\WithdrawStatus;
 use Marvel\Enums\PaymentGatewayType;
 use Marvel\Enums\PaymentStatus;
 use Marvel\Enums\ProductStatus;
+use Marvel\Enums\RefundPolicyStatus;
+use Marvel\Enums\RefundPolicyTarget;
+use Marvel\Enums\Role;
 use Marvel\Payments\Payment;
 use Marvel\Enums\StoreNoticePriority;
 use Marvel\Enums\StoreNoticeType;
 use Marvel\Http\Middleware\EnsureEmailIsVerified;
+use Marvel\Http\Resources\Resource;
+use Marvel\Providers\MarvelBroadcastServiceProvider;
 
 class ShopServiceProvider extends ServiceProvider
 {
@@ -46,6 +51,7 @@ class ShopServiceProvider extends ServiceProvider
         RestApiServiceProvider::class,
         EventServiceProvider::class,
         WhereConditionsServiceProvider::class,
+        MarvelBroadcastServiceProvider::class,
         // Maatwebsite\Excel\ExcelServiceProvider::class,
 
     ];
@@ -68,6 +74,9 @@ class ShopServiceProvider extends ServiceProvider
         PaymentStatus::class,
         ProductStatus::class,
         EventType::class,
+        Role::class,
+        RefundPolicyStatus::class,
+        RefundPolicyTarget::class,
     ];
 
     protected $commandList = [
@@ -83,7 +92,7 @@ class ShopServiceProvider extends ServiceProvider
      */
     protected $routeMiddleware = [
         'role' => \Spatie\Permission\Middlewares\RoleMiddleware::class,
-        'permission' => \Spatie\Permission\Middlewares\PermissionMiddleware::class,
+        'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
         'email.verified' => EnsureEmailIsVerified::class,
     ];
 
@@ -102,6 +111,7 @@ class ShopServiceProvider extends ServiceProvider
         $this->givePermissionToSuperAdmin();
         $this->loadMigrations();
         $this->loadHelpers();
+        Resource::withoutWrapping();
     }
 
     public function loadMigrations()
@@ -117,6 +127,9 @@ class ShopServiceProvider extends ServiceProvider
     {
         if (File::exists(__DIR__ . '/Helpers/helpers.php')) {
             require(__DIR__ . '/Helpers/helpers.php');
+        }
+        if (File::exists(__DIR__ . '/Helpers/ResourceHelpers.php')) {
+            require(__DIR__ . '/Helpers/ResourceHelpers.php');
         }
     }
 
@@ -174,6 +187,7 @@ class ShopServiceProvider extends ServiceProvider
         config([
             'auth' => File::getRequire(__DIR__ . '/../config/auth.php'),
             'cors' => File::getRequire(__DIR__ . '/../config/cors.php'),
+            'cache' => File::getRequire(__DIR__ . '/../config/cache.php'),
             'graphql-playground' => File::getRequire(__DIR__ . '/../config/graphql-playground.php'),
             'laravel-omnipay' => File::getRequire(__DIR__ . '/../config/laravel-omnipay.php'),
             'media-library' => File::getRequire(__DIR__ . '/../config/media-library.php'),
@@ -187,6 +201,7 @@ class ShopServiceProvider extends ServiceProvider
             'paystack' => File::getRequire(__DIR__ . '/../config/paystack.php'),
             'graphiql' => File::getRequire(__DIR__ . '/../config/graphiql.php'),
             'sslcommerz' => File::getRequire(__DIR__ . '/../config/sslcommerz.php'),
+            'broadcasting' => File::getRequire(__DIR__ . '/../config/broadcasting.php')
         ]);
 
         // Register the service the package provides.
@@ -203,7 +218,7 @@ class ShopServiceProvider extends ServiceProvider
             } else {
                 $active_payment_gateway = $settings->options['defaultPaymentGateway'];
             }
-            
+
             try {
                 $gateway = 'Marvel\\Payments\\' . ucfirst($active_payment_gateway);
                 return new Payment($app->make($gateway));
@@ -211,7 +226,6 @@ class ShopServiceProvider extends ServiceProvider
                 $gateway = 'Marvel\\Payments\\' . ucfirst($settings->options['defaultPaymentGateway']);
                 return new Payment($app->make($gateway));
             }
-
         });
 
         $this->app->singleton('ai', function ($app) {

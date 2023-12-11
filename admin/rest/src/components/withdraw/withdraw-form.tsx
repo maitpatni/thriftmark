@@ -16,6 +16,7 @@ import { useShopQuery } from '@/data/shop';
 import { useCreateWithdrawMutation } from '@/data/withdraw';
 import Label from '@/components/ui/label';
 import usePrice from '@/utils/use-price';
+import StickyFooterPanel from '@/components/ui/sticky-footer-panel';
 
 type FormValues = {
   amount: number;
@@ -49,6 +50,7 @@ export default function CreateOrUpdateWithdrawForm({ initialValues }: IProps) {
   } = useForm<FormValues>({
     //@ts-ignore
     defaultValues: initialValues,
+    //@ts-ignore
     resolver: yupResolver(withdrawValidationSchema),
   });
 
@@ -71,7 +73,7 @@ export default function CreateOrUpdateWithdrawForm({ initialValues }: IProps) {
           setErrorMessage(error?.response?.data?.message);
           animateScroll.scrollToTop();
         },
-      }
+      },
     );
   };
 
@@ -79,7 +81,7 @@ export default function CreateOrUpdateWithdrawForm({ initialValues }: IProps) {
     <>
       {errorMessage ? (
         <Alert
-          message={t(`common:${errorMessage}`)}
+          message={t('form:error-insufficient-balance')}
           variant="error"
           closeable={true}
           className="mt-5"
@@ -87,7 +89,7 @@ export default function CreateOrUpdateWithdrawForm({ initialValues }: IProps) {
         />
       ) : null}
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="my-5 flex flex-wrap sm:my-8">
+        <div className="flex flex-wrap my-5 sm:my-8">
           <Description
             title={t('form:input-label-description')}
             details={`${
@@ -101,6 +103,7 @@ export default function CreateOrUpdateWithdrawForm({ initialValues }: IProps) {
           <Card className="w-full sm:w-8/12 md:w-2/3">
             <Label>
               {t('form:input-label-amount')}
+              <span className="ml-0.5 text-red-500">*</span>
               <span className="text-xs text-body">
                 ({t('common:text-available-balance')}:
                 <span className="font-bold text-accent">{shopBalance}</span>)
@@ -119,6 +122,7 @@ export default function CreateOrUpdateWithdrawForm({ initialValues }: IProps) {
               error={t(errors.payment_method?.message!)}
               variant="outline"
               className="mb-5"
+              required
             />
 
             <TextArea
@@ -135,24 +139,30 @@ export default function CreateOrUpdateWithdrawForm({ initialValues }: IProps) {
             />
           </Card>
         </div>
-        <div className="mb-4 text-end">
-          {initialValues && (
-            <Button
-              variant="outline"
-              onClick={router.back}
-              className="me-4"
-              type="button"
-            >
-              {t('form:button-label-back')}
-            </Button>
-          )}
+        <StickyFooterPanel className="z-0">
+          <div className="text-end">
+            {initialValues && (
+              <Button
+                variant="outline"
+                onClick={router.back}
+                className="text-sm me-4 md:text-base"
+                type="button"
+              >
+                {t('form:button-label-back')}
+              </Button>
+            )}
 
-          <Button loading={creating}>
-            {initialValues
-              ? t('form:button-label-update-withdraw')
-              : t('form:button-label-add-withdraw')}
-          </Button>
-        </div>
+            <Button
+              loading={creating}
+              disabled={creating}
+              className="text-sm md:text-base"
+            >
+              {initialValues
+                ? t('form:button-label-update-withdraw')
+                : t('form:button-label-add-withdraw')}
+            </Button>
+          </div>
+        </StickyFooterPanel>
       </form>
     </>
   );

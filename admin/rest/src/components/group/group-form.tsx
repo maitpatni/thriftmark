@@ -25,11 +25,12 @@ import { Config } from '@/config';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { join, split } from 'lodash';
 import { formatSlug } from '@/utils/use-slug';
+import StickyFooterPanel from '@/components/ui/sticky-footer-panel';
 
 export const updatedIcons = typeIconList.map((item: any) => {
   item.label = (
     <div className="flex items-center space-s-5">
-      <span className="flex h-5 w-5 items-center justify-center">
+      <span className="flex items-center justify-center w-5 h-5">
         {getIcon({
           iconList: typeIcons,
           iconName: item.value,
@@ -135,6 +136,7 @@ export default function CreateOrUpdateTypeForm({ initialValues }: IProps) {
     formState: { errors },
   } = useForm<FormValues>({
     shouldUnregister: true,
+    //@ts-ignore
     resolver: yupResolver(typeValidationSchema),
     defaultValues: {
       ...initialValues,
@@ -150,7 +152,7 @@ export default function CreateOrUpdateTypeForm({ initialValues }: IProps) {
       },
       icon: initialValues?.icon
         ? typeIconList.find(
-            (singleIcon) => singleIcon.value === initialValues?.icon
+            (singleIcon) => singleIcon.value === initialValues?.icon,
           )
         : '',
     },
@@ -180,7 +182,7 @@ export default function CreateOrUpdateTypeForm({ initialValues }: IProps) {
           thumbnail,
           original,
           id,
-        })
+        }),
       ),
       banners: values?.banners?.map((banner) => ({
         ...banner,
@@ -209,14 +211,14 @@ export default function CreateOrUpdateTypeForm({ initialValues }: IProps) {
   };
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="my-5 flex flex-wrap sm:my-8">
+      <div className="flex flex-wrap my-5 sm:my-8">
         <Description
           title={t('form:item-description')}
           details={`${
             initialValues
               ? t('form:item-description-update')
               : t('form:item-description-add')
-          } ${t('form:type-description-help-text')}`}
+          } ${t('form:group-description-help-text')}`}
           className="w-full px-0 pb-5 sm:w-4/12 sm:py-8 sm:pe-4 md:w-1/3 md:pe-5"
         />
 
@@ -232,14 +234,14 @@ export default function CreateOrUpdateTypeForm({ initialValues }: IProps) {
           {isSlugEditable ? (
             <div className="relative mb-5">
               <Input
-                label={`${t('Slug')}`}
+                label={t('form:input-label-slug')}
                 {...register('slug')}
                 error={t(errors.slug?.message!)}
                 variant="outline"
                 disabled={isSlugDisable}
               />
               <button
-                className="absolute top-[27px] right-px z-10 flex h-[46px] w-11 items-center justify-center rounded-tr rounded-br border-l border-solid border-border-base bg-white px-2 text-body transition duration-200 hover:text-heading focus:outline-none"
+                className="absolute top-[27px] right-px z-0 flex h-[46px] w-11 items-center justify-center rounded-tr rounded-br border-l border-solid border-border-base bg-white px-2 text-body transition duration-200 hover:text-heading focus:outline-none"
                 type="button"
                 title={t('common:text-edit')}
                 onClick={() => setIsSlugDisable(false)}
@@ -249,7 +251,7 @@ export default function CreateOrUpdateTypeForm({ initialValues }: IProps) {
             </div>
           ) : (
             <Input
-              label={`${t('Slug')}`}
+              label={t('form:input-label-slug')}
               {...register('slug')}
               value={slugAutoSuggest}
               variant="outline"
@@ -271,7 +273,7 @@ export default function CreateOrUpdateTypeForm({ initialValues }: IProps) {
         </Card>
       </div>
 
-      <div className="my-5 flex flex-wrap border-b border-dashed border-border-base pb-8 sm:my-8">
+      <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
         <Description
           title={t('form:group-settings')}
           details={t('form:group-settings-help-text')}
@@ -326,7 +328,7 @@ export default function CreateOrUpdateTypeForm({ initialValues }: IProps) {
       </div>
 
       {layoutType === 'classic' ? (
-        <div className="my-5 flex flex-wrap border-b border-dashed border-border-base pb-8 sm:my-8">
+        <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
           <Description
             title={t('form:promotional-slider')}
             details={t('form:promotional-slider-help-text')}
@@ -338,7 +340,7 @@ export default function CreateOrUpdateTypeForm({ initialValues }: IProps) {
         </div>
       ) : null}
 
-      <div className="my-5 flex flex-wrap sm:my-8">
+      <div className="flex flex-wrap my-5 sm:my-8">
         <Description
           title={t('common:text-banner')}
           details={t('form:banner-slider-help-text')}
@@ -348,10 +350,10 @@ export default function CreateOrUpdateTypeForm({ initialValues }: IProps) {
           <div>
             {fields.map((item: any & { id: string }, index: number) => (
               <div
-                className="border-b border-dashed border-border-200 py-5 first:pt-0 last:border-0 md:py-8"
+                className="py-5 border-b border-dashed border-border-200 first:pt-0 last:border-0 md:py-8"
                 key={item.id}
               >
-                <div className="mb-5 flex items-center justify-between">
+                <div className="flex items-center justify-between mb-5">
                   <Title className="mb-0">
                     {t('common:text-banner')} {index + 1}
                   </Title>
@@ -381,7 +383,7 @@ export default function CreateOrUpdateTypeForm({ initialValues }: IProps) {
                   />
                 </div>
 
-                <div className="mt-5 w-full">
+                <div className="w-full mt-5">
                   <Title>{t('form:input-gallery')}</Title>
                   <FileInput
                     name={`banners.${index}.image`}
@@ -418,24 +420,30 @@ export default function CreateOrUpdateTypeForm({ initialValues }: IProps) {
         </Card>
       </div>
 
-      <div className="mb-4 text-end">
-        {initialValues && (
-          <Button
-            variant="outline"
-            onClick={router.back}
-            className="me-4"
-            type="button"
-          >
-            {t('form:button-label-back')}
-          </Button>
-        )}
+      <StickyFooterPanel className="z-0">
+        <div className="text-end">
+          {initialValues && (
+            <Button
+              variant="outline"
+              onClick={router.back}
+              className="text-sm me-4 md:text-base"
+              type="button"
+            >
+              {t('form:button-label-back')}
+            </Button>
+          )}
 
-        <Button loading={creating || updating}>
-          {initialValues
-            ? t('form:button-label-update-group')
-            : t('form:button-label-add-group')}
-        </Button>
-      </div>
+          <Button
+            loading={creating || updating}
+            disabled={creating || updating}
+            className="text-sm md:text-base"
+          >
+            {initialValues
+              ? t('form:button-label-update-group')
+              : t('form:button-label-add-group')}
+          </Button>
+        </div>
+      </StickyFooterPanel>
     </form>
   );
 }

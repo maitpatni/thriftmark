@@ -24,11 +24,7 @@ class CreateMarvelTables extends Migration
             $table->string('name');
             $table->double('amount');
             $table->string('is_global')->default(true);
-            $table->enum('type', [
-                ShippingType::FIXED,
-                ShippingType::PERCENTAGE,
-                ShippingType::FREE
-            ])->default('fixed');
+            $table->enum('type', ShippingType::getValues())->default(ShippingType::FIXED);
             $table->timestamps();
         });
         Schema::create('coupons', function (Blueprint $table) {
@@ -36,14 +32,7 @@ class CreateMarvelTables extends Migration
             $table->string('code');
             $table->text('description')->nullable();
             $table->json('image')->nullable();
-            $table->enum(
-                'type',
-                [
-                    CouponType::FIXED_COUPON,
-                    CouponType::PERCENTAGE_COUPON,
-                    CouponType::FREE_SHIPPING_COUPON
-                ]
-            )->default(CouponType::DEFAULT_COUPON);
+            $table->enum('type', CouponType::getValues())->default(CouponType::DEFAULT_COUPON);
             $table->float('amount')->default(0);
             $table->float('minimum_cart_amount')->default(0);
             $table->string('active_from');
@@ -108,24 +97,8 @@ class CreateMarvelTables extends Migration
             $table->boolean('is_taxable')->default(false);
             $table->unsignedBigInteger('shipping_class_id')->nullable();
             $table->foreign('shipping_class_id')->references('id')->on('shipping_classes');
-            $table->enum(
-                'status', 
-                [
-                    ProductStatus::UNDER_REVIEW,
-                    ProductStatus::APPROVED,
-                    ProductStatus::REJECTED,
-                    ProductStatus::PUBLISH,
-                    ProductStatus::UNPUBLISH,
-                    ProductStatus::DRAFT,
-                ]
-            )->default(ProductStatus::DRAFT);
-            $table->enum(
-                'product_type',
-                [
-                    ProductType::SIMPLE,
-                    ProductType::VARIABLE,
-                ]
-            )->default(ProductType::SIMPLE);
+            $table->enum('status', ProductStatus::getValues())->default(ProductStatus::DRAFT);
+            $table->enum('product_type', ProductType::getValues())->default(ProductType::SIMPLE);
             $table->string('unit');
             $table->string('height')->nullable();
             $table->string('width')->nullable();
@@ -154,33 +127,8 @@ class CreateMarvelTables extends Migration
             $table->unsignedBigInteger('logistics_provider')->nullable();
             $table->double('delivery_fee')->nullable();
             $table->string('delivery_time')->nullable();
-            $table->enum(
-                'order_status',
-                [
-                    OrderStatus::PENDING,
-                    OrderStatus::PROCESSING,
-                    OrderStatus::COMPLETED,
-                    OrderStatus::REFUNDED,
-                    OrderStatus::FAILED,
-                    OrderStatus::CANCELLED,
-                    OrderStatus::AT_LOCAL_FACILITY,
-                    OrderStatus::OUT_FOR_DELIVERY
-                ]
-            )->default(OrderStatus::DEFAULT_ORDER_STATUS);
-            $table->enum(
-                'payment_status',
-                [
-                    PaymentStatus::PENDING,
-                    PaymentStatus::PROCESSING,
-                    PaymentStatus::SUCCESS,
-                    PaymentStatus::FAILED,
-                    PaymentStatus::REVERSAL,
-                    PaymentStatus::CASH_ON_DELIVERY,
-                    PaymentStatus::CASH,
-                    PaymentStatus::WALLET,
-                    PaymentStatus::AWAITING_FOR_APPROVAL
-                ]
-            )->default(PaymentStatus::DEFAULT_PAYMENT_STATUS);
+            $table->enum('order_status', OrderStatus::getValues())->default(OrderStatus::DEFAULT_ORDER_STATUS);
+            $table->enum('payment_status', PaymentStatus::getValues())->default(PaymentStatus::DEFAULT_PAYMENT_STATUS);
             $table->softDeletes();
             $table->timestamps();
             $table->foreign('customer_id')->references('id')->on('users');

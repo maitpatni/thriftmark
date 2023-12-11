@@ -163,4 +163,132 @@ export const categoryIcons = [
     value: 'Table',
     label: 'Table',
   },
+  {
+    value: 'Diapers',
+    label: 'Diapers',
+  },
+  {
+    value: 'Feeders',
+    label: 'Feeders',
+  },
+  {
+    value: 'HealthProtein',
+    label: 'Health & Protein',
+  },
+  {
+    value: 'BeautyCare',
+    label: 'Beauty Care',
+  },
+  {
+    value: 'Contraceptive',
+    label: 'Contraceptive',
+  },
+  {
+    value: 'FaceSkinCare',
+    label: 'Face & Skin Care',
+  },
+  {
+    value: 'Oral',
+    label: 'Oral',
+  },
+  {
+    value: 'FirstAidKit',
+    label: 'First Aid Kit',
+  },
+  {
+    value: 'Pregnancy',
+    label: 'Pregnancy',
+  },
+  {
+    value: 'FeminineHygiene',
+    label: 'Feminine Hygiene',
+  },
+  {
+    value: 'HealthWellness',
+    label: 'Health & Wellness',
+  },
+  {
+    value: 'BabyCare',
+    label: 'Baby Care',
+  },
+  {
+    value: 'SexualWellbeing',
+    label: 'Sexual Wellbeing',
+  },
+  {
+    value: 'GadgetAccessories',
+    label: 'Gadget Accessories',
+  },
+  {
+    value: 'Console',
+    label: 'Console',
+  },
+  {
+    value: 'Camera',
+    label: 'Camera',
+  },
+  {
+    value: 'Mobile',
+    label: 'Mobile',
+  },
+  {
+    value: 'Router',
+    label: 'Router',
+  },
+  {
+    value: 'SmartWatch',
+    label: 'Smart Watch',
+  },
+  {
+    value: 'Headphone',
+    label: 'Headphone',
+  },
+  {
+    value: 'SoundBox',
+    label: 'Sound Box',
+  },
+  {
+    value: 'Laptop',
+    label: 'Laptop',
+  },
+  {
+    value: 'Monitor',
+    label: 'Monitor',
+  },
+  {
+    value: 'Blender',
+    label: 'Blender',
+  },
+  {
+    value: 'Microwave',
+    label: 'Microwave',
+  },
+  {
+    value: 'WashingMachine',
+    label: 'Washing Machine',
+  },
+  {
+    value: 'Orchid',
+    label: 'Orchid',
+  },
+  {
+    value: 'Succulent',
+    label: 'Succulent',
+  },
+  {
+    value: 'IndoorPlants',
+    label: 'Indoor Plants',
+  },
+  {
+    value: 'Herb',
+    label: 'Herb',
+  },
+  {
+    value: 'Seeds',
+    label: 'Seeds',
+  },
+  {
+    value: 'TinyVeg',
+    label: 'Tiny Veg',
+  },
 ];

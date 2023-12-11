@@ -4,7 +4,6 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Marvel\Enums\RefundStatus;
-use Marvel\Enums\WithdrawStatus;
 
 class CreateWalletTable extends Migration
 {
@@ -36,7 +35,7 @@ class CreateWalletTable extends Migration
         Schema::create('refunds', function (Blueprint $table) {
             $table->id();
             $table->double('amount')->default(0);
-            $table->string('status')->default(RefundStatus::PENDING);
+            $table->enum('status',RefundStatus::getValues())->default(RefundStatus::PENDING);
             $table->string('title')->nullable();
             $table->text('description')->nullable();
             $table->json('images')->nullable();

@@ -37,14 +37,13 @@ class ConversationController extends CoreController
         $conversation = $this->fetchConversations($request);
 
         return $conversation->paginate($limit);
-
     }
 
     public function show($conversation_id)
     {
         $user = Auth::user();
         $conversation = $this->repository->with(['shop', 'user.profile'])->findOrFail($conversation_id);
-        abort_unless($user->shop_id === $conversation->shop_id || in_array( $conversation->shop_id, $user->shops->pluck('id')->toArray()) || $user->id === $conversation->user_id, 404, 'Unauthorized');
+        abort_unless($user->shop_id === $conversation->shop_id || in_array($conversation->shop_id, $user->shops->pluck('id')->toArray()) || $user->id === $conversation->user_id, 404, 'Unauthorized');
 
         return $conversation;
     }
@@ -57,7 +56,7 @@ class ConversationController extends CoreController
      */
     public function fetchConversations(Request $request)
     {
-        return $this->repository->where(function($query) {
+        return $this->repository->where(function ($query) {
             $user = Auth::user();
             $query->where('user_id', $user->id);
             $query->orWhereIn('shop_id', $user->shops->pluck('id'));
@@ -76,15 +75,15 @@ class ConversationController extends CoreController
     public function store(ConversationCreateRequest $request)
     {
         $user = $request->user();
-        if(empty($user)) {
+        if (empty($user)) {
             throw new MarvelException(NOT_AUTHORIZED);
         }
 
         $shop = Shop::findOrFail($request->shop_id);
-        if($shop->owner_id === $request->user()->id) {
+        if ($shop->owner_id === $request->user()->id) {
             throw new MarvelException(YOU_CAN_NOT_SEND_MESSAGE_TO_YOUR_OWN_SHOP);
         }
-        if($request->shop_id === $request->user()->shop_id) {
+        if ($request->shop_id === $request->user()->shop_id) {
             throw new MarvelException(YOU_CAN_NOT_SEND_MESSAGE_TO_YOUR_OWN_SHOP);
         }
         return $this->repository->firstOrCreate([

@@ -17,6 +17,9 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
+import { NoDataFound } from '@/components/icons/no-data-found';
+import Badge from '@/components/ui/badge/badge';
+import StatusColor from '@/components/order/status-color';
 
 dayjs.extend(relativeTime);
 dayjs.extend(utc);
@@ -168,13 +171,20 @@ export default function RefundDetailsView({
 
   return (
     <Card>
+      <div className="mb-6 -mt-5 -ml-5 -mr-5 md:-mr-8 md:-ml-8 md:-mt-8">
+        <div className="bg-[#F7F8FA] px-8 py-4 text-base font-bold text-heading capitalize">
+          <span className="mb-2 block lg:mb-0 lg:inline-block lg:ltr:mr-4 lg:rtl:ml-4">
+            {t('text-refund-status')} :
+          </span>
+          <Badge
+            text={t(refund?.status)}
+            color={StatusColor(refund?.status)}
+          />
+        </div>
+      </div>
       <div className="flex flex-col items-center lg:flex-row">
         <h3 className="mb-8 w-full whitespace-nowrap text-center text-2xl font-semibold text-heading lg:mb-0 lg:w-1/3 lg:text-start">
-          {t('common:text-refund-id')} - {refund?.id} (
-          <span className="inline-block lowercase first-letter:uppercase">
-            {refund?.status}
-          </span>
-          )
+          {t('common:text-refund-id')} - #{refund?.id}
         </h3>
 
         {refund?.status && canChangeStatus && (
@@ -194,12 +204,13 @@ export default function RefundDetailsView({
                   required: t('common:text-status-required'),
                 }}
               />
-              <ValidationError
-                message={
-                  errors?.status?.message &&
-                  t(`common:${errors?.status?.message}`)
-                }
-              />
+              {errors?.status?.message &&
+                <ValidationError
+                  message={
+                    t(`${errors?.status?.message}`)
+                  }
+                />
+              }
             </div>
             <Button
               loading={updating}
@@ -211,81 +222,71 @@ export default function RefundDetailsView({
         )}
       </div>
 
-      <div className="my-10 flex flex-col md:flex-row md:justify-between">
-        <div className="order-1 flex flex-shrink-0 flex-col sm:items-end md:order-2">
-          <p className="mb-5 flex flex-col text-sm text-sub-heading sm:mb-3 sm:flex-row sm:items-center">
-            <span className="mb-2 min-w-[180px] font-semibold sm:mb-0 md:min-w-[110px]">
+      <div className="mt-10 mb-9 md:my-10 flex flex-col">
+        <div className="flex flex-col gap-3.5">
+          <p className="flex flex-col text-sm text-sub-heading sm:flex-row sm:items-center">
+            <span className="mb-2 min-w-[180px] font-medium sm:mb-0">
               {t('common:text-refund-created')}
             </span>
             <span className="mx-2 hidden sm:block">: </span>
-            <span className="capitalize">
+            <span className="md:pl-10 capitalize">
               {dayjs
                 .utc(refund?.order?.created_at)
                 .tz(dayjs.tz.guess())
                 .format('DD MMMM YYYY')}
             </span>
           </p>
-          <p className="mb-5 flex flex-col text-sm text-sub-heading sm:mb-3 sm:flex-row sm:items-center">
-            <span className="mb-2 min-w-[180px] font-semibold sm:mb-0 md:min-w-[110px]">
+          <p className="flex flex-col text-sm text-sub-heading sm:flex-row sm:items-center">
+            <span className="mb-2 min-w-[180px] font-medium sm:mb-0">
               {t('common:text-order-created')}
             </span>
             <span className="mx-2 hidden sm:block">: </span>
-            <span className="capitalize">
+            <span className="md:pl-10 capitalize">
               {dayjs
                 .utc(refund?.order?.created_at)
                 .tz(dayjs.tz.guess())
                 .format('DD MMMM YYYY')}
             </span>
           </p>
-        </div>
-
-        <div className="order-2 flex flex-col md:order-1">
-          <p className="mb-5 flex flex-col text-sm text-sub-heading sm:mb-3 sm:flex-row sm:items-center">
-            <span className="mb-2 min-w-[180px] font-semibold sm:mb-0">
+          <p className="flex flex-col text-sm text-sub-heading sm:flex-row sm:items-center">
+            <span className="mb-2 min-w-[180px] font-medium sm:mb-0">
               {t('table:table-item-tracking-number')}
             </span>
             <span className="mx-2 hidden sm:block">: </span>
-            <span>{refund?.order?.tracking_number}</span>
+            <span className="md:pl-10 capitalize">{refund?.order?.tracking_number}</span>
           </p>
-          <p className="mb-5 flex flex-col text-sm text-sub-heading sm:mb-3 sm:flex-row sm:items-center">
-            <span className="mb-2 min-w-[180px] font-semibold sm:mb-0">
-              {t('common:text-order-status')}
-            </span>
-            <span className="mx-2 hidden sm:block">: </span>
-            <span>{refund?.order?.status?.name}</span>
-          </p>
-          <p className="mb-5 flex flex-col text-sm text-sub-heading sm:mb-3 sm:flex-row sm:items-center">
-            <span className="mb-2 min-w-[180px] font-semibold sm:mb-0">
+          <p className="flex flex-col text-sm text-sub-heading sm:flex-row sm:items-center">
+            <span className="mb-2 min-w-[180px] font-medium sm:mb-0">
               {t('common:text-customer-email')}
             </span>
             <span className="mx-2 hidden sm:block">: </span>
-            <span>{refund?.customer?.email}</span>
+            <span className="md:pl-10 capitalize">{refund?.customer?.email}</span>
           </p>
-          <p className="mb-5 flex flex-col text-sm text-sub-heading sm:mb-3 sm:flex-row sm:items-center">
-            <span className="mb-2 min-w-[180px] font-semibold sm:mb-0">
+          <p className="flex flex-col text-sm text-sub-heading sm:flex-row sm:items-center">
+            <span className="mb-2 min-w-[180px] font-medium sm:mb-0">
               {t('form:input-label-contact')}
             </span>
             <span className="mx-2 hidden sm:block">: </span>
-            <span>{refund?.order?.customer_contact}</span>
+            <span className="md:pl-10 capitalize">{refund?.order?.customer_contact}</span>
           </p>
         </div>
       </div>
 
       {/* Reason with description */}
       <div className="mb-10 flex flex-col">
-        <p className="mb-7 flex flex-col text-sub-heading">
-          <span className="mb-2 font-semibold">{t('common:text-reason')}</span>
-          <span className="text-sm">{refund?.title}</span>
+        <p className="mb-9 flex flex-col text-sub-heading">
+          <span className="mb-3 text-lg font-semibold">{t('common:text-reason')}</span>
+          <span className="text-sm">{refund?.title ?? refund?.refund_reason?.name}</span>
         </p>
-        <p className="mb-7 flex flex-col text-sub-heading">
-          <span className="mb-2 font-semibold">
+        <p className="mb-9 flex flex-col text-sub-heading">
+          <span className="mb-3 text-lg font-semibold">
             {t('form:input-description')}
           </span>
-          <span className="text-sm">{refund?.description}</span>
+          <span className="text-sm leading-[1.8]">{refund?.description}</span>
         </p>
 
         <div className="flex flex-col">
-          <span className="mb-4 font-semibold text-sub-heading">
+          <span className="mb-4 text-lg font-semibold text-sub-heading">
             {t('common:text-images')}
           </span>
           <div className="grid grid-cols-2 gap-5 sm:grid-cols-4 lg:grid-cols-6 3xl:grid-cols-8">
@@ -314,41 +315,51 @@ export default function RefundDetailsView({
       </div>
 
       <div className="mb-10">
-        <span className="mb-4 flex w-56 overflow-hidden font-semibold text-sub-heading">
+        <span className="mb-4 flex w-56 overflow-hidden text-lg font-semibold text-sub-heading">
           {t('common:text-order-details')}
         </span>
         {refund?.order ? (
           <Table
             //@ts-ignore
             columns={columns}
-            emptyText={t('table:empty-table-data')}
+            emptyText={() => (
+              <div className="flex flex-col items-center py-7">
+                <NoDataFound className="w-52" />
+                <div className="mb-1 pt-6 text-base font-semibold text-heading">
+                  {t('table:empty-table-data')}
+                </div>
+                <p className="text-[13px]">
+                  {t('table:empty-table-sorry-text')}
+                </p>
+              </div>
+            )}
             //@ts-ignore
             data={refund?.order?.products!}
             rowKey="id"
-            scroll={{ x: 300, y: 320 }}
+            scroll={{ x: 1000 }}
           />
         ) : (
           <span>{t('common:no-order-found')}</span>
         )}
 
-        <div className="flex w-full flex-col space-y-2 border-t-4 border-double border-border-200 py-4 ms-auto sm:w-1/2 sm:px-4 md:w-1/3">
+        <div className="flex w-full flex-col space-y-2 py-4 ms-auto sm:w-1/2 sm:px-4 md:w-1/3 border-t-4 border-double border-border-200">
           <div className="flex items-center justify-between text-sm text-body">
             <span>{t('common:order-sub-total')}</span>
-            <span>{subtotal}</span>
+            <span className='text-sub-heading font-semibold'>{subtotal}</span>
           </div>
           <div className="flex items-center justify-between text-sm text-body">
             <span>{t('common:order-tax')}</span>
-            <span>{sales_tax}</span>
+            <span className='text-sub-heading font-semibold'>{sales_tax}</span>
           </div>
           <div className="flex items-center justify-between text-sm text-body">
             <span>{t('common:order-delivery-fee')}</span>
-            <span>{delivery_fee}</span>
+            <span className='text-sub-heading font-semibold'>{delivery_fee}</span>
           </div>
           <div className="flex items-center justify-between text-sm text-body">
             <span>{t('common:order-discount')}</span>
-            <span>{discount}</span>
+            <span className='text-sub-heading font-semibold'>{discount}</span>
           </div>
-          <div className="flex items-center justify-between font-semibold text-body">
+          <div className="flex items-center justify-between font-semibold text-sub-heading">
             <span>{t('common:order-total')}</span>
             <span>{total}</span>
           </div>
@@ -362,7 +373,7 @@ export default function RefundDetailsView({
           </h3>
 
           <div className="flex flex-col items-start space-y-1 text-sm text-body">
-            <span>{refund?.order?.customer?.name}</span>
+            <span>{refund?.order?.customer_name}</span>
             {refund?.order?.billing_address && (
               <span>{formatAddress(refund.order.billing_address)}</span>
             )}
@@ -378,7 +389,7 @@ export default function RefundDetailsView({
           </h3>
 
           <div className="flex flex-col items-start space-y-1 text-sm text-body text-start sm:items-end sm:text-end">
-            <span>{refund?.order?.customer?.name}</span>
+            <span>{refund?.order?.customer_name}</span>
             {refund?.order?.shipping_address && (
               <span>{formatAddress(refund.order.shipping_address)}</span>
             )}

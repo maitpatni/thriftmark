@@ -6,6 +6,10 @@ extend type Query {
         sortedBy: String
         language: String
         searchJoin: String = "AND"
+        product_type: String
+        flash_sale_builder: Boolean
+        status: String
+        shop_id: String
     ): [Product]
         @paginate(
             builder: "Marvel\\GraphQL\\Queries\\ProductQuery@fetchProducts"
@@ -44,6 +48,36 @@ extend type Query {
     #     @paginate(defaultCount: 15)
     #     @orderBy(column: "created_at", direction: "DESC")
     product(id: ID @eq, slug: String @eq, language: String @eq): Product @find
+
+    productsStock(
+        language: String!
+        searchJoin: String = "and"
+        search: String
+        name: String
+        type_id: ID
+        shop_id: ID
+        orderBy: String
+        sortedBy: String
+    ): [Product!]!
+        @paginate(
+            builder: "Marvel\\GraphQL\\Queries\\ProductQuery@fetchProductStock"
+            defaultCount: 15
+        )
+
+    productsDraft(
+        language: String!
+        searchJoin: String = "and"
+        search: String
+        name: String
+        type_id: ID
+        shop_id: ID
+        orderBy: String
+        sortedBy: String
+    ): [Product!]!
+        @paginate(
+            builder: "Marvel\\GraphQL\\Queries\\ProductQuery@fetchDraftedProducts"
+            defaultCount: 15
+        )
 }
 
 enum ProductStatus {
@@ -83,6 +117,7 @@ type Variation {
     is_digital: Boolean
     sale_price: Float
     quantity: Int
+    sold_quantity: Int
     options: [VariationOption]
 }
 
@@ -174,6 +209,8 @@ type Product {
     price: Float
     quantity: Int
     unit: String!
+    sold_quantity: Int
+    in_flash_sale: Int
     created_at: DateTime
     updated_at: DateTime
 }
@@ -241,7 +278,7 @@ input CreateProductInput {
     quantity: Int
     product_type: ProductType! @rules(apply: ["required"])
     unit: String! @rules(apply: ["required"])
-    description: String @rules(apply: ["max:1000"])
+    description: String @rules(apply: ["max:10000"])
     categories: [ID!]
     tags: [ID!]
     digital_file: DigitalFileInput
@@ -280,7 +317,7 @@ input UpdateProductInput {
     quantity: Int
     product_type: ProductType! @rules(apply: ["required"])
     unit: String! @rules(apply: ["required"])
-    description: String @rules(apply: ["max:1000"])
+    description: String @rules(apply: ["max:10000"])
     categories: [ID!]
     tags: [ID!]
     digital_file: DigitalFileInput

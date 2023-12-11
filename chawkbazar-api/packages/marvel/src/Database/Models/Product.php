@@ -27,6 +27,7 @@ class Product extends Model
 
     protected $table = 'products';
     protected $metaTable = 'products_meta'; //optional.
+    // protected $disableFluentMeta = true;
     public $hideMeta = true;
 
     protected $casts = [
@@ -284,9 +285,17 @@ class Product extends Model
     public function getSoldAttribute()
     {
         return DB::table('order_product')
-            ->join('orders', 'orders.id', '=' , 'order_product.order_id')
+            ->join('orders', 'orders.id', '=', 'order_product.order_id')
             ->where('order_product.product_id', '=', $this->id)
             ->where('orders.parent_id', '=', null)
             ->sum('order_quantity');
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function flash_sales(): BelongsToMany
+    {
+        return $this->belongsToMany(FlashSale::class, 'flash_sale_products');
     }
 }

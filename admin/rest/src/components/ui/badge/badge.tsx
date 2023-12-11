@@ -1,5 +1,6 @@
 import cn from 'classnames';
 import { useTranslation } from 'next-i18next';
+import { twMerge } from 'tailwind-merge';
 
 type BadgeProps = {
   className?: string;
@@ -22,7 +23,7 @@ const Badge: React.FC<BadgeProps> = (props) => {
   } = props;
 
   const classes = {
-    root: 'px-3 py-1 rounded-full text-xs whitespace-nowrap relative',
+    root: 'px-3 py-1.5 rounded text-xs whitespace-nowrap relative font-medium',
     animate: 'animate-pulse',
     default: 'bg-accent',
     text: 'text-light',
@@ -31,16 +32,19 @@ const Badge: React.FC<BadgeProps> = (props) => {
   return (
     <>
       <span
-        className={cn(
-          classes.root,
-          {
-            [classes.default]: !colorOverride,
-            [classes.text]: !textColorOverride,
-            [classes.animate]: animate,
-          },
-          colorOverride,
-          textColorOverride,
-          className
+        className={twMerge(
+          cn(
+            'inline-block',
+            classes.root,
+            {
+              [classes.default]: !colorOverride,
+              [classes.text]: !textColorOverride,
+              [classes.animate]: animate,
+            },
+            colorOverride,
+            textColorOverride,
+            className
+          )
         )}
       >
         {textKey ? t(textKey) : text}

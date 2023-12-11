@@ -17,6 +17,14 @@ class ProductQuery
     {
         return Shop::call('Marvel\Http\Controllers\ProductController@fetchProducts', $args);
     }
+    public function fetchProductStock($rootValue, array $args, GraphQLContext $context)
+    {
+        return Shop::call('Marvel\Http\Controllers\ProductController@fetchProductStock', $args);
+    }
+    public function fetchDraftedProducts($rootValue, array $args, GraphQLContext $context)
+    {
+        return Shop::call('Marvel\Http\Controllers\ProductController@fetchDraftedProducts', $args);
+    }
     public function fetchDigitalFilesForProduct($rootValue, array $args, GraphQLContext $context)
     {
         $args['parent_id'] = $rootValue->id;

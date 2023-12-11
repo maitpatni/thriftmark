@@ -45,6 +45,18 @@ import {
   WishlistQueryOptions,
   WishlistPaginator,
   Wishlist,
+  TermsAndConditionsQueryOptions,
+  TermsAndConditionsPaginator,
+  FAQS,
+  FaqsQueryOptions,
+  FaqsPaginator,
+  TermsAndConditions,
+  DownloadableFilePaginator,
+  OrderQueryOptions,
+  UpdateEmailUserInput,
+  EmailChangeResponse,
+  Attachment,
+  UpdateUserInput,
 } from '@type/index';
 
 class Client {
@@ -149,6 +161,15 @@ class Client {
 
   user = {
     me: () => HttpClient.get<User>(API_ENDPOINTS.CUSTOMER),
+
+    updateEmail: (input: UpdateEmailUserInput) =>
+      HttpClient.post<EmailChangeResponse>(
+        API_ENDPOINTS.USERS_UPDATE_EMAIL,
+        input
+      ),
+
+    update: (user: UpdateUserInput) =>
+      HttpClient.put<User>(`${API_ENDPOINTS.CUSTOMERS}/${user.id}`, user),
   };
 
   category = {
@@ -242,6 +263,16 @@ class Client {
         payment_gateway,
         recall_gateway,
       }),
+    downloadable: (query?: OrderQueryOptions) =>
+      HttpClient.get<DownloadableFilePaginator>(
+        API_ENDPOINTS.ORDERS_DOWNLOADS,
+        query
+      ),
+    generateDownloadLink: (input: { digital_file_id: string }) =>
+      HttpClient.post<string>(
+        API_ENDPOINTS.GENERATE_DOWNLOADABLE_PRODUCT_LINK,
+        input
+      ),
   };
 
   contact = {
@@ -287,7 +318,7 @@ class Client {
         category,
         tags,
         variations,
-        status,
+        status = 'publish',
         is_active,
         shop_id,
         limit = 30,
@@ -335,6 +366,17 @@ class Client {
   settings = {
     findAll: (params?: SettingsQueryOptions) =>
       HttpClient.get<SettingsResponse>(API_ENDPOINTS.SETTINGS, { ...params }),
+    upload: (input: File[]) => {
+      let formData = new FormData();
+      input.forEach((attachment) => {
+        formData.append('attachment[]', attachment);
+      });
+      return HttpClient.post<Attachment[]>(API_ENDPOINTS.UPLOAD, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+    },
   };
 
   shop = {
@@ -432,6 +474,50 @@ class Client {
       HttpClient.get<boolean>(
         `${API_ENDPOINTS.WISHLIST}/in_wishlist/${product_id}`
       ),
+  };
+  termsAndConditions = {
+    all: ({
+      type,
+      issued_by,
+      shop_id,
+      is_approved,
+      ...params
+    }: Partial<TermsAndConditionsQueryOptions>) => {
+      return HttpClient.get<TermsAndConditionsPaginator>(
+        API_ENDPOINTS.TERMS_AND_CONDITIONS,
+        {
+          searchJoin: 'and',
+          shop_id,
+          ...params,
+          search: HttpClient.stringifySearchQuery({
+            is_approved,
+            shop_id,
+            issued_by,
+          }),
+          with: 'shop',
+        }
+      );
+    },
+    get: (id: string) =>
+      HttpClient.get<TermsAndConditions>(
+        `${API_ENDPOINTS.TERMS_AND_CONDITIONS}/${id}`
+      ),
+  };
+  faqs = {
+    all: ({
+      faq_type,
+      issued_by,
+      shop_id,
+      ...params
+    }: Partial<FaqsQueryOptions>) =>
+      HttpClient.get<FaqsPaginator>(API_ENDPOINTS.FAQS, {
+        ...params,
+        search: HttpClient.stringifySearchQuery({
+          // faq_type,
+          issued_by,
+          shop_id,
+        }),
+      }),
   };
 }
 

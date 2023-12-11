@@ -18,6 +18,7 @@ import { useRouter } from 'next/router';
 import { useShopQuery } from '@/data/shop';
 import { Routes } from '@/config/routes';
 import { useMeQuery } from '@/data/user';
+import PageHeading from '@/components/common/page-heading';
 
 export default function Questions() {
   const [page, setPage] = useState(1);
@@ -60,9 +61,7 @@ export default function Questions() {
     <>
       <Card className="mb-8 flex flex-col">
         <div className="flex w-full flex-col items-center md:flex-row">
-          <h1 className="text-xl font-semibold text-heading">
-            {t('common:sidebar-nav-item-questions')}
-          </h1>
+          <PageHeading title={t('common:sidebar-nav-item-questions')} />
         </div>
       </Card>
       <QuestionList

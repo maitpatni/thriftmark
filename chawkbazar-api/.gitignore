@@ -1,6 +1,7 @@
 /node_modules
 /public/hot
 /public/storage
+/public/license
 /storage/*.key
 /storage/framework/cache
 /storage/debugbar

@@ -28,13 +28,13 @@ class TagCreateRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'        => ['required', 'string'],
-            'slug'        => ['nullable', 'string'],
-            // 'type_id'     => ['required', 'integer'],
-            'icon'        => ['nullable', 'string'],
-            'image'       => ['array'],
-            'details'       => ['nullable', 'string'],
-            'language'     => ['nullable', 'string'],
+            'name'     => ['required', 'string'],
+            'slug'     => ['nullable', 'string'],
+            // 'type_id'  => ['required', 'integer'],
+            'icon'     => ['nullable', 'string'],
+            'image'    => ['nullable', 'array'],
+            'details'  => ['nullable', 'string'],
+            'language' => ['nullable', 'string'],
         ];
     }
 
@@ -46,12 +46,12 @@ class TagCreateRequest extends FormRequest
     public function messages()
     {
         return [
-            'name.required'         => 'Name field is required',
-            'name.string'           => 'Name is not a valid string',
-            'icon.string'           => 'Icon is not a valid string',
-            'image.string'          => 'Image is not a valid image',
-            'details.string'        => 'Details is not a valid string',
-            'parent.integer'        => 'Parent is not a valid integer',
+            'name.required'  => 'Name field is required',
+            'name.string'    => 'Name is not a valid string',
+            'icon.string'    => 'Icon is not a valid string',
+            'image.string'   => 'Image is not a valid image',
+            'details.string' => 'Details is not a valid string',
+            'parent.integer' => 'Parent is not a valid integer',
         ];
     }
 

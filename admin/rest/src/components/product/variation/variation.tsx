@@ -9,6 +9,7 @@ import { AddToCart } from '@/components/cart/add-to-cart/add-to-cart';
 import { useProductQuery } from '@/data/product';
 import { Config } from '@/config';
 import { useRouter } from 'next/router';
+import Loader from '@/components/ui/loader/loader';
 
 interface Props {
   product: any;
@@ -38,8 +39,8 @@ const Variation = ({ product }: Props) => {
       <div className="mb-8 flex items-center justify-center">
         <VariationPrice
           selectedVariation={selectedVariation}
-          minPrice={product.min_price}
-          maxPrice={product.max_price}
+          minPrice={product?.min_price}
+          maxPrice={product?.max_price}
         />
       </div>
       <div className="mb-8">
@@ -62,7 +63,12 @@ const ProductVariation = ({ productSlug }: { productSlug: string }) => {
     language: locale!,
   });
 
-  if (loading || !product) return <div>Loading</div>;
+  if (loading || !product)
+    return (
+      <div className="flex h-48 w-48 items-center justify-center rounded-md bg-white">
+        <Loader />
+      </div>
+    );
   return (
     <AttributesProvider>
       <Variation product={product} />

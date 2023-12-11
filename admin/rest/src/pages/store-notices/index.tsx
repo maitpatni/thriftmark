@@ -3,7 +3,7 @@ import Layout from '@/components/layouts/admin';
 import Search from '@/components/common/search';
 import StoreNoticeList from '@/components/store-notice/store-notice-list';
 import LinkButton from '@/components/ui/link-button';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ErrorMessage from '@/components/ui/error-message';
 import Loader from '@/components/ui/loader/loader';
 import { useTranslation } from 'next-i18next';
@@ -13,10 +13,13 @@ import { adminOnly } from '@/utils/auth-utils';
 import { useStoreNoticesQuery } from '@/data/store-notice';
 import { useRouter } from 'next/router';
 import { Config } from '@/config';
+import PageHeading from '@/components/common/page-heading';
+// import Pusher from 'pusher-js';
 
 export default function StoreNotices() {
   const { t } = useTranslation();
   const { locale } = useRouter();
+  // const [message, setMessage] = useState([]);
   const [orderBy, setOrder] = useState('created_at');
   const [sortedBy, setColumn] = useState<SortOrder>(SortOrder.Desc);
   const [searchTerm, setSearchTerm] = useState('');
@@ -29,6 +32,24 @@ export default function StoreNotices() {
     orderBy,
     sortedBy,
   });
+
+  let allMessage: any = [];
+
+  // useEffect(() => {
+  //   // Enable pusher logging - don't include this in production
+  //   Pusher.logToConsole = true;
+
+  //   const pusher = new Pusher('4ef94e52833c9542eadc', {
+  //     cluster: 'ap2',
+  //   });
+
+  //   const channel = pusher.subscribe('store_notice.created');
+  //   channel.bind('TestPusherEvent', function (data: any) {
+  //     allMessage.push(data);
+  //     setMessage(allMessage);
+  //     alert(JSON.stringify(data));
+  //   });
+  // }, [storeNotices]);
 
   if (loading) return <Loader text={t('common:text-loading')} />;
   if (error) return <ErrorMessage message={error.message} />;
@@ -46,9 +67,7 @@ export default function StoreNotices() {
     <>
       <Card className="mb-8 flex flex-col items-center md:flex-row">
         <div className="mb-4 md:mb-0 md:w-1/4">
-          <h1 className="text-xl font-semibold text-heading">
-            {t('form:input-label-store-notices')}
-          </h1>
+          <PageHeading title={t('form:input-label-store-notices')} />
         </div>
 
         <div className="flex w-full flex-col items-center space-y-4 ms-auto md:w-2/3 md:flex-row md:space-y-0 xl:w-3/4 2xl:w-1/2">

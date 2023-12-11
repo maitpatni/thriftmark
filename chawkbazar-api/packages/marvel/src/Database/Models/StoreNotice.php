@@ -80,11 +80,15 @@ class StoreNotice extends Model
      */
     public function getCreatorRoleAttribute(): string
     {
-        $permissionArr = $this->creator->permissions->pluck('name')->toArray();
-        if (in_array(Permission::SUPER_ADMIN, $permissionArr)) {
-            return ucfirst(str_replace('_', ' ', Permission::SUPER_ADMIN));
+        try {
+            $permissionArr = $this->creator->permissions->pluck('name')->toArray();
+            if (in_array(Permission::SUPER_ADMIN, $permissionArr)) {
+                return ucfirst(str_replace('_', ' ', Permission::SUPER_ADMIN));
+            }
+            return ucfirst(str_replace('_', ' ', Permission::STORE_OWNER));
+        } catch (\Throwable $th) {
+            return '';
         }
-        return ucfirst(str_replace('_', ' ', Permission::STORE_OWNER));
     }
 
     /**
@@ -92,12 +96,16 @@ class StoreNotice extends Model
      */
     public function getIsReadAttribute(): bool
     {
-        $readStatusArr = $this->read_status;
-        foreach ($readStatusArr as $readStatus) {
-            if ($readStatus->id === Auth::id() && $readStatus->pivot->is_read) {
-                return true;
+        try {
+            $readStatusArr = $this->read_status;
+            foreach ($readStatusArr as $readStatus) {
+                if ($readStatus->id === Auth::id() && $readStatus->pivot->is_read) {
+                    return true;
+                }
             }
+            return false;
+        } catch (\Throwable $th) {
+            return false;
         }
-        return false;
     }
 }

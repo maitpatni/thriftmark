@@ -4,7 +4,7 @@ extend type Query {
         language: String @eq
         is_approved: Boolean @eq
         hasType: _ @whereHasConditions(columns: ["slug"])
-        orderBy: _ @orderBy(columns: ["updated_at", "created_at", "name"])
+        orderBy: _ @orderBy(columns: ["updated_at", "created_at", "name", "id"])
     ): [Manufacturer!]! @paginate(defaultCount: 15)
     manufacturer(slug: String @eq, language: String @eq): Manufacturer @find
     topManufacturers(limit: Int = 15, language: String): [Manufacturer!]!

@@ -99,7 +99,6 @@ trait SmsTrait
         } catch (Exception $e) {
             // do nothing
             info('This exception info is from SmsTrait sendSmsOnOrderEvent method');
-            logger($e);
         }
     }
 

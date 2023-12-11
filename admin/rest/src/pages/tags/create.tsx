@@ -8,7 +8,7 @@ export default function CreateCategoriesPage() {
   const { t } = useTranslation();
   return (
     <>
-      <div className="flex border-b border-dashed border-gray-300 py-5 sm:py-8">
+      <div className="flex border-b border-dashed border-gray-300 pb-5 md:pb-7">
         <h1 className="text-lg font-semibold text-heading">
           {t('form:button-label-add-tag')}
         </h1>

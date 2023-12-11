@@ -253,6 +253,31 @@ export declare type Order = {
   payment_status?: string;
   order_status?: string;
 };
+export interface TermsAndConditionsQueryOptions extends QueryOptions {
+  title: string;
+  issued_by: string;
+  type: string;
+  orderBy: string;
+  sortedBy: string;
+  shop_id: string;
+  is_approved: boolean;
+  config: any;
+}
+export interface TermsAndConditions {
+  id: string;
+  translated_languages: string[];
+  title: string;
+  description: string;
+  shop_id?: string;
+  user_id: string;
+  created_at: string;
+  updated_at: string;
+  deleted_at?: string;
+  is_approved?: boolean;
+  issued_by?: string;
+  type?: string;
+  shop?: Shop;
+}
 
 export interface PaymentIntent {
   id: number | string;
@@ -573,18 +598,77 @@ export interface Wishlist {
   user_id: string;
 }
 
-export interface SettingsQueryOptions extends QueryOptions { }
-export interface AttributeQueryOptions extends QueryOptions { }
+export interface SettingsQueryOptions extends QueryOptions {}
+export interface AttributeQueryOptions extends QueryOptions {}
 export interface WishlistQueryOptions extends QueryOptions {
   sortedBy?: string;
   orderBy?: string;
 }
 
-export interface TypePaginator extends PaginatorInfo<Type> { }
-export interface CategoryPaginator extends PaginatorInfo<Category> { }
-export interface CouponPaginator extends PaginatorInfo<Coupon> { }
-export interface OrderPaginator extends PaginatorInfo<Order> { }
-export interface ProductPaginator extends PaginatorInfo<Product> { }
-export interface ShopPaginator extends PaginatorInfo<Shop> { }
-export interface TagPaginator extends PaginatorInfo<Tag> { }
-export interface WishlistPaginator extends PaginatorInfo<Wishlist> { }
+export interface TypePaginator extends PaginatorInfo<Type> {}
+export interface CategoryPaginator extends PaginatorInfo<Category> {}
+export interface CouponPaginator extends PaginatorInfo<Coupon> {}
+export interface OrderPaginator extends PaginatorInfo<Order> {}
+export interface ProductPaginator extends PaginatorInfo<Product> {}
+export interface ShopPaginator extends PaginatorInfo<Shop> {}
+export interface TagPaginator extends PaginatorInfo<Tag> {}
+export interface WishlistPaginator extends PaginatorInfo<Wishlist> {}
+export interface TermsAndConditionsPaginator
+  extends PaginatorInfo<TermsAndConditions> {}
+
+export interface FAQS {
+  id: string;
+  faq_title: string;
+  faq_description: string;
+  slug: string;
+  faq_type: string;
+  issued_by: string;
+  language: string;
+  shop_id?: Shop;
+  user_id: User;
+  translated_languages: string[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface FaqsPaginator extends PaginatorInfo<FAQS> {}
+
+export interface FaqsQueryOptions extends QueryOptions {
+  faq_title?: string;
+  issued_by?: string;
+  faq_type?: string;
+  orderBy?: string;
+  sortedBy?: string;
+  shop_id?: string;
+}
+
+export interface OrderQueryOptions extends QueryOptions {
+  name?: string;
+  orderBy: string;
+}
+
+export interface DigitalFile {
+  id: string;
+  fileable: Product;
+}
+export interface DownloadableFile {
+  id: string;
+  purchase_key: string;
+  digital_file_id: string;
+  customer_id: string;
+  file: DigitalFile;
+  created_at: string;
+  updated_at: string;
+}
+export interface DownloadableFilePaginator
+  extends PaginatorInfo<DownloadableFile> {}
+
+export interface UpdateEmailUserInput {
+  email: string;
+}
+
+export interface EmailChangeResponse extends Success {}
+
+export interface UpdateUserInput extends Partial<User> {
+  id: string;
+}

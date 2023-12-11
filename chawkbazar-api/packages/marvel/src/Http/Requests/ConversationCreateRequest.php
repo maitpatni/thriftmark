@@ -34,7 +34,6 @@ class ConversationCreateRequest extends FormRequest
 
     public function failedValidation(Validator $validator)
     {
-        // TODO: Need to check from the request if it's coming from GraphQL API or not.
         throw new HttpResponseException(response()->json($validator->errors(), 422));
     }
 }

@@ -22,6 +22,7 @@ import { SortOrder } from '@/types';
 import { Config } from '@/config';
 import { useShopQuery } from '@/data/shop';
 import { useMeQuery } from '@/data/user';
+import PageHeading from '@/components/common/page-heading';
 export default function Authors() {
   const router = useRouter();
   const { permissions } = getAuthCredentials();
@@ -72,9 +73,7 @@ export default function Authors() {
     <>
       <Card className="mb-8 flex flex-col items-center xl:flex-row">
         <div className="mb-4 md:w-1/4 xl:mb-0">
-          <h1 className="text-xl font-semibold text-heading">
-            {t('common:text-authors')}
-          </h1>
+          <PageHeading title={t('common:text-authors')} />
         </div>
 
         <div className="flex w-full flex-col items-center space-y-4 ms-auto md:flex-row md:space-y-0 xl:w-1/2">

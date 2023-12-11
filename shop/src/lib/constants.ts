@@ -8,6 +8,9 @@ export const CUSTOMER = 'customer';
 export const CHECKOUT = 'chawkbazar-checkout';
 export const RTL_LANGUAGES: ReadonlyArray<string> = ['ar', 'he'];
 export const EMAIL_VERIFIED = 'EMAIL_VERIFIED';
+export const AUTH_CRED = 'AUTH_CRED_SHOP';
+export const STORE_OWNER = 'store_owner';
+export const STAFF = 'staff';
 
 export const ORDER_STATUS = [
   { name: 'Order Pending', status: 'order-pending', serial: 1 },

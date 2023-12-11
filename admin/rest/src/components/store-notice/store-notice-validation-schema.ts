@@ -8,19 +8,8 @@ export const storeNoticeValidationSchema = yup.object().shape({
   notice: yup.string().required('form:error-notice-title-required'),
   description: yup.string().required('form:error-notice-description-required'),
   effective_from: yup.date().required('form:error-active-date-required'),
-  expired_at: yup
-    .date()
-    .required('form:error-expire-date-required')
-    .when('effective_from', (effective_from, schema) => {
-      if (effective_from) {
-        const dayAfter = new Date(effective_from.getTime() + 86400000);
-
-        return schema.min(dayAfter, 'End date has to be after than start date');
-      }
-
-      return schema;
-    }),
-  received_by: yup.array().when('type', (type, schema) => {
+  expired_at: yup.date().required('form:error-expire-date-required'),
+  received_by: yup.array().when('type', (type: any, schema: any) => {
     if ((type && !typeArr.includes(type.value)) || schema.min() === 0) {
       return yup
         .array()

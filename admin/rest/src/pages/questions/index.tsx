@@ -9,6 +9,7 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useQuestionsQuery } from '@/data/question';
 import { adminOnly } from '@/utils/auth-utils';
+import PageHeading from '@/components/common/page-heading';
 
 export default function Questions() {
   const [page, setPage] = useState(1);
@@ -32,11 +33,9 @@ export default function Questions() {
 
   return (
     <>
-      <Card className="flex flex-col mb-8">
-        <div className="flex flex-col items-center w-full md:flex-row">
-          <h1 className="text-xl font-semibold text-heading">
-            {t('common:sidebar-nav-item-questions')}
-          </h1>
+      <Card className="mb-8 flex flex-col">
+        <div className="flex w-full items-center">
+          <PageHeading title={t('common:sidebar-nav-item-questions')} />
         </div>
       </Card>
       <QuestionList

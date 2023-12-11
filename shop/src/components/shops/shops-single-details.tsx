@@ -11,13 +11,13 @@ import ShopSidebarDrawer from './shop-sidebar-drawer';
 import { Shop } from '@type/index';
 import { productPlaceholder } from '@lib/placeholders';
 import { useTranslation } from 'next-i18next';
-import ShopProductsGrid from '@components/shops/shop-products-grid';
 
 type Props = {
   data: Shop;
+  children: React.ReactNode;
 };
 
-const ShopsSingleDetails: React.FC<Props> = ({ data }) => {
+const ShopsSingleDetails: React.FC<Props> = ({ data, children }) => {
   const { openShop, displayShop, closeShop } = useUI();
   const { locale } = useRouter();
   const { t } = useTranslation();
@@ -70,7 +70,7 @@ const ShopsSingleDetails: React.FC<Props> = ({ data }) => {
               </div>
             )}
 
-            <ShopProductsGrid shopId={data?.id} />
+            {children}
           </div>
         </div>
       </Container>
@@ -78,9 +78,9 @@ const ShopsSingleDetails: React.FC<Props> = ({ data }) => {
         placement={dir === 'rtl' ? 'right' : 'left'}
         open={displayShop}
         onClose={closeShop}
-        handler={false}
-        showMask={true}
-        level={null}
+        // handler={false}
+        // showMask={true}
+        // level={null}
         contentWrapperStyle={contentWrapperCSS}
       >
         <ShopSidebarDrawer data={data} />

@@ -3,7 +3,6 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Marvel\Enums\PaymentGatewayType;
 use Marvel\Enums\WithdrawStatus;
 
 class CreateNewMarvelTables extends Migration
@@ -111,13 +110,7 @@ class CreateNewMarvelTables extends Migration
             $table->foreign('shop_id')->references('id')->on('shops')->onDelete('cascade');
             $table->float('amount');
             $table->string('payment_method')->nullable();
-            $table->enum('status', [
-                WithdrawStatus::APPROVED,
-                WithdrawStatus::PROCESSING,
-                WithdrawStatus::REJECTED,
-                WithdrawStatus::PENDING,
-                WithdrawStatus::ON_HOLD,
-            ])->default(WithdrawStatus::PENDING);
+            $table->enum('status', WithdrawStatus::getValues())->default(WithdrawStatus::PENDING);
             $table->text('details')->nullable();
             $table->text('note')->nullable();
             $table->softDeletes();

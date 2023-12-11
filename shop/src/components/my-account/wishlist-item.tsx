@@ -71,7 +71,7 @@ export default function WishlistItem({ product }: { product: Product }) {
 
       <div className="w-full flex justify-between items-center md:flex-nowrap flex-wrap gap-3 md:gap-0">
         <div className="flex-1">
-          <h2 className="text-lg mb-2 font-semibold text-heading tracking-[-0.18px] hover:text-opacity-80 transition-colors duration-300">
+          <h2 className="md:text-2xl text-lg mb-2 font-semibold text-heading tracking-[-0.18px] hover:text-opacity-80 transition-colors duration-300">
             <Link
               href={`${ROUTES.PRODUCT}/${product?.slug}`}
               locale={product?.language}
@@ -80,7 +80,7 @@ export default function WishlistItem({ product }: { product: Product }) {
             </Link>
           </h2>
 
-          <div className="mb-4 md:text-2xl text-xl flex items-center font-bold gap-2 text-black tracking-[-0.24px] leading-none">
+          <div className="mb-4 text-xl flex items-center font-bold gap-2 text-black tracking-[-0.24px] leading-none">
             {product?.product_type?.toLowerCase() === 'variable' ? (
               <>
                 <span>{minPrice}</span>

@@ -15,7 +15,9 @@ import ReviewCard from './review-card';
 import { useRouter } from 'next/router';
 import TitleWithSort from '@/components/ui/title-with-sort';
 import { StarIcon } from '@/components/icons/star-icon';
+import { NoDataFound } from '@/components/icons/no-data-found';
 import { useModalAction } from '@/components/ui/modal/modal.context';
+import Link from 'next/link';
 
 export type IProps = {
   reviews: Review[] | undefined;
@@ -35,7 +37,6 @@ const ReviewList = ({
   const router = useRouter();
   const { alignLeft } = useIsRTL();
   const { openModal } = useModalAction();
-
   const [sortingObj, setSortingObj] = useState<{
     sort: SortOrder;
     column: string | null;
@@ -68,20 +69,49 @@ const ReviewList = ({
 
   let columns = [
     {
-      title: t('table:table-item-image'),
+      title: (
+        <TitleWithSort
+          title={t('table:table-item-id')}
+          ascending={
+            sortingObj.sort === SortOrder.Asc && sortingObj.column === 'id'
+          }
+          isActive={sortingObj.column === 'id'}
+        />
+      ),
+      className: 'cursor-pointer',
+      dataIndex: 'id',
+      key: 'id',
+      align: alignLeft,
+      width: 120,
+      onHeaderCell: () => onHeaderClick('id'),
+      render: (id: number) => `#${t('table:table-item-id')}: ${id}`,
+    },
+    {
+      title: t('table:table-item-product'),
       dataIndex: 'product',
       key: 'product-image',
       align: alignLeft,
-      width: 120,
+      width: 220,
       render: (product: Product) => (
-        <div className="relative h-[60px] w-[60px]">
-          <Image
-            src={product?.image?.thumbnail ?? siteSettings.product.placeholder}
-            alt={product?.name}
-            fill
-            sizes="(max-width: 768px) 100vw"
-            className="overflow-hidden rounded object-fill"
-          />
+        <div className="flex items-center">
+          <div className="relative aspect-square h-14 w-14 shrink-0 overflow-hidden rounded border border-border-200/80 bg-gray-100 me-2.5">
+            <Image
+              src={
+                product?.image?.thumbnail ?? siteSettings.product.placeholder
+              }
+              alt={product?.name}
+              fill
+              priority={true}
+              sizes="(max-width: 768px) 100vw"
+            />
+          </div>
+          <Link
+            href={`${process.env.NEXT_PUBLIC_SHOP_URL}/products/${product?.slug}`}
+          >
+            <span className="truncate whitespace-nowrap font-medium">
+              {product?.name}
+            </span>
+          </Link>
         </div>
       ),
     },
@@ -89,7 +119,7 @@ const ReviewList = ({
       title: t('table:table-item-customer-review'),
       key: 'review',
       align: alignLeft,
-      width: 650,
+      width: 350,
       render: (record: any) => <ReviewCard review={record} />,
     },
     {
@@ -105,7 +135,7 @@ const ReviewList = ({
       key: 'rating',
       className: 'cursor-pointer',
       align: 'center',
-      width: 300,
+      width: 150,
       onHeaderCell: () => onHeaderClick('rating'),
       render: (record: any) => (
         <div className="inline-flex shrink-0 items-center rounded-full border border-accent px-3 py-0.5 text-base text-accent">
@@ -115,27 +145,10 @@ const ReviewList = ({
       ),
     },
     {
-      title: t('table:table-item-products'),
-      dataIndex: 'product',
-      key: 'product-name',
-      align: alignLeft,
-      width: 300,
-      render: (product: any) => (
-        <a
-          href={`${process.env.NEXT_PUBLIC_SHOP_URL}/${product?.language}/products/${product?.slug}`}
-          className="transition-colors hover:text-accent"
-          target="_blank"
-          rel="noreferrer"
-        >
-          {product?.name}
-        </a>
-      ),
-    },
-    {
       title: t('table:table-item-reports'),
       key: 'report',
       align: 'center',
-      width: 300,
+      width: 150,
       render: (record: any) => {
         if (router.query.shop) {
           return (
@@ -174,6 +187,7 @@ const ReviewList = ({
       dataIndex: 'created_at',
       key: 'created_at',
       align: alignLeft,
+      width: 120,
       onHeaderCell: () => onHeaderClick('created_at'),
       render: (date: string) => {
         dayjs.extend(relativeTime);
@@ -191,7 +205,7 @@ const ReviewList = ({
       dataIndex: 'id',
       key: 'actions',
       align: 'right',
-      width: 90,
+      width: 100,
       render: (id: string) => {
         if (router?.query?.shop) {
           return (
@@ -210,11 +224,18 @@ const ReviewList = ({
         <Table
           //@ts-ignore
           columns={columns}
-          rowClassName="align-top"
-          emptyText={t('table:empty-table-data')}
+          emptyText={() => (
+            <div className="flex flex-col items-center py-7">
+              <NoDataFound className="w-52" />
+              <div className="mb-1 pt-6 text-base font-semibold text-heading">
+                {t('table:empty-table-data')}
+              </div>
+              <p className="text-[13px]">{t('table:empty-table-sorry-text')}</p>
+            </div>
+          )}
           data={reviews}
           rowKey="id"
-          scroll={{ x: 1000 }}
+          scroll={{ x: 1200 }}
         />
       </div>
 

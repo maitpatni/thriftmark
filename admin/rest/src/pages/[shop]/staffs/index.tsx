@@ -19,6 +19,7 @@ import { useState } from 'react';
 import { SortOrder } from '@/types';
 import { Routes } from '@/config/routes';
 import { useMeQuery } from '@/data/user';
+import PageHeading from '@/components/common/page-heading';
 
 export default function StaffsPage() {
   const router = useRouter();
@@ -73,9 +74,7 @@ export default function StaffsPage() {
     <>
       <Card className="mb-8 flex flex-row items-center justify-between">
         <div className="md:w-1/4">
-          <h1 className="text-lg font-semibold text-heading">
-            {t('form:text-staff')}
-          </h1>
+          <PageHeading title={t('form:text-staff')} />
         </div>
 
         <div className="flex w-3/4 items-center ms-auto xl:w-2/4">

@@ -25,23 +25,23 @@ const AddressCard: React.FC<AddressProps> = ({ checked, address, userId }) => {
         {
           'border-accent shadow-sm': checked,
           'border-transparent bg-gray-100': !checked,
-        }
+        },
       )}
     >
-      <p className="mb-3 truncate text-sm font-semibold capitalize text-heading">
+      <p className="mb-3 text-sm font-semibold capitalize truncate text-heading">
         {address.title}
       </p>
-      <p className="group flex flex-col text-sm text-sub-heading">
+      <p className="flex flex-col text-sm group text-sub-heading">
         {formatAddress(address.address)}
       </p>
-      <div className="absolute top-4 flex opacity-0 end-4 space-s-2 group-hover:opacity-100">
+      <div className="absolute flex opacity-0 top-4 end-4 space-s-2 group-hover:opacity-100">
         {onEdit && (
           <button
-            className="flex h-5 w-5 items-center justify-center rounded-full bg-accent text-light"
+            className="flex items-center justify-center w-5 h-5 rounded-full bg-accent text-light"
             onClick={onEdit}
           >
             <span className="sr-only">{t('text-edit')}</span>
-            <PencilIcon className="h-3 w-3" />
+            {/* <PencilIcon className="w-3 h-3" /> */}
           </button>
         )}
       </div>

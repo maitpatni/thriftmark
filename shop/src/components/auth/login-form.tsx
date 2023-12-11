@@ -1,6 +1,6 @@
 import { useForm } from 'react-hook-form';
 // @ts-ignore
-import { ImGoogle2 } from "react-icons/im";
+// import { ImGoogle2 } from "react-icons/im";
 import { ImFacebook2 } from 'react-icons/im';
 import { useTranslation } from 'next-i18next';
 import * as yup from 'yup';

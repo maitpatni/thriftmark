@@ -1,19 +1,21 @@
 /** @type {import('next').NextConfig} */
-const runtimeCaching = require('next-pwa/cache');
-const { i18n } = require('./next-i18next.config');
-const withPWA = require('next-pwa')({
-  disable: process.env.NODE_ENV === 'development',
-  dest: 'public',
-  runtimeCaching,
-});
 
-module.exports = withPWA({
+const { i18n } = require('./next-i18next.config');
+
+// const runtimeCaching = require('next-pwa/cache');
+// const withPWA = require('next-pwa')({
+//   disable: process.env.NODE_ENV === 'development',
+//   dest: 'public',
+//   runtimeCaching,
+// });
+
+const nextConfig = {
   basePath: "/admin",
   reactStrictMode: true,
   i18n,
   images: {
     domains: [
-      'thriftmark.in',
+'thriftmark.in',
       'via.placeholder.com',
       'res.cloudinary.com',
       's3.amazonaws.com',
@@ -36,4 +38,6 @@ module.exports = withPWA({
       ignoreDuringBuilds: true,
     },
   }),
-});
+};
+
+module.exports = nextConfig

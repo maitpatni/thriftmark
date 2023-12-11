@@ -1,5 +1,7 @@
+import classNames from 'classnames';
 import cn from 'classnames';
 import React, { TextareaHTMLAttributes } from 'react';
+import { twMerge } from 'tailwind-merge';
 
 export interface Props extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   className?: string;
@@ -9,7 +11,7 @@ export interface Props extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   error?: string;
   shadow?: boolean;
   variant?: 'normal' | 'solid' | 'outline';
-  disabled?: boolean
+  disabled?: boolean;
 }
 
 const classes = {
@@ -49,16 +51,21 @@ const TextArea = React.forwardRef<HTMLTextAreaElement, Props>((props, ref) => {
   );
 
   return (
-    <div className={className}>
+    <div className={twMerge(classNames(className))}>
       {label && (
-        <label className="block text-body-dark font-semibold text-sm leading-none mb-3">
+        <label className="mb-3 block text-sm font-semibold leading-none text-body-dark">
           {label}
         </label>
       )}
       <textarea
         id={name}
         name={name}
-        className={`${rootClassName} ${disabled ? 'cursor-not-allowed bg-[#EEF1F4] border-[#D4D8DD]' : ''}`}
+        className={twMerge(
+          classNames(
+            rootClassName,
+            disabled ? 'cursor-not-allowed border-[#D4D8DD] bg-[#EEF1F4]' : ''
+          )
+        )}
         autoComplete="off"
         autoCorrect="off"
         autoCapitalize="off"
@@ -68,7 +75,11 @@ const TextArea = React.forwardRef<HTMLTextAreaElement, Props>((props, ref) => {
         disabled={disabled}
         {...rest}
       />
-      {error && <p className="my-2 text-xs text-end text-red-500">{error}</p>}
+      {error && (
+        <p className="my-2 text-xs text-red-500 ltr:text-left rtl:text-right">
+          {error}
+        </p>
+      )}
     </div>
   );
 });

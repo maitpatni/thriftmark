@@ -15,6 +15,7 @@ use Marvel\Mail\ForgetPassword;
 use Illuminate\Support\Facades\Mail;
 use Marvel\Database\Models\Address;
 use Marvel\Database\Models\Profile;
+use Marvel\Database\Models\Settings;
 use Marvel\Database\Models\Shop;
 use Marvel\Exceptions\MarvelException;
 
@@ -129,7 +130,7 @@ class UserRepository extends BaseRepository
 
     public function updateEmail($request): array
     {
-        $user =$request->user();
+        $user = $request->user();
         $user->email = $request->email;
         $user->email_verified_at = null;
         $user->save();
@@ -137,4 +138,10 @@ class UserRepository extends BaseRepository
         return ['message' => EMAIL_UPDATED_SUCCESSFULLY, 'status' => 'success'];
     }
 
+    public function checkIfApplicationIsValid(): bool
+    {
+        $settings = Settings::getData();
+        $useMustVerifyLicense = isset($settings->options['app_settings']['trust']) ? $settings->options['app_settings']['trust'] : false;
+        return $useMustVerifyLicense;
+    }
 }

@@ -23,42 +23,19 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "paths": {
-      "@components/*": [
-        "src/components/*"
-      ],
-      "@containers/*": [
-        "src/containers/*"
-      ],
-      "@contexts/*": [
-        "src/contexts/*"
-      ],
-      "@framework/*": [
-        "src/framework/rest/*"
-      ],
-      "@lib/*": [
-        "src/lib/*"
-      ],
-      "@settings/*": [
-        "src/settings/*"
-      ],
-      "@styles/*": [
-        "src/styles/*"
-      ],
-      "@utils/*": [
-        "src/utils/*"
-      ],
-      "@store/*": [
-        "src/store/*"
-      ],
-      "@assets/*": [
-        "src/assets/*"
-      ],
-      "@data/*": [
-        "src/data/*"
-      ],
-      "@type/*": [
-        "src/types/*"
-      ]
+      "@components/*": ["src/components/*"],
+      "@containers/*": ["src/containers/*"],
+      "@contexts/*": ["src/contexts/*"],
+      "@framework/*": ["src/framework/rest/*"],
+      "@lib/*": ["src/lib/*"],
+      "@settings/*": ["src/settings/*"],
+      "@styles/*": ["src/styles/*"],
+      "@utils/*": ["src/utils/*"],
+      "@store/*": ["src/store/*"],
+      "@assets/*": ["src/assets/*"],
+      "@data/*": ["src/data/*"],
+      "@type/*": ["src/types/*"],
+      "@providers/*": ["src/providers/*"]
     },
     "incremental": true
   },

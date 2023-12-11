@@ -16,6 +16,7 @@ import {
   useOrderQuery,
   useUpdateOrderMutation,
 } from '@/data/order';
+import { NoDataFound } from '@/components/icons/no-data-found';
 import { siteSettings } from '@/settings/site.settings';
 import { Attachment, OrderStatus, PaymentStatus } from '@/types';
 import { formatAddress } from '@/utils/format-address';
@@ -30,6 +31,8 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { useFormatPhoneNumber } from '@/utils/format-phone-number';
+import { useShopQuery } from '@/data/shop';
 
 type FormValues = {
   order_status: any;
@@ -59,7 +62,7 @@ export default function OrderDetailsPage() {
       isRTL,
       language: locale!,
     },
-    { enabled: false }
+    { enabled: true }
   );
 
   const {
@@ -123,6 +126,10 @@ export default function OrderDetailsPage() {
     (initial = 0, p) => initial + parseInt(p?.pivot?.order_quantity!),
     0
   );
+
+  const phoneNumber = useFormatPhoneNumber({
+    customer_contact: order?.customer_contact as string,
+  });
 
   if (loading) return <Loader text={t('common:text-loading')} />;
   if (error) return <ErrorMessage message={error.message} />;
@@ -205,34 +212,37 @@ export default function OrderDetailsPage() {
             {t('form:input-label-order-id')} - {order?.tracking_number}
           </h3>
 
-          {order?.order_status !== OrderStatus.FAILED &&
-            order?.order_status !== OrderStatus.CANCELLED && (
-              <form
-                onSubmit={handleSubmit(ChangeStatus)}
-                className="flex w-full items-start ms-auto lg:w-2/4"
-              >
-                <div className="z-20 w-full me-5">
-                  <SelectInput
-                    name="order_status"
-                    control={control}
-                    getOptionLabel={(option: any) => t(option.name)}
-                    getOptionValue={(option: any) => option.status}
-                    options={ORDER_STATUS.slice(1, 6)}
-                    placeholder={t('form:input-placeholder-order-status')}
-                  />
+          {![
+            OrderStatus.FAILED,
+            OrderStatus.CANCELLED,
+            OrderStatus.REFUNDED,
+          ].includes(order?.order_status! as OrderStatus) && (
+            <form
+              onSubmit={handleSubmit(ChangeStatus)}
+              className="flex w-full items-start ms-auto lg:w-2/4"
+            >
+              <div className="z-20 w-full me-5">
+                <SelectInput
+                  name="order_status"
+                  control={control}
+                  getOptionLabel={(option: any) => t(option.name)}
+                  getOptionValue={(option: any) => option.status}
+                  options={ORDER_STATUS.slice(0, 6)}
+                  placeholder={t('form:input-placeholder-order-status')}
+                />
 
-                  <ValidationError message={t(errors?.order_status?.message)} />
-                </div>
-                <Button loading={updating}>
-                  <span className="hidden sm:block">
-                    {t('form:button-label-change-status')}
-                  </span>
-                  <span className="block sm:hidden">
-                    {t('form:button-label-change')}
-                  </span>
-                </Button>
-              </form>
-            )}
+                <ValidationError message={t(errors?.order_status?.message)} />
+              </div>
+              <Button loading={updating}>
+                <span className="hidden sm:block">
+                  {t('form:button-label-change-status')}
+                </span>
+                <span className="block sm:hidden">
+                  {t('form:form:button-label-change')}
+                </span>
+              </Button>
+            </form>
+          )}
         </div>
 
         <div className="my-5 flex items-center justify-center lg:my-10">
@@ -247,7 +257,17 @@ export default function OrderDetailsPage() {
             <Table
               //@ts-ignore
               columns={columns}
-              emptyText={t('table:empty-table-data')}
+              emptyText={() => (
+                <div className="flex flex-col items-center py-7">
+                  <NoDataFound className="w-52" />
+                  <div className="mb-1 pt-6 text-base font-semibold text-heading">
+                    {t('table:empty-table-data')}
+                  </div>
+                  <p className="text-[13px]">
+                    {t('table:empty-table-sorry-text')}
+                  </p>
+                </div>
+              )}
               data={order?.products!}
               rowKey="id"
               scroll={{ x: 300 }}
@@ -311,6 +331,19 @@ export default function OrderDetailsPage() {
           )}
         </div>
 
+        {order?.note ? (
+          <div>
+            <h2 className="mt-12 mb-5 text-xl font-bold text-heading">
+              Purchase Note
+            </h2>
+            <div className="mb-12 flex items-start rounded border border-gray-700 bg-gray-100 p-4">
+              {order?.note}
+            </div>
+          </div>
+        ) : (
+          ''
+        )}
+
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between">
           <div className="mb-10 w-full sm:mb-0 sm:w-1/2 sm:pe-8">
             <h3 className="mb-3 border-b border-border-200 pb-2 font-semibold text-heading">
@@ -338,9 +371,7 @@ export default function OrderDetailsPage() {
               {order?.billing_address && (
                 <span>{formatAddress(order.billing_address)}</span>
               )}
-              {order?.customer_contact && (
-                <span>{order?.customer_contact}</span>
-              )}
+              {order?.customer_contact && <span>{phoneNumber}</span>}
             </div>
           </div>
 
@@ -354,9 +385,7 @@ export default function OrderDetailsPage() {
               {order?.shipping_address && (
                 <span>{formatAddress(order.shipping_address)}</span>
               )}
-              {order?.customer_contact && (
-                <span>{order?.customer_contact}</span>
-              )}
+              {order?.customer_contact && <span>{phoneNumber}</span>}
             </div>
           </div>
         </div>

@@ -13,6 +13,8 @@ import { Config } from '@/config';
 import Link from '@/components/ui/link';
 import { Routes } from '@/config/routes';
 import LanguageSwitcher from '@/components/ui/lang-action/action';
+import { NoDataFound } from '@/components/icons/no-data-found';
+import { siteSettings } from '@/settings/site.settings';
 
 export type IProps = {
   categories: Category[] | undefined;
@@ -31,7 +33,6 @@ const CategoryList = ({
   const { t } = useTranslation();
   const rowExpandable = (record: any) => record.children?.length;
   const { alignLeft, alignRight } = useIsRTL();
-
   const [sortingObj, setSortingObj] = useState<{
     sort: SortOrder;
     column: string | null;
@@ -61,7 +62,8 @@ const CategoryList = ({
       dataIndex: 'id',
       key: 'id',
       align: alignLeft,
-      width: 60,
+      width: 120,
+      render: (id: number) => `#${t('table:table-item-id')}: ${id}`,
     },
     {
       title: (
@@ -106,7 +108,7 @@ const CategoryList = ({
                 layout="fixed"
                 width={40}
                 height={40}
-                className="overflow-hidden rounded-lg bg-gray-300 object-contain"
+                className="overflow-hidden h-10 w-10 rounded-lg bg-gray-300 object-contain"
                 key={`brand-image-${index}`}
               />
             ))}
@@ -119,7 +121,7 @@ const CategoryList = ({
       dataIndex: 'banner_image',
       key: 'banner_image',
       align: 'center',
-      width: 140,
+      width: 100,
       render: (banner_image: Attachment[]) => {
         if (!banner_image?.length) return null;
         return (
@@ -131,8 +133,8 @@ const CategoryList = ({
                   alt={`brand-image-${image.id}`}
                   layout="fixed"
                   width={40}
-                  height={40}
-                  className="overflow-hidden rounded-lg bg-gray-300 object-contain"
+                  height={140}
+                  className="overflow-hidden h-10 w-10 rounded-lg bg-gray-300 object-contain"
                   key={`brand-image-${index}`}
                 />
               )
@@ -177,21 +179,6 @@ const CategoryList = ({
       width: 150,
       onHeaderCell: () => onHeaderClick('slug'),
     },
-    // {
-    //   title: t('table:table-item-group'),
-    //   dataIndex: 'type',
-    //   key: 'type',
-    //   align: 'center',
-    //   width: 120,
-    //   render: (type: any) => (
-    //     <div
-    //       className="overflow-hidden truncate whitespace-nowrap"
-    //       title={type?.name}
-    //     >
-    //       {type?.name}
-    //     </div>
-    //   ),
-    // },
     {
       title: t('table:table-item-actions'),
       dataIndex: 'slug',
@@ -215,7 +202,15 @@ const CategoryList = ({
         <Table
           //@ts-ignore
           columns={columns}
-          emptyText={t('table:empty-table-data')}
+          emptyText={() => (
+            <div className="flex flex-col items-center py-7">
+              <NoDataFound className="w-52" />
+              <div className="mb-1 pt-6 text-base font-semibold text-heading">
+                {t('table:empty-table-data')}
+              </div>
+              <p className="text-[13px]">{t('table:empty-table-sorry-text')}</p>
+            </div>
+          )}
           data={categories}
           rowKey="id"
           scroll={{ x: 1000 }}

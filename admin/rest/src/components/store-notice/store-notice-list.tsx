@@ -16,6 +16,7 @@ import utc from 'dayjs/plugin/utc';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
+import { NoDataFound } from '@/components/icons/no-data-found';
 
 dayjs.extend(relativeTime);
 dayjs.extend(utc);
@@ -37,6 +38,9 @@ const StoreNoticeList = ({
 }: IProps) => {
   const { t } = useTranslation();
   const router = useRouter();
+  const {
+    query: { shop },
+  } = router;
   const { alignLeft, alignRight } = useIsRTL();
   const [sortingObj, setSortingObj] = useState<{
     sort: SortOrder;
@@ -67,11 +71,22 @@ const StoreNoticeList = ({
 
   const columns = [
     {
-      title: t('table:table-item-id'),
+      title: (
+        <TitleWithSort
+          title={t('table:table-item-id')}
+          ascending={
+            sortingObj.sort === SortOrder.Asc && sortingObj.column === 'id'
+          }
+          isActive={sortingObj.column === 'id'}
+        />
+      ),
+      className: 'cursor-pointer',
       dataIndex: 'id',
       key: 'id',
-      align: 'center',
+      align: alignLeft,
       width: 100,
+      onHeaderCell: () => onHeaderClick('id'),
+      render: (id: number) => `#${t('table:table-item-id')}: ${id}`,
     },
     {
       title: (
@@ -202,11 +217,25 @@ const StoreNoticeList = ({
         if (router?.asPath !== '/') {
           return (
             <>
-              <LanguageSwitcher
+              {/* <LanguageSwitcher
                 slug={data?.id}
                 record={data}
                 deleteModalView="DELETE_STORE_NOTICE"
                 routes={Routes?.storeNotice}
+                isShop={Boolean(shop)}
+                shopSlug={(shop as string) ?? ''}
+              />*/}
+              <ActionButtons
+                id={data?.id}
+                deleteModalView="DELETE_STORE_NOTICE"
+                editUrl={
+                  shop
+                    ? Routes?.storeNotice?.editWithoutLang(
+                        data?.id,
+                        shop as string
+                      )
+                    : Routes?.storeNotice?.editWithoutLang(data?.id)
+                }
               />
             </>
           );
@@ -214,7 +243,7 @@ const StoreNoticeList = ({
           return (
             <ActionButtons
               id={data?.id}
-              detailsUrl={Routes?.storeNotice?.details(data?.id)}
+              detailsUrl={`${router.asPath}/${data?.id}`}
               customLocale={router?.locale}
             />
           );
@@ -229,13 +258,12 @@ const StoreNoticeList = ({
           //@ts-ignore
           columns={columns}
           emptyText={() => (
-            <div className="flex flex-col items-center py-6">
-              <div className="relative w-72 sm:h-80 sm:w-96">
-                <NoShop />
-              </div>
-              <div className="pt-6 text-sm font-semibold">
+            <div className="flex flex-col items-center py-7">
+              <NoDataFound className="w-52" />
+              <div className="mb-1 pt-6 text-base font-semibold text-heading">
                 {t('table:empty-table-data')}
               </div>
+              <p className="text-[13px]">{t('table:empty-table-sorry-text')}</p>
             </div>
           )}
           data={storeNotices}

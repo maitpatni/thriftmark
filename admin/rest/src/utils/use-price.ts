@@ -5,17 +5,18 @@ export function formatPrice({
   amount,
   currencyCode,
   locale,
-  fractions = 2
+  fractions = 2,
 }: {
   amount: number;
   currencyCode: string;
   locale: string;
-  fractions: number
+  fractions: number;
 }) {
   const formatCurrency = new Intl.NumberFormat(locale, {
     style: 'currency',
     currency: currencyCode,
-    maximumFractionDigits: (fractions > 20 || fractions < 0 || !fractions ) ? 2 : fractions,
+    maximumFractionDigits:
+      fractions > 20 || fractions < 0 || !fractions ? 2 : fractions,
   });
 
   return formatCurrency.format(amount);
@@ -26,13 +27,13 @@ export function formatVariantPrice({
   baseAmount,
   currencyCode,
   locale,
-  fractions = 2
+  fractions = 2,
 }: {
   baseAmount: number;
   amount: number;
   currencyCode: string;
   locale: string;
-  fractions: number
+  fractions: number;
 }) {
   const hasDiscount = baseAmount < amount;
   const formatDiscount = new Intl.NumberFormat(locale, { style: 'percent' });
@@ -61,7 +62,13 @@ export default function usePrice(data?: PriceProps | null) {
     if (typeof amount !== 'number' || !currencyCode) return '';
 
     return baseAmount
-      ? formatVariantPrice({ amount, baseAmount, currencyCode, locale, fractions })
+      ? formatVariantPrice({
+          amount,
+          baseAmount,
+          currencyCode,
+          locale,
+          fractions,
+        })
       : formatPrice({ amount, currencyCode, locale, fractions });
   }, [amount, baseAmount, currencyCode]);
 

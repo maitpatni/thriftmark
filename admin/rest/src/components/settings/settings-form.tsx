@@ -1,11 +1,23 @@
 import Card from '@/components/common/card';
 import GooglePlacesAutocomplete from '@/components/form/google-places-autocomplete';
 import * as socialIcons from '@/components/icons/social';
-import { CURRENCY } from '@/components/settings/currency';
+import OpenAIButton from '@/components/openAI/openAI.button';
 import { AI } from '@/components/settings/ai';
-import { PAYMENT_GATEWAY } from '@/components/settings/payment';
-import WebHookURL from '@/components/settings/webhook-url';
+import {
+  EMAIL_GROUP_OPTION,
+  SMS_GROUP_OPTION,
+} from '@/components/settings/events/eventsOption';
+import {
+  chatbotAutoSuggestion,
+  chatbotAutoSuggestion1,
+} from '@/components/settings/openAIPromptSample';
+import { COUNTRY_LOCALE } from '@/components/settings/payment/country-locale';
+import { CURRENCY } from '@/components/settings/payment/currency';
+import { PAYMENT_GATEWAY } from '@/components/settings/payment/payment-gateway';
+import WebHookURL from '@/components/settings/payment/webhook-url';
+import { settingsValidationSchema } from '@/components/settings/settings-validation-schema';
 import Alert from '@/components/ui/alert';
+import Badge from '@/components/ui/badge/badge';
 import Button from '@/components/ui/button';
 import Description from '@/components/ui/description';
 import FileInput from '@/components/ui/file-input';
@@ -13,24 +25,29 @@ import ValidationError from '@/components/ui/form-validation-error';
 import Input from '@/components/ui/input';
 import Label from '@/components/ui/label';
 import Loader from '@/components/ui/loader/loader';
+import { useModalAction } from '@/components/ui/modal/modal.context';
 import PaymentSelect from '@/components/ui/payment-select';
 import SelectInput from '@/components/ui/select-input';
 import SwitchInput from '@/components/ui/switch-input';
 import TextArea from '@/components/ui/text-area';
 import { Config } from '@/config';
-import { useSettingsQuery, useUpdateSettingsMutation } from '@/data/settings';
+import { useUpdateSettingsMutation } from '@/data/settings';
 import { siteSettings } from '@/settings/site.settings';
 import {
   AttachmentInput,
   ContactDetailsInput,
+  ItemProps,
+  ServerInfo,
   SettingCurrencyOptions,
   Settings,
   Shipping,
   ShopSocialInput,
   Tax,
-  ServerInfo,
-  ItemProps,
 } from '@/types';
+import {
+  formatEventAPIData,
+  formatEventOptions,
+} from '@/utils/format-event-options';
 import { getIcon } from '@/utils/get-icon';
 import { formatPrice } from '@/utils/use-price';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -40,106 +57,7 @@ import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { useCallback, useMemo, useState } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
-import Badge from '@/components/ui/badge/badge';
-import { COUNTRY_LOCALE } from '@/components/settings/country-locale';
-import { settingsValidationSchema } from '@/components/settings/settings-validation-schema';
-import {
-  formatEventAPIData,
-  formatEventOptions,
-} from '@/utils/format-event-options';
-import { EMAIL_GROUP_OPTION, SMS_GROUP_OPTION } from './eventsOption';
-import OpenAIButton from '../openAI/openAI.button';
-import { useModalAction } from '../ui/modal/modal.context';
-
-export const chatbotAutoSuggestion = ({ name }: { name: string }) => {
-  return [
-    {
-      id: 1,
-      title: `Write a meta description that entices and informs users about ${name}'s offerings.`,
-    },
-    {
-      id: 2,
-      title: `Craft a concise and compelling meta description that captures the essence of ${name}.`,
-    },
-    {
-      id: 3,
-      title: `Develop a captivating meta description that sparks curiosity and encourages click-throughs.`,
-    },
-    {
-      id: 4,
-      title: `Create a concise and engaging meta description that highlights the unique value of ${name}.`,
-    },
-    {
-      id: 5,
-      title: `Shape a compelling meta description that communicates the benefits of exploring ${name}.`,
-    },
-    {
-      id: 6,
-      title: `Craft a concise and informative meta description to drive organic traffic to ${name}.`,
-    },
-    {
-      id: 7,
-      title: `Build a captivating meta description that stands out and encourages users to visit ${name}.`,
-    },
-    {
-      id: 8,
-      title: `Design a concise and enticing meta description to improve click-through rates to ${name}.`,
-    },
-    {
-      id: 9,
-      title: `Write an engaging meta description that effectively summarizes ${name}'s offerings.`,
-    },
-    {
-      id: 10,
-      title: `Develop a compelling meta description that boosts visibility and drives user engagement with ${name}.`,
-    },
-  ];
-};
-
-export const chatbotAutoSuggestion1 = ({ name }: { name: string }) => {
-  return [
-    {
-      id: 1,
-      title: `Write an enticing OG description that grabs attention and compels users to explore ${name}.`,
-    },
-    {
-      id: 2,
-      title: `Craft a concise and compelling OG description that showcases the unique value of ${name}.`,
-    },
-    {
-      id: 3,
-      title: `Develop a captivating OG description that piques curiosity and encourages user engagement.`,
-    },
-    {
-      id: 4,
-      title: `Create a concise and engaging OG description that conveys the essence of ${name}.`,
-    },
-    {
-      id: 5,
-      title: `Shape an enticing OG description that entices users to click and discover more on ${name}.`,
-    },
-    {
-      id: 6,
-      title: `Craft a concise and informative OG description that sparks interest in ${name}'s offerings.`,
-    },
-    {
-      id: 7,
-      title: `Build a captivating OG description that leaves a lasting impression and drives traffic to ${name}.`,
-    },
-    {
-      id: 8,
-      title: `Design a concise and enticing OG description to maximize visibility and user engagement.`,
-    },
-    {
-      id: 9,
-      title: `Write an engaging OG description that effectively communicates the key benefits of ${name}.`,
-    },
-    {
-      id: 10,
-      title: `Develop a compelling OG description that stands out and encourages users to explore ${name} further.`,
-    },
-  ];
-};
+import { socialIcon } from '@/settings/site.settings';
 
 type FormValues = {
   siteTitle: string;
@@ -202,29 +120,29 @@ type paymentGatewayOption = {
   title: string;
 };
 
-const socialIcon = [
-  {
-    value: 'FacebookIcon',
-    label: 'Facebook',
-  },
-  {
-    value: 'InstagramIcon',
-    label: 'Instagram',
-  },
-  {
-    value: 'TwitterIcon',
-    label: 'Twitter',
-  },
-  {
-    value: 'YouTubeIcon',
-    label: 'Youtube',
-  },
-];
+// const socialIcon = [
+//   {
+//     value: 'FacebookIcon',
+//     label: 'Facebook',
+//   },
+//   {
+//     value: 'InstagramIcon',
+//     label: 'Instagram',
+//   },
+//   {
+//     value: 'TwitterIcon',
+//     label: 'Twitter',
+//   },
+//   {
+//     value: 'YouTubeIcon',
+//     label: 'Youtube',
+//   },
+// ];
 
 export const updatedIcons = socialIcon.map((item: any) => {
   item.label = (
     <div className="flex items-center text-body space-s-4">
-      <span className="flex h-4 w-4 items-center justify-center">
+      <span className="flex items-center justify-center w-4 h-4">
         {getIcon({
           iconList: socialIcons,
           iconName: item.value,
@@ -267,6 +185,7 @@ export default function SettingsForm({
     formState: { errors },
   } = useForm<FormValues>({
     shouldUnregister: true,
+    //@ts-ignore
     resolver: yupResolver(settingsValidationSchema),
     defaultValues: {
       ...options,
@@ -275,9 +194,9 @@ export default function SettingsForm({
         ...options?.contactDetails,
         socials: options?.contactDetails?.socials
           ? options?.contactDetails?.socials.map((social: any) => ({
-            icon: updatedIcons?.find((icon) => icon?.value === social?.icon),
-            url: social?.url,
-          }))
+              icon: updatedIcons?.find((icon) => icon?.value === social?.icon),
+              url: social?.url,
+            }))
           : [],
       },
       deliveryTime: options?.deliveryTime ? options?.deliveryTime : [],
@@ -299,25 +218,24 @@ export default function SettingsForm({
 
       defaultPaymentGateway: options?.defaultPaymentGateway
         ? PAYMENT_GATEWAY.find(
-          (item) => item.name == options?.defaultPaymentGateway
-        )
+            (item) => item.name == options?.defaultPaymentGateway,
+          )
         : PAYMENT_GATEWAY[0],
 
       currencyOptions: {
         ...options?.currencyOptions,
-        // @ts-ignore
         formation: options?.currencyOptions?.formation
           ? COUNTRY_LOCALE.find(
-            (item) => item.code == options?.currencyOptions?.formation
-          )
+              (item) => item.code == options?.currencyOptions?.formation,
+            )
           : COUNTRY_LOCALE[0],
       },
       // multi-select on payment gateway
       paymentGateway: options?.paymentGateway
         ? options?.paymentGateway?.map((gateway: any) => ({
-          name: gateway?.name,
-          title: gateway?.title,
-        }))
+            name: gateway?.name,
+            title: gateway?.title,
+          }))
         : [],
 
       // @ts-ignore
@@ -327,8 +245,8 @@ export default function SettingsForm({
       // @ts-ignore
       shippingClass: !!shippingClasses?.length
         ? shippingClasses?.find(
-          (shipping: Shipping) => shipping.id == options?.shippingClass
-        )
+            (shipping: Shipping) => shipping.id == options?.shippingClass,
+          )
         : '',
       smsEvent: options?.smsEvent
         ? formatEventAPIData(options?.smsEvent)
@@ -387,7 +305,7 @@ export default function SettingsForm({
     name: 'contactDetails.socials',
   });
 
-  const isNotDefaultSettingsPage = Config.defaultLanguage !== locale;
+  // const isNotDefaultSettingsPage = Config.defaultLanguage !== locale;
 
   async function onSubmit(values: FormValues) {
     const contactDetails = {
@@ -395,9 +313,9 @@ export default function SettingsForm({
       location: { ...omit(values?.contactDetails?.location, '__typename') },
       socials: values?.contactDetails?.socials
         ? values?.contactDetails?.socials?.map((social: any) => ({
-          icon: social?.icon?.value,
-          url: social?.url,
-        }))
+            icon: social?.icon?.value,
+            url: social?.url,
+          }))
         : [],
     };
     const smsEvent = formatEventOptions(values.smsEvent);
@@ -419,9 +337,9 @@ export default function SettingsForm({
         paymentGateway:
           values?.paymentGateway && values?.paymentGateway!.length
             ? values?.paymentGateway?.map((gateway: any) => ({
-              name: gateway.name,
-              title: gateway.title,
-            }))
+                name: gateway.name,
+                title: gateway.title,
+              }))
             : PAYMENT_GATEWAY.filter((value: any, index: number) => index < 2),
         useEnableGateway: values?.useEnableGateway,
         guestCheckout: values?.guestCheckout,
@@ -438,7 +356,6 @@ export default function SettingsForm({
         },
         currencyOptions: {
           ...values.currencyOptions,
-          //@ts-ignore
           formation: values?.currencyOptions?.formation?.code,
         },
       },
@@ -450,10 +367,8 @@ export default function SettingsForm({
   let useEnableGateway = watch('useEnableGateway');
   // let enableAi = watch('useAi');
 
-  const upload_max_filesize = options?.server_info?.upload_max_filesize! / 1024;
+  // const upload_max_filesize = options?.server_info?.upload_max_filesize! / 1024;
   const max_fileSize = options?.server_info?.upload_max_filesize! * 1000;
-
-  // console.log('upload_max_filesize', upload_max_filesize)
 
   const logoInformation = (
     <span>
@@ -464,19 +379,21 @@ export default function SettingsForm({
       </span>
       <br />
       {t('form:size-help-text')} &nbsp;
-      <span className="font-bold">{upload_max_filesize} MB </span>
+      <span className="font-bold">{max_fileSize} MB </span>
     </span>
   );
 
   let checkAvailableDefaultGateway = paymentGateway?.some(
-    (item: any) => item?.name === defaultPaymentGateway?.name
+    (item: any) => item?.name === defaultPaymentGateway?.name,
   );
 
-  const isStripeActive = paymentGateway?.some(payment => payment?.name === "stripe");
+  const isStripeActive = paymentGateway?.some(
+    (payment) => payment?.name === 'stripe',
+  );
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="my-5 flex flex-wrap border-b border-dashed border-border-base pb-8 sm:my-8">
+      <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
         <Description
           title={t('form:input-label-logo')}
           details={logoInformation}
@@ -484,11 +401,16 @@ export default function SettingsForm({
         />
 
         <Card className="w-full sm:w-8/12 md:w-2/3">
-          <FileInput name="logo" control={control} multiple={false} maxSize={max_fileSize} />
+          <FileInput
+            name="logo"
+            control={control}
+            multiple={false}
+            maxSize={max_fileSize}
+          />
         </Card>
       </div>
 
-      <div className="my-5 flex flex-wrap border-b border-dashed border-border-base pb-8 sm:my-8">
+      <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
         <Description
           title={t('form:form-title-information')}
           details={t('form:site-info-help-text')}
@@ -517,7 +439,7 @@ export default function SettingsForm({
             error={t(errors.minimumOrderAmount?.message!)}
             variant="outline"
             className="mb-5"
-            disabled={isNotDefaultSettingsPage}
+            // disabled={isNotDefaultSettingsPage}
           />
           {/* <Input
             label={`${t('form:input-label-wallet-currency-ratio')}`}
@@ -552,7 +474,7 @@ export default function SettingsForm({
               <SwitchInput
                 name="useOtp"
                 control={control}
-                disabled={isNotDefaultSettingsPage}
+                // disabled={isNotDefaultSettingsPage}
               />
               <Label className="mb-0">{t('form:input-label-enable-otp')}</Label>
             </div>
@@ -563,7 +485,7 @@ export default function SettingsForm({
               <SwitchInput
                 name="useMustVerifyEmail"
                 control={control}
-                disabled={isNotDefaultSettingsPage}
+                // disabled={isNotDefaultSettingsPage}
               />
               <Label className="mb-0">
                 {t('form:input-label-use-must-verify-email')}
@@ -576,7 +498,7 @@ export default function SettingsForm({
               <SwitchInput
                 name="useAi"
                 control={control}
-                disabled={isNotDefaultSettingsPage}
+                // disabled={isNotDefaultSettingsPage}
               />
               <Label className="mb-0">
                 {t('form:input-label-enable-open-ai')}
@@ -591,7 +513,7 @@ export default function SettingsForm({
               getOptionLabel={(option: any) => option.name}
               getOptionValue={(option: any) => option.value}
               options={AI}
-              disabled={isNotDefaultSettingsPage}
+              // disabled={isNotDefaultSettingsPage}
             />
           </div>
 
@@ -603,7 +525,7 @@ export default function SettingsForm({
               getOptionLabel={(option: any) => option.name}
               getOptionValue={(option: any) => option.id}
               options={taxClasses!}
-              disabled={isNotDefaultSettingsPage}
+              // disabled={isNotDefaultSettingsPage}
             />
           </div>
 
@@ -615,7 +537,7 @@ export default function SettingsForm({
               getOptionLabel={(option: any) => option.name}
               getOptionValue={(option: any) => option.id}
               options={shippingClasses!}
-              disabled={isNotDefaultSettingsPage}
+              // disabled={isNotDefaultSettingsPage}
             />
           </div>
           <div className="mb-5">
@@ -623,7 +545,7 @@ export default function SettingsForm({
               <SwitchInput
                 name="guestCheckout"
                 control={control}
-                disabled={isNotDefaultSettingsPage}
+                // disabled={isNotDefaultSettingsPage}
               />
               <Label className="mb-0">
                 {t('form:input-label-enable-guest-checkout')}
@@ -636,7 +558,7 @@ export default function SettingsForm({
               name="freeShipping"
               control={control}
               checked={enableFreeShipping}
-              disabled={isNotDefaultSettingsPage}
+              // disabled={isNotDefaultSettingsPage}
             />
             <Label className="mb-0">
               {t('form:input-label-enable-free-shipping')}
@@ -651,7 +573,7 @@ export default function SettingsForm({
               variant="outline"
               type="number"
               className="mt-5"
-              disabled={isNotDefaultSettingsPage}
+              // disabled={isNotDefaultSettingsPage}
             />
           )}
           <Input
@@ -664,7 +586,7 @@ export default function SettingsForm({
         </Card>
       </div>
 
-      <div className="my-5 flex flex-wrap border-b border-dashed border-border-base pb-8 sm:my-8">
+      <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
         <Description
           title={t('Payment')}
           details={t('Configure Payment Option')}
@@ -676,7 +598,7 @@ export default function SettingsForm({
               <SwitchInput
                 name="useCashOnDelivery"
                 control={control}
-                disabled={isNotDefaultSettingsPage}
+                // disabled={isNotDefaultSettingsPage}
               />
               <Label className="mb-0">{t('Enable Cash On Delivery')}</Label>
             </div>
@@ -689,21 +611,21 @@ export default function SettingsForm({
               getOptionLabel={(option: any) => option.name}
               getOptionValue={(option: any) => option.code}
               options={CURRENCY}
-              disabled={isNotDefaultSettingsPage}
+              // disabled={isNotDefaultSettingsPage}
             />
             <ValidationError message={t(errors.currency?.message)} />
           </div>
           <div className="flex items-center gap-x-4">
             <SwitchInput
               control={control}
-              disabled={isNotDefaultSettingsPage}
+              // disabled={isNotDefaultSettingsPage}
               {...register('useEnableGateway')}
             />
             <Label className="mb-0">{t('Enable Gateway')}</Label>
           </div>
           {useEnableGateway ? (
             <>
-              <div className="mb-5 mt-5">
+              <div className="mt-5 mb-5">
                 <Label>{t('text-select-payment-gateway')}</Label>
                 <PaymentSelect
                   options={PAYMENT_GATEWAY}
@@ -737,7 +659,7 @@ export default function SettingsForm({
                       getOptionLabel={(option: any) => option.title}
                       getOptionValue={(option: any) => option.name}
                       options={paymentGateway ?? []}
-                      disabled={isNotDefaultSettingsPage}
+                      // disabled={isNotDefaultSettingsPage}
                     />
                   </div>
                   {isStripeActive && (
@@ -747,9 +669,11 @@ export default function SettingsForm({
                           <SwitchInput
                             name="StripeCardOnly"
                             control={control}
-                            disabled={isNotDefaultSettingsPage}
+                            // disabled={isNotDefaultSettingsPage}
                           />
-                          <Label className="!mb-0">{t('Enable Stripe Element')}</Label>
+                          <Label className="!mb-0">
+                            {t('Enable Stripe Element')}
+                          </Label>
                         </div>
                       </div>
                     </>
@@ -768,7 +692,7 @@ export default function SettingsForm({
           )}
         </Card>
       </div>
-      <div className="my-5 flex flex-wrap border-b border-dashed border-border-base pb-8 sm:my-8">
+      <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
         <Description
           title="Currency Options"
           details={t('form:currency-options-info-help-text')}
@@ -784,7 +708,7 @@ export default function SettingsForm({
               getOptionLabel={(option: any) => option.name}
               getOptionValue={(option: any) => option.code}
               options={COUNTRY_LOCALE}
-              disabled={isNotDefaultSettingsPage}
+              // disabled={isNotDefaultSettingsPage}
             />
           </div>
           <Input
@@ -816,7 +740,7 @@ export default function SettingsForm({
           )}
         </Card>
       </div>
-      <div className="my-5 flex flex-wrap border-b border-dashed border-border-base pb-8 sm:my-8">
+      <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
         <Description
           title="SEO"
           details={t('form:tax-form-seo-info-help-text')}
@@ -833,7 +757,7 @@ export default function SettingsForm({
           <div className="relative">
             {options?.useAi && (
               <OpenAIButton
-                title="Generate Description With AI"
+                title={t('form:button-label-description-ai')}
                 onClick={handleGenerateDescription}
               />
             )}
@@ -867,7 +791,7 @@ export default function SettingsForm({
           <div className="relative">
             {options?.useAi && (
               <OpenAIButton
-                title="Generate Description With AI"
+                title={t('form:button-label-description-ai')}
                 onClick={handleGenerateDescription1}
               />
             )}
@@ -899,7 +823,7 @@ export default function SettingsForm({
           />
         </Card>
       </div>
-      <div className="my-5 flex flex-wrap border-b border-dashed border-border-base pb-8 sm:my-8">
+      <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
         <Description
           title={t('form:title-sms-event-settings')}
           details={t('form:description-sms-event-settings')}
@@ -926,14 +850,14 @@ export default function SettingsForm({
               isCloseMenuOnSelect={false}
               options={SMS_GROUP_OPTION}
               isMulti
-              disabled={isNotDefaultSettingsPage}
+              // disabled={isNotDefaultSettingsPage}
             />
             <ValidationError message={t(errors.currency?.message)} />
           </div>
         </Card>
       </div>
 
-      <div className="my-5 flex flex-wrap border-b border-dashed border-border-base pb-8 sm:my-8">
+      <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
         <Description
           title={t('form:title-email-event-settings')}
           details={t('form:description-email-event-settings')}
@@ -960,14 +884,14 @@ export default function SettingsForm({
               isCloseMenuOnSelect={false}
               options={EMAIL_GROUP_OPTION}
               isMulti
-              disabled={isNotDefaultSettingsPage}
+              // disabled={isNotDefaultSettingsPage}
             />
             <ValidationError message={t(errors.currency?.message)} />
           </div>
         </Card>
       </div>
 
-      <div className="my-5 flex flex-wrap border-b border-dashed border-gray-300 pb-8 sm:my-8">
+      <div className="flex flex-wrap pb-8 my-5 border-b border-gray-300 border-dashed sm:my-8">
         <Description
           title={t('form:text-delivery-schedule')}
           details={t('form:delivery-schedule-help-text')}
@@ -978,7 +902,7 @@ export default function SettingsForm({
           <div>
             {fields.map((item: any & { id: string }, index: number) => (
               <div
-                className="border-b border-dashed border-border-200 py-5 first:pt-0 last:border-0 md:py-8"
+                className="py-5 border-b border-dashed border-border-200 first:pt-0 last:border-0 md:py-8"
                 key={item.id}
               >
                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-5">
@@ -995,7 +919,7 @@ export default function SettingsForm({
                       label={t('form:input-delivery-time-description')}
                       variant="outline"
                       {...register(
-                        `deliveryTime.${index}.description` as const
+                        `deliveryTime.${index}.description` as const,
                       )}
                       defaultValue={item.description!} // make sure to set up defaultValue
                     />
@@ -1036,7 +960,7 @@ export default function SettingsForm({
         </Card>
       </div>
 
-      <div className="my-5 flex flex-wrap border-b border-dashed border-gray-300 pb-8 sm:my-8">
+      <div className="flex flex-wrap pb-8 my-5 border-b border-gray-300 border-dashed sm:my-8">
         <Description
           title={t('form:shop-settings')}
           details={t('form:shop-settings-helper-text')}
@@ -1053,7 +977,7 @@ export default function SettingsForm({
                 <GooglePlacesAutocomplete
                   onChange={onChange}
                   data={getValues('contactDetails.location')!}
-                  disabled={isNotDefaultSettingsPage}
+                  // disabled={isNotDefaultSettingsPage}
                 />
               )}
             />
@@ -1064,7 +988,7 @@ export default function SettingsForm({
             variant="outline"
             className="mb-5"
             error={t(errors.contactDetails?.contact?.message!)}
-            disabled={isNotDefaultSettingsPage}
+            // disabled={isNotDefaultSettingsPage}
           />
           <Input
             label={t('form:input-label-website')}
@@ -1072,7 +996,7 @@ export default function SettingsForm({
             variant="outline"
             className="mb-5"
             error={t(errors.contactDetails?.website?.message!)}
-            disabled={isNotDefaultSettingsPage}
+            // disabled={isNotDefaultSettingsPage}
           />
 
           {/* <div className="mt-6">
@@ -1080,7 +1004,7 @@ export default function SettingsForm({
               <SwitchInput
                 name="useGoogleMap"
                 control={control}
-                disabled={isNotDefaultSettingsPage}
+                // disabled={isNotDefaultSettingsPage}
               />
               <Label className="mb-0">
                 {t('form:input-label-use-google-map-service')}
@@ -1103,7 +1027,7 @@ export default function SettingsForm({
               <SwitchInput
                 name="isProductReview"
                 control={control}
-                disabled={isNotDefaultSettingsPage}
+                // disabled={isNotDefaultSettingsPage}
               />
               <Label className="mb-0">
                 {t('form:input-label-product-for-review')}
@@ -1116,7 +1040,7 @@ export default function SettingsForm({
             {socialFields.map(
               (item: ShopSocialInput & { id: string }, index: number) => (
                 <div
-                  className="border-b border-dashed border-border-200 py-5 first:mt-5 first:border-t last:border-b-0 md:py-8 md:first:mt-10"
+                  className="py-5 border-b border-dashed border-border-200 first:mt-5 first:border-t last:border-b-0 md:py-8 md:first:mt-10"
                   key={item.id}
                 >
                   <div className="grid grid-cols-1 gap-5 sm:grid-cols-5">
@@ -1130,7 +1054,7 @@ export default function SettingsForm({
                         options={updatedIcons}
                         isClearable={true}
                         defaultValue={item?.icon!}
-                        disabled={isNotDefaultSettingsPage}
+                        // disabled={isNotDefaultSettingsPage}
                       />
                     </div>
                     <Input
@@ -1138,44 +1062,48 @@ export default function SettingsForm({
                       label={t('form:input-label-social-url')}
                       variant="outline"
                       {...register(
-                        `contactDetails.socials.${index}.url` as const
+                        `contactDetails.socials.${index}.url` as const,
                       )}
                       defaultValue={item.url!} // make sure to set up defaultValue
-                      disabled={isNotDefaultSettingsPage}
+                      // disabled={isNotDefaultSettingsPage}
                     />
-                    {!isNotDefaultSettingsPage && (
-                      <button
-                        onClick={() => {
-                          socialRemove(index);
-                        }}
-                        type="button"
-                        className="text-sm text-red-500 transition-colors duration-200 hover:text-red-700 focus:outline-none sm:col-span-1 sm:mt-4"
-                        disabled={isNotDefaultSettingsPage}
-                      >
-                        {t('form:button-label-remove')}
-                      </button>
-                    )}
+                    {/* {!isNotDefaultSettingsPage && ( */}
+                    <button
+                      onClick={() => {
+                        socialRemove(index);
+                      }}
+                      type="button"
+                      className="text-sm text-red-500 transition-colors duration-200 hover:text-red-700 focus:outline-none sm:col-span-1 sm:mt-4"
+                      // disabled={isNotDefaultSettingsPage}
+                    >
+                      {t('form:button-label-remove')}
+                    </button>
+                    {/* )} */}
                   </div>
                 </div>
-              )
+              ),
             )}
           </div>
 
-          {!isNotDefaultSettingsPage && (
-            <Button
-              type="button"
-              onClick={() => socialAppend({ icon: '', url: '' })}
-              className="w-full sm:w-auto"
-              disabled={isNotDefaultSettingsPage}
-            >
-              {t('form:button-label-add-social')}
-            </Button>
-          )}
+          {/* {!isNotDefaultSettingsPage && ( */}
+          <Button
+            type="button"
+            onClick={() => socialAppend({ icon: '', url: '' })}
+            className="w-full sm:w-auto"
+            // disabled={isNotDefaultSettingsPage}
+          >
+            {t('form:button-label-add-social')}
+          </Button>
+          {/* )} */}
         </Card>
       </div>
 
-      <div className="mb-4 text-end">
-        <Button loading={loading} disabled={loading}>
+      <div className="text-end">
+        <Button
+          loading={loading}
+          disabled={loading}
+          className="text-sm md:text-base"
+        >
           {t('form:button-label-save-settings')}
         </Button>
       </div>

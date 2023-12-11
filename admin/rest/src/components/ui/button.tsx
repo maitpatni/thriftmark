@@ -1,5 +1,6 @@
 import cn from 'classnames';
 import React, { ButtonHTMLAttributes } from 'react';
+import { twMerge } from 'tailwind-merge';
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   className?: string;
@@ -8,6 +9,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   active?: boolean;
   loading?: boolean;
   disabled?: boolean;
+  children?: React.ReactNode;
 }
 
 const classes = {
@@ -33,8 +35,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       className,
       variant = 'normal',
       size = 'medium',
-      children,
       active,
+      children,
       loading = false,
       disabled = false,
       ...rest
@@ -50,7 +52,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         [classes.medium]: size === 'medium',
         [classes.big]: size === 'big',
       },
-      className
+      className,
     );
 
     return (
@@ -58,11 +60,11 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         aria-pressed={active}
         data-variant={variant}
         ref={ref}
-        className={classesName}
+        className={twMerge(classesName)}
         disabled={disabled}
         {...rest}
       >
-        {children}
+        <>{children}</>
         {loading && (
           <span
             className={classes.loading}
@@ -74,7 +76,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         )}
       </button>
     );
-  }
+  },
 );
 
 Button.displayName = 'Button';

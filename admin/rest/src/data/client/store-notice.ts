@@ -14,16 +14,14 @@ export const storeNoticeClient = {
   ),
   all: ({
     notice,
-    shop_id,
     ...params
   }: Partial<StoreNoticeQueryOptions> = {}) =>
     HttpClient.get<StoreNoticePaginator>(API_ENDPOINTS.STORE_NOTICES, {
       searchJoin: 'and',
-      shop_id: shop_id,
       ...params,
       search: HttpClient.formatSearchParams({
         notice,
-        shop_id,
+        'users.id': params['users.id']
       }),
     }),
   get({ id, language }: { id: string; language: string }) {
@@ -33,14 +31,13 @@ export const storeNoticeClient = {
   },
   paginated: ({
     notice,
-    shop_id,
+    shops,
     ...params
   }: Partial<StoreNoticeQueryOptions>) => {
     return HttpClient.get<StoreNoticePaginator>(API_ENDPOINTS.STORE_NOTICES, {
       searchJoin: 'and',
-      shop_id: shop_id,
       ...params,
-      search: HttpClient.formatSearchParams({ notice, shop_id }),
+      search: HttpClient.formatSearchParams({ notice, shops, 'users.id': params['users.id'] }),
     });
   },
 

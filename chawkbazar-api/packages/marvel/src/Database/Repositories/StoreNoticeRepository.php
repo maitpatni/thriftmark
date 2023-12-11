@@ -30,7 +30,10 @@ class StoreNoticeRepository extends BaseRepository
         'notice'       => 'like',
         'effective_from',
         'expired_at',
+        'type',
         'receiver.id',
+        'shops.slug',
+        'users.id',
         'creator_role' => 'like',
     ];
 
@@ -80,21 +83,20 @@ class StoreNoticeRepository extends BaseRepository
 
             if (!$request->user()) {
                 $shop_id = $request['shop_id'] ?? 0;
-                $shop = Shop::where('id', $shop_id)->orWhere('slug', $shop_id)->first();
-                if (!$shop) {
-                    throw new NotFoundException(NOT_FOUND);
+                if (isset($shop_id)) {
+                    $shop = Shop::where('id', $shop_id)->orWhere('slug', $shop_id)->first();
+                    return $storeNotices
+                        ->where([
+                            'created_by' => $shop->owner_id ?? 0,
+                        ])->whereRelation('shops', 'id', $shop_id)
+                        ->whereDate('expired_at', '>=', now());
                 }
-                return $storeNotices
-                    ->where([
-                        'created_by' => $shop->owner_id ?? 0,
-                    ])->whereRelation('shops', 'id', $shop_id)
-                    ->whereDate('expired_at', '>=', now());
             }
 
             if (!$request->user()->hasPermissionTo(Permission::SUPER_ADMIN)) {
-
                 /* Block for authenticated user [vendor or staff] */
-                if (!empty($request['shop_id'])) {
+                if (isset($request['shop_id'])) {
+                    /* code for customers */
                     $shop_id = $request['shop_id'];
                     $shop = Shop::findOrFail($shop_id);
                     $storeNotices
@@ -176,7 +178,7 @@ class StoreNoticeRepository extends BaseRepository
             $storeNotice = $this->create($request->only($this->dataArray));
             $this->syncUsersOrShops($request, $storeNotice);
             $this->syncReadStatus($storeNotice);
-            event(new StoreNoticeEvent($storeNotice, 'create'));
+            event(new StoreNoticeEvent($storeNotice, 'create', $request->user()));
             return $storeNotice;
         } catch (Exception $e) {
             throw new HttpException(400, COULD_NOT_CREATE_THE_RESOURCE);
@@ -197,7 +199,7 @@ class StoreNoticeRepository extends BaseRepository
             $storeNotice->update($request->only($this->dataArray));
             $this->syncUsersOrShops($request, $storeNotice);
             $this->syncReadStatus($storeNotice);
-            event(new StoreNoticeEvent($storeNotice, 'update'));
+            event(new StoreNoticeEvent($storeNotice, 'update', $request->user()));
             return $storeNotice;
         } catch (Exception $e) {
             throw new Exception(SOMETHING_WENT_WRONG);

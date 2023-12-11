@@ -11,6 +11,7 @@ use Marvel\Database\Repositories\CategoryRepository;
 use Marvel\Exceptions\MarvelException;
 use Marvel\Http\Requests\CategoryCreateRequest;
 use Marvel\Http\Requests\CategoryUpdateRequest;
+use Marvel\Http\Resources\CategoryResource;
 use Prettus\Validator\Exceptions\ValidatorException;
 
 
@@ -62,12 +63,22 @@ class CategoryController extends CoreController
     {
         $language = $request->language ?? DEFAULT_LANGUAGE;
         $parent = $request->parent;
-        $limit = $request->limit ?   $request->limit : 15;
+        $selfId = $request->self ?? null;
+        $limit = $request->limit ?? 15;
+
+        $categoriesQuery = $this->repository->with(['type', 'parent', 'children'])
+            ->where('language', $language)->withCount(['products']);
+
         if ($parent === 'null') {
-            return $this->repository->withCount(['products'])->with(['type', 'parent', 'children'])->where('parent', null)->where('language', $language)->paginate($limit);
-        } else {
-            return $this->repository->withCount(['products'])->with(['type', 'parent', 'children'])->where('language', $language)->paginate($limit);
+            $categoriesQuery->whereNull('parent');
         }
+        if ($selfId) {
+            $categoriesQuery->where('id', '!=', $selfId);
+        }
+
+        $categories = $categoriesQuery->paginate($limit);
+        $data = CategoryResource::collection($categories)->response()->getData(true);
+        return formatAPIResourcePaginate($data);
     }
 
     /**
@@ -98,14 +109,15 @@ class CategoryController extends CoreController
      */
     public function show(Request $request, $params)
     {
-
         try {
             $language = $request->language ?? DEFAULT_LANGUAGE;
             if (is_numeric($params)) {
                 $params = (int) $params;
-                return $this->repository->with(['type', 'parent', 'children'])->where('id', $params)->firstOrFail();
+                $category = $this->repository->with(['type', 'parentCategory', 'children'])->where('id', $params)->firstOrFail();
+                return new CategoryResource($category);
             }
-            return $this->repository->with(['type', 'parent', 'children'])->where('slug', $params)->where('language', $language)->firstOrFail();
+            $category = $this->repository->with(['type', 'parentCategory', 'children'])->where('slug', $params)->firstOrFail();
+            return new CategoryResource($category);
         } catch (MarvelException $e) {
             throw new MarvelException(NOT_FOUND);
         }

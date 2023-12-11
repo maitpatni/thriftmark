@@ -4,10 +4,18 @@ import {
   CreateOrderPaymentInput,
   PaymentGateway,
   OrderCreateInputType,
+  DownloadableFilePaginator,
+  QueryOptions,
+  OrderQueryOptions,
 } from '@type/index';
 import { mapPaginatorData } from '@framework/utils/data-mappers';
 import { API_ENDPOINTS } from '@framework/utils/endpoints';
-import { useMutation, useQuery, useQueryClient } from 'react-query';
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from 'react-query';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'next-i18next';
 import client from '@framework/utils/index';
@@ -36,9 +44,11 @@ export const useOrders = (options: OrdersQueryOptionsType) => {
 };
 
 export const useOrder = ({ tracking_number }: { tracking_number: string }) => {
-  const { data, isLoading, error, isFetching, refetch } = useQuery<Order, Error>(
-    [API_ENDPOINTS.ORDER, tracking_number],
-    () => client.orders.findOne(tracking_number)
+  const { data, isLoading, error, isFetching, refetch } = useQuery<
+    Order,
+    Error
+  >([API_ENDPOINTS.ORDER, tracking_number], () =>
+    client.orders.findOne(tracking_number)
   );
 
   return {
@@ -226,7 +236,7 @@ export function useGetPaymentIntent({
             paymentIntentInfo: data?.payment_intent_info,
             trackingNumber: data?.tracking_number,
           });
-          setModalView("PAYMENT_MODAL");
+          setModalView('PAYMENT_MODAL');
           return openModal();
         }
       },
@@ -238,5 +248,78 @@ export function useGetPaymentIntent({
     getPaymentIntentQuery: refetch,
     isLoading,
     error,
+  };
+}
+
+export const useDownloadableProducts = (options: OrderQueryOptions) => {
+  const { locale } = useRouter();
+
+  const formattedOptions = {
+    ...options,
+    // language: locale
+  };
+
+  const {
+    data,
+    isLoading,
+    isFetching,
+    isFetchingNextPage,
+    fetchNextPage,
+    hasNextPage,
+    error,
+  } = useInfiniteQuery<DownloadableFilePaginator, Error>(
+    [API_ENDPOINTS.ORDERS_DOWNLOADS, formattedOptions],
+    ({ queryKey, pageParam }) =>
+      client.orders.downloadable(Object.assign({}, queryKey[1], pageParam)),
+    {
+      getNextPageParam: ({ current_page, last_page }) =>
+        last_page > current_page && { page: current_page + 1 },
+      refetchOnWindowFocus: false,
+    }
+  );
+
+  function handleLoadMore() {
+    fetchNextPage();
+  }
+
+  return {
+    downloads: data?.pages?.flatMap((page) => page.data) ?? [],
+    paginatorInfo: Array.isArray(data?.pages)
+      ? mapPaginatorData(data?.pages[data.pages.length - 1])
+      : null,
+    isLoading,
+    isFetching,
+    isLoadingMore: isFetchingNextPage,
+    error,
+    loadMore: handleLoadMore,
+    hasMore: Boolean(hasNextPage),
+  };
+};
+
+export function useGenerateDownloadableUrl() {
+  const { mutate: getDownloadableUrl } = useMutation(
+    client.orders.generateDownloadLink,
+    {
+      onSuccess: (data) => {
+        function download(fileUrl: string, fileName: string) {
+          var a = document.createElement('a');
+          a.href = fileUrl;
+          a.setAttribute('download', fileName);
+          a.click();
+        }
+
+        download(data, 'record.name');
+      },
+    }
+  );
+
+  function generateDownloadableUrl(digital_file_id: string) {
+    getDownloadableUrl({
+      digital_file_id,
+    });
+  }
+
+  return {
+    generateDownloadableUrl,
   };
 }

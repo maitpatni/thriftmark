@@ -6,6 +6,8 @@ extend type Query {
         id: ID @where(operator: "=", key: "id")
         orderBy: String
         sortedBy: String
+        search: String
+        searchJoin: String = "AND"
     ): [StoreNotice]
         @paginate(
             builder: "Marvel\\GraphQL\\Queries\\StoreNoticeQuery@fetchStoreNotices"

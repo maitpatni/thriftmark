@@ -187,7 +187,15 @@ const SignUpForm: React.FC<Props> = ({ layout = "modal" }) => {
       {/*  <ImFacebook2 className="text-sm sm:text-base ltr:ml-1.5 rtl:mr-1.5" />*/}
       {/*  {t("common:text-login-with-facebook")}*/}
       {/*</Button>*/}
-    
+      <Button
+        type="submit"
+        loading={false}
+        disabled={isLoading}
+        className="h-11 md:h-12 w-full mt-2.5 bg-google hover:bg-googleHover"
+      >
+        <ImGoogle2 className="text-sm sm:text-base ltr:mr-1.5 rtl:ml-1.5" />
+        {t("common:text-login-with-google")}
+      </Button>
       <div className="text-sm sm:text-base text-body text-center mt-5 mb-1">
         {t("common:text-have-account")}{" "}
         <button

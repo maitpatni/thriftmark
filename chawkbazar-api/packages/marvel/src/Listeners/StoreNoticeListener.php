@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Listeners;
+namespace Marvel\Listeners;
 
 
 use Illuminate\Contracts\Queue\ShouldQueue;

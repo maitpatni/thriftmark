@@ -88,7 +88,7 @@ const Counter: React.FC<CounterProps> = ({
             'hover:!bg-gray-100': variant === 'pillVertical',
           }
         )}
-        title={disabled ? t('text-out-stock') : ''}
+        title={disabled ? t('text-out-of-stock') : ''}
       >
         <span className="sr-only">{t('text-plus')}</span>
         <PlusIcon className="md:h-4.5 md:w-4.5 h-3.5 w-3.5 stroke-2" />

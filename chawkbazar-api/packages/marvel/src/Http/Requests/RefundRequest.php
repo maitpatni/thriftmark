@@ -28,9 +28,10 @@ class RefundRequest extends FormRequest
     {
         return [
             'order_id' => ['required', 'exists:Marvel\Database\Models\Order,id'],
-            'title' => ['string', 'required'],
+            'title' => ['string'],
             'description' => ['string', 'nullable'],
             'images' => ['array', 'nullable'],
+            'refund_reason_id' => ['exists:Marvel\Database\Models\RefundReason,id'],
         ];
     }
 

@@ -33,11 +33,11 @@ export const useCreateProductMutation = () => {
       queryClient.invalidateQueries(API_ENDPOINTS.PRODUCTS);
     },
     onError: (error: any) => {
-      const {data, status} =  error?.response;
+      const { data, status } = error?.response;
       if (status === 422) {
-        const errorMessage:any = Object.values(data).flat();
+        const errorMessage: any = Object.values(data).flat();
         toast.error(errorMessage[0]);
-      }else{
+      } else {
         toast.error(t(`common:${error?.response?.data.message}`));
       }
     },
@@ -137,4 +137,68 @@ export const useGenerateDescriptionMutation = () => {
       data;
     },
   });
+};
+
+export const useInActiveProductsQuery = (
+  options: Partial<ProductQueryOptions>
+) => {
+  const { data, error, isLoading } = useQuery<ProductPaginator, Error>(
+    [API_ENDPOINTS.NEW_OR_INACTIVE_PRODUCTS, options],
+    ({ queryKey, pageParam }) =>
+      productClient.newOrInActiveProducts(
+        Object.assign({}, queryKey[1], pageParam)
+      ),
+    {
+      keepPreviousData: true,
+    }
+  );
+
+  return {
+    products: data?.data ?? [],
+    paginatorInfo: mapPaginatorData(data),
+    error,
+    loading: isLoading,
+  };
+};
+
+export const useProductStockQuery = (options: Partial<ProductQueryOptions>) => {
+  const { data, error, isLoading } = useQuery<ProductPaginator, Error>(
+    [API_ENDPOINTS.LOW_OR_OUT_OF_STOCK_PRODUCTS, options],
+    ({ queryKey, pageParam }) =>
+      productClient.lowOrOutOfStockProducts(
+        Object.assign({}, queryKey[1], pageParam)
+      ),
+    {
+      keepPreviousData: true,
+    }
+  );
+
+  return {
+    products: data?.data ?? [],
+    paginatorInfo: mapPaginatorData(data),
+    error,
+    loading: isLoading,
+  };
+};
+
+// Read All products by flash sale
+
+export const useProductsByFlashSaleQuery = (options: any) => {
+  const { data, error, isLoading } = useQuery<ProductPaginator, Error>(
+    [API_ENDPOINTS.PRODUCTS_BY_FLASH_SALE, options],
+    ({ queryKey, pageParam }) =>
+      productClient.getProductsByFlashSale(
+        Object.assign({}, queryKey[1], pageParam)
+      ),
+    {
+      keepPreviousData: true,
+    }
+  );
+
+  return {
+    products: data?.data ?? [],
+    paginatorInfo: mapPaginatorData(data),
+    error,
+    loading: isLoading,
+  };
 };

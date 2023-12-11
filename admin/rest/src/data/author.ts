@@ -88,6 +88,23 @@ export const useUpdateAuthorMutation = () => {
   });
 };
 
+export const useUpdateAuthorMutationInList = () => {
+  const { t } = useTranslation();
+  const queryClient = useQueryClient();
+  return useMutation(AuthorClient.update, {
+    onSuccess: async () => {
+      toast.success(t('common:successfully-updated'));
+    },
+    // Always refetch after error or success:
+    onSettled: () => {
+      queryClient.invalidateQueries(API_ENDPOINTS.AUTHORS);
+    },
+    onError: (error: any) => {
+      toast.error(t(`common:${error?.response?.data.message}`));
+    },
+  });
+};
+
 export const useAuthorQuery = ({ slug, language }: GetParams) => {
   const { data, error, isLoading } = useQuery<Author, Error>(
     [API_ENDPOINTS.AUTHORS, { slug, language }],

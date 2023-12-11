@@ -9,12 +9,12 @@ export default function MessagePageIndex() {
   const { width } = useWindowSize();
   return (
     <>
-      <Card
-        className="h-full overflow-hidden !p-0 !shadow-chatBox"
+      <div
+        className="h-full overflow-hidden"
         style={{ maxHeight: 'calc(100% - 5px)' }}
       >
         {width >= RESPONSIVE_WIDTH ? (
-          <div className="flex h-full flex-wrap overflow-hidden">
+          <div className="flex h-full flex-wrap gap-6 overflow-hidden">
             <UserListIndex />
 
             <UserMessageIndex />
@@ -22,7 +22,7 @@ export default function MessagePageIndex() {
         ) : (
           <ResponsiveView />
         )}
-      </Card>
+      </div>
     </>
   );
 }

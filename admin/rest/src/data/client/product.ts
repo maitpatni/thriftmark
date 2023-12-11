@@ -24,17 +24,22 @@ export const productClient = {
     name,
     categories,
     shop_id,
+    product_type,
+    status,
     ...params
   }: Partial<ProductQueryOptions>) => {
     return HttpClient.get<ProductPaginator>(API_ENDPOINTS.PRODUCTS, {
       searchJoin: 'and',
       with: 'shop;type',
+      shop_id,
       ...params,
       search: HttpClient.formatSearchParams({
         type,
         name,
         categories,
         shop_id,
+        product_type,
+        status,
       }),
     });
   },
@@ -46,7 +51,117 @@ export const productClient = {
       search: HttpClient.formatSearchParams({ shop_id }),
     });
   },
+  lowStock({ shop_id, ...params }: Partial<ProductQueryOptions>) {
+    return HttpClient.get<Product[]>(
+      API_ENDPOINTS.LOW_STOCK_PRODUCTS_ANALYTICS,
+      {
+        searchJoin: 'and',
+        with: 'type;shop',
+        ...params,
+        search: HttpClient.formatSearchParams({ shop_id }),
+      }
+    );
+  },
   generateDescription: (data: GenerateDescriptionInput) => {
     return HttpClient.post<any>(API_ENDPOINTS.GENERATE_DESCRIPTION, data);
+  },
+  newOrInActiveProducts: ({
+    user_id,
+    shop_id,
+    status,
+    name,
+    ...params
+  }: Partial<ProductQueryOptions>) => {
+    return HttpClient.get<ProductPaginator>(
+      API_ENDPOINTS.NEW_OR_INACTIVE_PRODUCTS,
+      {
+        searchJoin: 'and',
+        user_id,
+        shop_id,
+        status,
+        name,
+        ...params,
+        search: HttpClient.formatSearchParams({
+          status,
+          name,
+        }),
+      }
+    );
+  },
+  lowOrOutOfStockProducts: ({
+    user_id,
+    shop_id,
+    status,
+    categories,
+    name,
+    type,
+    ...params
+  }: Partial<ProductQueryOptions>) => {
+    return HttpClient.get<ProductPaginator>(
+      API_ENDPOINTS.LOW_OR_OUT_OF_STOCK_PRODUCTS,
+      {
+        searchJoin: 'and',
+        user_id,
+        shop_id,
+        status,
+        name,
+        ...params,
+        search: HttpClient.formatSearchParams({
+          status,
+          name,
+          categories,
+          type,
+        }),
+      }
+    );
+  },
+  productByCategory({ shop_id, ...params }: Partial<ProductQueryOptions>) {
+    return HttpClient.get<Product[]>(API_ENDPOINTS.CATEGORY_WISE_PRODUCTS, {
+      searchJoin: 'and',
+      ...params,
+      search: HttpClient.formatSearchParams({ shop_id }),
+    });
+  },
+  mostSoldProductByCategory({
+    shop_id,
+    ...params
+  }: Partial<ProductQueryOptions>) {
+    return HttpClient.get<Product[]>(
+      API_ENDPOINTS.CATEGORY_WISE_PRODUCTS_SALE,
+      {
+        searchJoin: 'and',
+        ...params,
+        search: HttpClient.formatSearchParams({ shop_id }),
+      }
+    );
+  },
+  getProductsByFlashSale: ({
+    user_id,
+    shop_id,
+    slug,
+    name,
+    ...params
+  }: any) => {
+    return HttpClient.get<ProductPaginator>(
+      API_ENDPOINTS.PRODUCTS_BY_FLASH_SALE,
+      {
+        searchJoin: 'and',
+        user_id,
+        shop_id,
+        slug,
+        name,
+        ...params,
+        search: HttpClient.formatSearchParams({
+          name,
+        }),
+      }
+    );
+  },
+  topRated({ shop_id, ...params }: Partial<ProductQueryOptions>) {
+    return HttpClient.get<Product[]>(API_ENDPOINTS.TOP_RATED_PRODUCTS, {
+      searchJoin: 'and',
+      ...params,
+      search: HttpClient.formatSearchParams({ shop_id }),
+    });
   },
 };

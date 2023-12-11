@@ -22,6 +22,7 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
+import PageHeading from '@/components/common/page-heading';
 
 export default function ProductsPage() {
   const { locale } = useRouter();
@@ -62,12 +63,10 @@ export default function ProductsPage() {
       <Card className="mb-8 flex flex-col">
         <div className="flex w-full flex-col items-center md:flex-row">
           <div className="mb-4 md:mb-0 md:w-1/4">
-            <h1 className="text-lg font-semibold text-heading">
-              {t('form:input-label-create-order')}
-            </h1>
+            <PageHeading title={t('form:input-label-create-order')} />
           </div>
 
-          <div className="flex w-full flex-col items-center ms-auto md:w-3/4">
+          <div className="flex w-full flex-col items-center ms-auto md:w-2/4">
             <Search
               onSearch={handleSearch}
               placeholderText={t('form:input-placeholder-search-name')}
@@ -105,6 +104,8 @@ export default function ProductsPage() {
                 setPage(1);
               }}
               className="w-full"
+              enableCategory
+              enableType
             />
           </div>
         </div>

@@ -3,7 +3,7 @@ extend type Query {
         product_id: ID @eq
         shop_id: ID @eq
         rating: Int @eq
-        orderBy: _ @orderBy(columns: ["created_at", "rating"])
+        orderBy: _ @orderBy(columns: ["created_at", "rating", "id"])
     ): [Review!]! @paginate(defaultCount: 15)
     review(id: ID @eq): Review @find @can(ability: "super_admin")
 }

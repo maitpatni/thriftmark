@@ -15,7 +15,7 @@ import { adminOnly } from '@/utils/auth-utils';
 import { useCategoriesQuery } from '@/data/category';
 import { useRouter } from 'next/router';
 import { Config } from '@/config';
-
+import PageHeading from '@/components/common/page-heading';
 export default function Categories() {
   const { locale } = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
@@ -52,9 +52,7 @@ export default function Categories() {
       <Card className="mb-8 flex flex-col">
         <div className="flex w-full flex-col items-center md:flex-row">
           <div className="mb-4 md:mb-0 md:w-1/4">
-            <h1 className="text-xl font-semibold text-heading">
-              {t('form:input-label-categories')}
-            </h1>
+            <PageHeading title={t('form:input-label-categories')} />
           </div>
 
           <div className="flex w-full flex-col items-center space-y-4 ms-auto md:flex-row md:space-y-0 xl:w-3/4">

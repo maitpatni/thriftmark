@@ -1,32 +1,25 @@
-import Input from "@/components/ui/input";
-import { useFieldArray, useForm } from "react-hook-form";
-import Button from "@/components/ui/button";
-import Description from "@/components/ui/description";
-import Card from "@/components/common/card";
-import { useRouter } from "next/router";
-import { getIcon } from "@/utils/get-icon";
-import Label from "@/components/ui/label";
-import * as typeIcons from "@/components/icons/type";
-import {
-  Attachment,
-  Type,
-  TypeSettingsInput
-} from "@/types";
+import Card from '@/components/common/card';
+import * as typeIcons from '@/components/icons/type';
+import Button from '@/components/ui/button';
+import Description from '@/components/ui/description';
+import Input from '@/components/ui/input';
+import Label from '@/components/ui/label';
+import { Attachment, Type, TypeSettingsInput } from '@/types';
+import { getIcon } from '@/utils/get-icon';
+import { useRouter } from 'next/router';
+import { useFieldArray, useForm } from 'react-hook-form';
 // import { useCreateTypeMutation } from "@/data/type/use-type-create.mutation";
 // import { useUpdateTypeMutation } from "@/data/type/use-type-update.mutation";
-import {
-  useCreateTypeMutation,
-  useUpdateTypeMutation,
-} from '@/data/type';
+import { useCreateTypeMutation, useUpdateTypeMutation } from '@/data/type';
 
-import { typeIconList } from "./brand-icons";
-import { useTranslation } from "next-i18next";
+import Alert from '@/components/ui/alert';
+import FileInput from '@/components/ui/file-input';
+import ValidationError from '@/components/ui/form-validation-error';
+import SelectInput from '@/components/ui/select-input';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { typeValidationSchema } from "./brand-validation-schema";
-import SelectInput from "@/components/ui/select-input";
-import Alert from "@/components/ui/alert";
-import FileInput from "@/components/ui/file-input";
-import ValidationError from "@/components/ui/form-validation-error";
+import { useTranslation } from 'next-i18next';
+import { typeIconList } from './brand-icons';
+import { typeValidationSchema } from './brand-validation-schema';
 
 export const updatedIcons = typeIconList.map((item: any) => {
   item.label = (
@@ -35,7 +28,7 @@ export const updatedIcons = typeIconList.map((item: any) => {
         {getIcon({
           iconList: typeIcons,
           iconName: item.value,
-          className: "max-h-full max-w-full",
+          className: 'max-h-full max-w-full',
         })}
       </span>
       <span>{item.label}</span>
@@ -54,8 +47,8 @@ const keyBasedImages = [
   {
     id: 2,
     value: 'slider-layout',
-    label: 'Slider Layout'
-  }
+    label: 'Slider Layout',
+  },
 ];
 
 export const updateImages = keyBasedImages.map((item: any) => {
@@ -71,10 +64,7 @@ type FormValues = {
   name?: string | null;
   icon?: any;
   settings: TypeSettingsInput;
-  images: [{
-    key: {},
-    image: [Attachment]
-  }]
+  images: any;
 };
 
 type IProps = {
@@ -100,25 +90,29 @@ export default function CreateOrUpdateTypeForm({ initialValues }: IProps) {
       },
       icon: initialValues?.icon
         ? typeIconList.find(
-          (singleIcon) => singleIcon.value === initialValues?.icon!
-        )
-        : "",
+            (singleIcon) => singleIcon.value === initialValues?.icon!,
+          )
+        : '',
       images: initialValues?.images?.map((item: any) => {
         return {
-          key: keyBasedImages.find(key => item?.key === key.value),
+          key: keyBasedImages.find((key) => item?.key === key.value),
           image: item?.image?.map((singleImage: Attachment) => ({
             id: singleImage?.id,
             original: singleImage?.original,
-            thumbnail: singleImage?.thumbnail
-          }))
-        }
-      })
+            thumbnail: singleImage?.thumbnail,
+          })),
+        };
+      }),
     },
   });
 
-  const { fields, append: brandImageAppend, remove } = useFieldArray({
+  const {
+    fields,
+    append: brandImageAppend,
+    remove,
+  } = useFieldArray({
     control,
-    name: "images",
+    name: 'images',
   });
 
   const { mutate: createType, isLoading: creating } = useCreateTypeMutation();
@@ -181,26 +175,26 @@ export default function CreateOrUpdateTypeForm({ initialValues }: IProps) {
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="flex flex-wrap my-5 sm:my-8">
         <Description
-          title={t("form:item-description")}
+          title={t('form:item-description')}
           details={`${
             initialValues
-              ? t("form:item-description-update")
-              : t("form:item-description-add")
-          } ${t("form:type-description-help-text")}`}
+              ? t('form:item-description-update')
+              : t('form:item-description-add')
+          } ${t('form:type-description-help-text')}`}
           className="w-full px-0 sm:pe-4 md:pe-5 pb-5 sm:w-4/12 md:w-1/3 sm:py-8"
         />
 
         <Card className="w-full sm:w-8/12 md:w-2/3">
           <Input
-            label={t("form:input-label-name")}
-            {...register("name")}
+            label={t('form:input-label-name')}
+            {...register('name')}
             error={t(errors.name?.message!)}
             variant="outline"
             className="mb-5"
           />
 
           <div className="mb-5">
-            <Label>{t("form:input-label-select-icon")}</Label>
+            <Label>{t('form:input-label-select-icon')}</Label>
             <SelectInput
               name="icon"
               control={control}
@@ -213,8 +207,8 @@ export default function CreateOrUpdateTypeForm({ initialValues }: IProps) {
 
       <div className="flex flex-wrap my-5 sm:my-8">
         <Description
-          title={t("form:text-brand-images")}
-          details={t("form:brand-image-help-text")}
+          title={t('form:text-brand-images')}
+          details={t('form:brand-image-help-text')}
           className="w-full px-0 sm:pr-4 md:pr-5 pb-5 sm:w-4/12 md:w-1/3 sm:py-8"
         />
 
@@ -228,7 +222,7 @@ export default function CreateOrUpdateTypeForm({ initialValues }: IProps) {
                 <div className="grid grid-cols-1 sm:grid-cols-5 gap-5">
                   <div className="grid grid-cols-1 gap-5 sm:col-span-4">
                     <Label className="whitespace-nowrap">
-                      {t("form:input-label-select-layout")}
+                      {t('form:input-label-select-layout')}
                     </Label>
                     <SelectInput
                       name={`images.${index}.key` as const}
@@ -236,11 +230,25 @@ export default function CreateOrUpdateTypeForm({ initialValues }: IProps) {
                       options={updateImages}
                       isClearable={false}
                     />
-                    <ValidationError message={t(errors.images?.[index]?.key?.message)}/>
+                    <ValidationError
+                      message={
+                        // @ts-ignore
+                        t(errors.images?.[index]?.key?.message)
+                      }
+                    />
 
                     <div>
-                      <FileInput name={`images.${index}.image` as const} control={control} multiple={true}/>
-                      <ValidationError message={t(errors.images?.[index]?.image?.message)}/>
+                      <FileInput
+                        name={`images.${index}.image` as const}
+                        control={control}
+                        multiple={true}
+                      />
+                      <ValidationError
+                        message={
+                          // @ts-ignore
+                          t(errors.images?.[index]?.image?.message)
+                        }
+                      />
                     </div>
                   </div>
 
@@ -251,7 +259,7 @@ export default function CreateOrUpdateTypeForm({ initialValues }: IProps) {
                     type="button"
                     className="text-sm text-red-500 hover:text-red-700 transition-colors duration-200 focus:outline-none sm:mt-4 sm:col-span-1"
                   >
-                    {t("form:button-label-remove")}
+                    {t('form:button-label-remove')}
                   </button>
                 </div>
               </div>
@@ -259,10 +267,12 @@ export default function CreateOrUpdateTypeForm({ initialValues }: IProps) {
           </div>
           <Button
             type="button"
-            onClick={() => brandImageAppend({ key: { ...keyBasedImages[0] }, image: [] })}
+            onClick={() =>
+              brandImageAppend({ key: { ...keyBasedImages[0] }, image: [] })
+            }
             className="w-full sm:w-auto"
           >
-            {t("form:button-label-add-brand-layout")}
+            {t('form:button-label-add-brand-layout')}
           </Button>
 
           {errors?.images?.message ? (
@@ -283,14 +293,14 @@ export default function CreateOrUpdateTypeForm({ initialValues }: IProps) {
             className="me-4"
             type="button"
           >
-            {t("form:button-label-back")}
+            {t('form:button-label-back')}
           </Button>
         )}
 
         <Button loading={creating || updating}>
           {initialValues
-            ? t("form:button-label-update-group")
-            : t("form:button-label-add-group")}
+            ? t('form:button-label-update-group')
+            : t('form:button-label-add-group')}
         </Button>
       </div>
     </form>

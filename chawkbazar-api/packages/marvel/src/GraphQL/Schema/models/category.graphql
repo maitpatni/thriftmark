@@ -1,6 +1,6 @@
 extend type Query {
     categories(
-        orderBy: _ @orderBy(columns: ["created_at", "name", "updated_at"])
+        orderBy: _ @orderBy(columns: ["created_at", "name", "updated_at", "slug"])
         language: String @eq
         name: String @where(operator: "LIKE")
         text: String @where(operator: "like", key: "name")

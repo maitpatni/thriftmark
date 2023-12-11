@@ -215,13 +215,26 @@ abstract class BaseRepository extends Repository implements CacheableInterface
      * 
      * @return string A string
      */
-    public function makeSlug(Request $request, string $key = ''): string
+    public function makeSlug(Request $request, string $key = '', ?int $update = null): string
     {
+        $slugText = match (true) {
+            !empty($request->slug)  => $request->slug,
+            !empty($request->name)  => $request->name,
+            !empty($request->title) => $request->title,
+            !empty($request[$key])  => $request[$key],
+            empty($request->slug)   => 'auto-generated-string',
+        };
         if (empty($key)) {
-            $slugText = isset($request['slug']) && $request['slug'] ? $request['slug'] : $request['name'];
-            return globalSlugify($slugText, $this->model());
+            return globalSlugify(slugText: $slugText, model: $this->model(), update: $update);
         }
-        $slug = globalSlugify($request[$key], $this->model(), $key);
-        return $slug;
+        return globalSlugify(slugText: $request[$key], model: $this->model(), key: $key, update: $update);
+    }
+
+    public function findBySlugOrId(int | string $value, string $language = DEFAULT_LANGUAGE)
+    {
+        return match (true) {
+            is_numeric($value) => $this->where('id', $value)->where('language', $language)->firstOrFail(),
+            is_string($value)  => $this->where('slug', $value)->where('language', $language)->firstOrFail(),
+        };
     }
 }

@@ -9,9 +9,7 @@ const MobileNavigation: React.FC<{ children?: React.ReactNode }> = ({
 
   return (
     <Drawer open={displaySidebar} onClose={closeSidebar} variant="left">
-      <DrawerWrapper onClose={closeSidebar}>
-        <div className="flex flex-col space-y-6 p-5">{children}</div>
-      </DrawerWrapper>
+      <DrawerWrapper onClose={closeSidebar}>{children}</DrawerWrapper>
     </Drawer>
   );
 };

@@ -10,12 +10,12 @@ type BadgeProps = {
 };
 
 const Badge: React.FC<BadgeProps> = ({
-                                       className,
-                                       color: colorOverride,
-                                       textColor: textColorOverride,
-                                       text,
-                                       style,
-                                     }) => {
+  className,
+  color: colorOverride,
+  textColor: textColorOverride,
+  text,
+  style,
+}) => {
   const { t } = useTranslation();
 
   const classes = {

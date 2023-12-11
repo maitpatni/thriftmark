@@ -6,9 +6,9 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Marvel\Database\Models\Address;
-use Marvel\Database\Models\Settings;
 use Marvel\Database\Repositories\SettingsRepository;
 use Marvel\Exceptions\MarvelException;
+use Illuminate\Support\Facades\Cache;
 use Marvel\Http\Requests\SettingsRequest;
 use Prettus\Validator\Exceptions\ValidatorException;
 
@@ -30,8 +30,20 @@ class SettingsController extends CoreController
      */
     public function index(Request $request)
     {
-        return $this->repository->getData($request->language);
+        $language = $request->language ? $request->language : DEFAULT_LANGUAGE;
+        return Cache::rememberForever(
+            'cached_settings_' . $language,
+            function () use ($request) {
+                return $this->repository->getData($request->language);
+            }
+        );
     }
+
+    // public function fetchSettings(Request $request)
+    // {
+    //     $language = $request->language ? $request->language : DEFAULT_LANGUAGE;
+    //     return $this->repository->getData($language);
+    // }
 
     /**
      * Store a newly created resource in storage.
@@ -42,20 +54,24 @@ class SettingsController extends CoreController
      */
     public function store(SettingsRequest $request)
     {
+        $language = $request->language ? $request->language : DEFAULT_LANGUAGE;
         $request->merge([
             'options' => [
                 ...$request->options,
+                ...$this->repository->getApplicationSettings(),
                 'server_info' => server_environment_info(),
-
             ]
         ]);
 
         $data = $this->repository->where('language', $request->language)->first();
 
         if ($data) {
+            if (Cache::has('cached_settings_' . $language)) {
+                Cache::forget('cached_settings_' . $language);
+            }
             return tap($data)->update($request->only(['options']));
         }
-
+        // Cache::flush();
         return $this->repository->create(['options' => $request['options'], 'language' => $request->language ?? DEFAULT_LANGUAGE]);
     }
 

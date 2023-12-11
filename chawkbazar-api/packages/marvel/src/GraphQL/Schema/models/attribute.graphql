@@ -1,8 +1,9 @@
+
 extend type Query {
     attributes(
         shop_id: ID @eq
         language: String @eq
-        orderBy: _ @orderBy(columns: ["created_at", "name", "updated_at"])
+        orderBy: _ @orderBy(columns: ["created_at", "name", "updated_at", "id"])
     ): [Attribute] @all
     attribute(id: ID @eq, slug: String @eq, language: String @eq): Attribute
         @find
@@ -13,9 +14,9 @@ type Attribute {
     name: String!
     language: String
     translated_languages: [String]
+    slug: String!
     shop_id: ID!
     shop: Shop @belongsTo
-    slug: String!
     values: [AttributeValue]
     created_at: DateTime
     updated_at: DateTime

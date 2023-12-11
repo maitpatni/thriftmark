@@ -36,7 +36,7 @@ export default function VerifyEmailActions() {
   return (
     <>
       <AuthPageLayout>
-        <h3 className="mb-6 mt-4 text-center text-base italic text-red-500 text-body">
+        <h3 className="mt-4 mb-6 text-center text-base italic text-red-500 text-body">
           {t('common:email-not-verified')}
         </h3>
         <div className="w-full space-y-3">
@@ -45,7 +45,7 @@ export default function VerifyEmailActions() {
             disabled={isVerifying}
             className="w-full"
           >
-            Resend Verification Email
+            {t('common:text-resend-verification-email')}
           </Button>
           <Button
             type="button"
@@ -53,7 +53,7 @@ export default function VerifyEmailActions() {
             className="w-full"
             onClick={() => logout()}
           >
-            Logout
+            {t('common:authorized-nav-item-logout')}
           </Button>
         </div>
       </AuthPageLayout>

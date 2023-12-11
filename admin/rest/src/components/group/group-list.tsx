@@ -10,6 +10,7 @@ import { Routes } from '@/config/routes';
 import { Config } from '@/config';
 import Link from '@/components/ui/link';
 import LanguageSwitcher from '@/components/ui/lang-action/action';
+import { NoDataFound } from '@/components/icons/no-data-found';
 
 export type IProps = {
   types: Type[] | undefined;
@@ -20,7 +21,6 @@ export type IProps = {
 const TypeList = ({ types, onSort, onOrder }: IProps) => {
   const { t } = useTranslation();
   const { alignLeft, alignRight } = useIsRTL();
-
   const [sortingObj, setSortingObj] = useState<{
     sort: SortOrder;
     column: string | null;
@@ -46,22 +46,34 @@ const TypeList = ({ types, onSort, onOrder }: IProps) => {
 
   const columns = [
     {
-      title: t('table:table-item-id'),
+      title: (
+        <TitleWithSort
+          title={t('table:table-item-id')}
+          ascending={
+            sortingObj.sort === SortOrder.Asc && sortingObj.column === 'id'
+          }
+          isActive={sortingObj.column === 'id'}
+        />
+      ),
+      className: 'cursor-pointer',
       dataIndex: 'id',
       key: 'id',
-      align: 'center',
-      width: 60,
+      align: alignLeft,
+      width: 150,
+      onHeaderCell: () => onHeaderClick('id'),
+      render: (id: number) => `#${t('table:table-item-id')}: ${id}`,
     },
     {
       title: (
         <TitleWithSort
-          title={t('table:table-item-title')}
+          title={t('table:table-homepage-name')}
           ascending={
             sortingObj.sort === SortOrder.Asc && sortingObj.column === 'name'
           }
           isActive={sortingObj.column === 'name'}
         />
       ),
+      width: 220,
       className: 'cursor-pointer',
       dataIndex: 'name',
       key: 'name',
@@ -70,10 +82,19 @@ const TypeList = ({ types, onSort, onOrder }: IProps) => {
       render: (name: any) => <span className="whitespace-nowrap">{name}</span>,
     },
     {
+      title: t('table:table-item-slug'),
+      dataIndex: 'slug',
+      key: 'slug',
+      align: 'center',
+      width: 220,
+      ellipsis: true,
+    },
+    {
       title: t('table:table-item-icon'),
       dataIndex: 'icon',
       key: 'slug',
       align: 'center',
+      width: 150,
       render: (icon: string) => {
         if (!icon) return null;
         return (
@@ -92,6 +113,7 @@ const TypeList = ({ types, onSort, onOrder }: IProps) => {
       dataIndex: 'slug',
       key: 'actions',
       align: alignRight,
+      width: 120,
       render: (slug: string, record: Type) => (
         <LanguageSwitcher
           slug={slug}
@@ -108,7 +130,15 @@ const TypeList = ({ types, onSort, onOrder }: IProps) => {
       <Table
         //@ts-ignore
         columns={columns}
-        emptyText={t('table:empty-table-data')}
+        emptyText={() => (
+          <div className="flex flex-col items-center py-7">
+            <NoDataFound className="w-52" />
+            <div className="mb-1 pt-6 text-base font-semibold text-heading">
+              {t('table:empty-table-data')}
+            </div>
+            <p className="text-[13px]">{t('table:empty-table-sorry-text')}</p>
+          </div>
+        )}
         data={types}
         rowKey="id"
         scroll={{ x: 380 }}

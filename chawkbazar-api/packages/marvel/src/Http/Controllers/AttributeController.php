@@ -13,6 +13,7 @@ use Marvel\Http\Requests\AttributeRequest;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Marvel\Database\Repositories\AttributeRepository;
+use Marvel\Http\Resources\AttributeResource;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class AttributeController extends CoreController
@@ -34,7 +35,8 @@ class AttributeController extends CoreController
     public function index(Request $request)
     {
         $language = $request->language ?? DEFAULT_LANGUAGE;
-        return $this->repository->where('language', $language)->with(['values', 'shop'])->get();
+        $attributes = $this->repository->where('language', $language)->with(['values', 'shop'])->get();
+        return AttributeResource::collection($attributes);
     }
 
     /**
@@ -69,9 +71,11 @@ class AttributeController extends CoreController
             $language = $request->language ?? DEFAULT_LANGUAGE;
             if (is_numeric($params)) {
                 $params = (int) $params;
-                return $this->repository->with('values')->where('id', $params)->firstOrFail();
+                $attribute = $this->repository->with('values')->where('id', $params)->firstOrFail();
+                return new AttributeResource($attribute);
             }
-            return $this->repository->with('values')->where('slug', $params)->where('language', $language)->firstOrFail();
+            $attribute = $this->repository->with('values')->where('slug', $params)->where('language', $language)->firstOrFail();
+            return new AttributeResource($attribute);
         } catch (MarvelException $e) {
             throw new MarvelException(NOT_FOUND);
         }

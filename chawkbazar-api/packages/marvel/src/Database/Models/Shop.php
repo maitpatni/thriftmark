@@ -110,7 +110,7 @@ class Shop extends Model
         return $this->belongsToMany(Category::class, 'category_shop');
     }
 
-     /**
+    /**
      * @return BelongsToMany
      */
     public function users(): BelongsToMany
@@ -124,5 +124,25 @@ class Shop extends Model
     public function conversations(): HasMany
     {
         return $this->hasMany(Conversation::class, 'shop_id');
+    }
+
+    /**
+     * faqs
+     *
+     * @return HasMany
+     */
+    public function faqs(): HasMany
+    {
+        return $this->HasMany(Faqs::class);
+    }
+
+    /**
+     * terms and conditions
+     *
+     * @return HasMany
+     */
+    public function terms_and_conditions(): HasMany
+    {
+        return $this->HasMany(TermsAndConditions::class);
     }
 }

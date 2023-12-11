@@ -23,6 +23,7 @@ import { useManufacturersQuery } from '@/data/manufacturer';
 import { Config } from '@/config';
 import { useMeQuery } from '@/data/user';
 import { useShopQuery } from '@/data/shop';
+import PageHeading from '@/components/common/page-heading';
 
 export default function Manufacturers() {
   const router = useRouter();
@@ -75,9 +76,7 @@ export default function Manufacturers() {
     <>
       <Card className="mb-8 flex flex-col items-center xl:flex-row">
         <div className="mb-4 md:w-1/3 xl:mb-0">
-          <h1 className="text-xl font-semibold text-heading">
-            {t('common:text-manufacturers-publications')}
-          </h1>
+          <PageHeading title={t('common:text-manufacturers-publications')} />
         </div>
 
         <div className="flex w-full flex-col items-center space-y-4 ms-auto md:flex-row md:space-y-0 xl:w-2/3">

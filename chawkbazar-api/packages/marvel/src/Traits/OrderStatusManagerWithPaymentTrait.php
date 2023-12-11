@@ -283,4 +283,18 @@ trait OrderStatusManagerWithPaymentTrait
 
         }
     }
+
+
+    /**
+     * The function checks if the order status is one of the final statuses.
+     * 
+     * @param Order order The parameter "order" is an instance of the Order class.
+     * 
+     * @return bool a boolean value, indicating whether the order status is final or not.
+     */
+    public function checkOrderStatusIsFinal(Order $order): bool
+    {
+        $orderStatuses = [OrderStatus::COMPLETED, OrderStatus::CANCELLED, OrderStatus::REFUNDED];
+        return in_array($order->order_status, $orderStatuses);
+    }
 }

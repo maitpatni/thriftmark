@@ -42,7 +42,7 @@ const RegistrationForm = () => {
     handleSubmit,
     formState: { errors },
     setError,
-  } = useForm<FormValues>({
+  } = useForm({
     resolver: yupResolver(registrationFormSchema),
     defaultValues: {
       permission: Permission.StoreOwner,
@@ -57,6 +57,7 @@ const RegistrationForm = () => {
         name,
         email,
         password,
+        //@ts-ignore
         permission,
       },
 
@@ -64,7 +65,7 @@ const RegistrationForm = () => {
         onSuccess: (data) => {
           if (data?.token) {
             if (hasAccess(allowedRoles, data?.permissions)) {
-              setAuthCredentials(data?.token, data?.permissions);
+              setAuthCredentials(data?.token, data?.permissions, data?.role);
               router.push(Routes.dashboard);
               return;
             }
@@ -81,13 +82,19 @@ const RegistrationForm = () => {
             });
           });
         },
-      }
+      },
     );
   }
 
   return (
     <>
-      <form onSubmit={handleSubmit(onSubmit)} noValidate>
+      <form
+        onSubmit={handleSubmit(
+          //@ts-ignore
+          onSubmit,
+        )}
+        noValidate
+      >
         <Input
           label={t('form:input-label-name')}
           {...register('name')}
@@ -124,17 +131,17 @@ const RegistrationForm = () => {
           />
         ) : null}
       </form>
-      <div className="relative mt-8 mb-6 flex flex-col items-center justify-center text-sm text-heading sm:mt-11 sm:mb-8">
+      <div className="relative flex flex-col items-center justify-center mt-8 mb-6 text-sm text-heading sm:mt-11 sm:mb-8">
         <hr className="w-full" />
         <span className="start-2/4 -ms-4 absolute -top-2.5 bg-light px-2">
           {t('common:text-or')}
         </span>
       </div>
-      <div className="text-center text-sm text-body sm:text-base">
+      <div className="text-sm text-center text-body sm:text-base">
         {t('form:text-already-account')}{' '}
         <Link
           href={Routes.login}
-          className="ms-1 font-semibold text-accent underline transition-colors duration-200 hover:text-accent-hover hover:no-underline focus:text-accent-700 focus:no-underline focus:outline-none"
+          className="font-semibold underline transition-colors duration-200 ms-1 text-accent hover:text-accent-hover hover:no-underline focus:text-accent-700 focus:no-underline focus:outline-none"
         >
           {t('form:button-label-login')}
         </Link>

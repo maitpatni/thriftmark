@@ -19,7 +19,6 @@ class Coupon extends Model
     public $guarded = [];
 
     // protected $appends = ['is_valid'];
-    // TODO: use it latter
     protected $appends = ['is_valid', 'translated_languages'];
 
     protected $casts = [

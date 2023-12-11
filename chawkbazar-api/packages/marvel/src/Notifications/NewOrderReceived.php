@@ -47,8 +47,7 @@ class NewOrderReceived extends Notification implements ShouldQueue
     public function toMail($notifiable)
     {
         App::setLocale($this->order->language ?? DEFAULT_LANGUAGE);
-        $customer = $this->order->customer;
-        //TODO: change this to customer name
+        $customer =  $this->order->customer ?? null;
         if (!$customer) {
             $customer = 'Guest Customer';
         } else {

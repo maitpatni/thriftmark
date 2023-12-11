@@ -11,6 +11,7 @@ use Marvel\Database\Models\Manufacturer;
 use Marvel\Database\Repositories\ManufacturerRepository;
 use Marvel\Exceptions\MarvelException;
 use Marvel\Http\Requests\ManufacturerRequest;
+use Marvel\Http\Resources\ManufacturerResource;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class ManufacturerController extends CoreController
@@ -33,7 +34,9 @@ class ManufacturerController extends CoreController
     {
         $language = $request->language ?? DEFAULT_LANGUAGE;
         $limit = $request->limit ?   $request->limit : 15;
-        return $this->repository->where('language', $language)->with('type')->paginate($limit);
+        $manufacturers = $this->repository->where('language', $language)->with('type')->paginate($limit);
+        $data = ManufacturerResource::collection($manufacturers)->response()->getData(true);
+        return formatAPIResourcePaginate($data);
     }
 
     /**
@@ -64,7 +67,8 @@ class ManufacturerController extends CoreController
     {
         try {
             $request['slug'] = $slug;
-            return $this->fetchManufacturer($request);
+            $manufacturer = $this->fetchManufacturer($request);
+            return new ManufacturerResource($manufacturer);
         } catch (MarvelException $th) {
             throw new MarvelException(NOT_FOUND);
         }

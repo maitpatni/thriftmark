@@ -22,7 +22,9 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Marvel\Database\Models\Settings;
 use Marvel\Exceptions\MarvelNotFoundException;
 use \OpenAI;
-
+use Marvel\Enums\Permission;
+use Marvel\Http\Resources\GetSingleProductResource;
+use Marvel\Http\Resources\ProductResource;
 
 class ProductController extends CoreController
 {
@@ -46,13 +48,26 @@ class ProductController extends CoreController
     public function index(Request $request)
     {
         $limit = $request->limit ?   $request->limit : 15;
-        return $this->fetchProducts($request)->paginate($limit);
+        $products = $this->fetchProducts($request)->paginate($limit)->withQueryString();
+        $data = ProductResource::collection($products)->response()->getData(true);
+        return formatAPIResourcePaginate($data);
     }
 
+
+
+    /**
+     * fetchProducts
+     *
+     * @param  mixed $request
+     * @return object
+     */
     public function fetchProducts(Request $request)
     {
         $unavailableProducts = [];
         $language = $request->language ? $request->language : DEFAULT_LANGUAGE;
+
+        $products_query = $this->repository->where('language', $language);
+
         if (isset($request->date_range)) {
             $dateRange = explode('//', $request->date_range);
             $unavailableProducts = $this->repository->getUnavailableProducts($dateRange[0], $dateRange[1]);
@@ -60,8 +75,16 @@ class ProductController extends CoreController
         if (in_array('variation_options.digital_files', explode(';', $request->with)) || in_array('digital_files', explode(';', $request->with))) {
             throw new AuthorizationException(NOT_AUTHORIZED);
         }
-        return $this->repository->where('language', $language)->whereNotIn('id', $unavailableProducts);
+        $products_query = $products_query->whereNotIn('id', $unavailableProducts);
+
+        if ($request->flash_sale_builder) {
+            $products_query = $this->repository->processFlashSaleProducts($request, $products_query);
+        }
+
+        return $products_query;
     }
+
+
 
     /**
      * Store a newly created resource in storage by rest.
@@ -73,6 +96,8 @@ class ProductController extends CoreController
     {
         return $this->ProductStore($request);
     }
+
+
 
     /**
      * Store a newly created resource in storage by GQL.
@@ -94,6 +119,8 @@ class ProductController extends CoreController
         }
     }
 
+
+
     /**
      * Display the specified resource.
      *
@@ -104,11 +131,14 @@ class ProductController extends CoreController
     {
         $request->merge(['slug' => $slug]);
         try {
-            return $this->fetchSingleProduct($request);
+            $product = $this->fetchSingleProduct($request);
+            return new GetSingleProductResource($product);
         } catch (MarvelException $e) {
             throw new MarvelException(NOT_FOUND);
         }
     }
+
+
 
     /**
      * Display the specified resource.
@@ -131,14 +161,16 @@ class ProductController extends CoreController
                     throw new AuthorizationException(NOT_AUTHORIZED);
                 }
             }
-            $product = $product->toArray();
-            $product['related_products'] = $this->repository->fetchRelated($slug, $limit, $language);
+            $related_products = $this->repository->fetchRelated($slug, $limit, $language);
+            $product->setRelation('related_products', $related_products);
 
             return $product;
         } catch (Exception $e) {
             throw new MarvelNotFoundException();
         }
     }
+
+
     /**
      * Update the specified resource in storage.
      *
@@ -156,6 +188,13 @@ class ProductController extends CoreController
         }
     }
 
+
+    /**
+     * updateProduct
+     *
+     * @param  Request $request
+     * @return void
+     */
     public function updateProduct(Request $request)
     {
         $setting = $this->settings->first();
@@ -166,6 +205,7 @@ class ProductController extends CoreController
             throw new AuthorizationException(NOT_AUTHORIZED);
         }
     }
+
 
     /**
      * Remove the specified resource from storage.
@@ -179,6 +219,13 @@ class ProductController extends CoreController
         return $this->destroyProduct($request);
     }
 
+
+    /**
+     * destroyProduct
+     *
+     * @param  Request $request
+     * @return void
+     */
     public function destroyProduct(Request $request)
     {
         try {
@@ -193,6 +240,14 @@ class ProductController extends CoreController
         }
     }
 
+
+
+    /**
+     * relatedProducts
+     *
+     * @param  Request $request
+     * @return void
+     */
     public function relatedProducts(Request $request)
     {
         $limit = isset($request->limit) ? $request->limit : 10;
@@ -202,6 +257,14 @@ class ProductController extends CoreController
     }
 
 
+
+    /**
+     * exportProducts
+     *
+     * @param  Request $request
+     * @param  mixed $shop_id
+     * @return void
+     */
     public function exportProducts(Request $request, $shop_id)
     {
 
@@ -268,6 +331,15 @@ class ProductController extends CoreController
         return response()->stream($callback, 200, $headers);
     }
 
+
+
+    /**
+     * exportVariableOptions
+     *
+     * @param  Request $request
+     * @param  mixed $shop_id
+     * @return void
+     */
     public function exportVariableOptions(Request $request, $shop_id)
     {
         $filename = 'variable-options-' . Str::random(5) . '.csv';
@@ -316,6 +388,15 @@ class ProductController extends CoreController
         return response()->stream($callback, 200, $headers);
     }
 
+
+
+
+    /**
+     * importProducts
+     *
+     * @param  Request $request
+     * @return void
+     */
     public function importProducts(Request $request)
     {
         $requestFile = $request->file();
@@ -360,6 +441,14 @@ class ProductController extends CoreController
         }
     }
 
+
+
+    /**
+     * importVariationOptions
+     *
+     * @param  Request $request
+     * @return void
+     */
     public function importVariationOptions(Request $request)
     {
         $requestFile = $request->file();
@@ -403,6 +492,14 @@ class ProductController extends CoreController
         }
     }
 
+
+
+    /**
+     * fetchDigitalFilesForProduct
+     *
+     * @param  Request $request
+     * @return void
+     */
     public function fetchDigitalFilesForProduct(Request $request)
     {
         $user = $request->user();
@@ -414,6 +511,14 @@ class ProductController extends CoreController
         }
     }
 
+
+
+    /**
+     * fetchDigitalFilesForVariation
+     *
+     * @param  Request $request
+     * @return void
+     */
     public function fetchDigitalFilesForVariation(Request $request)
     {
         $user = $request->user();
@@ -425,10 +530,12 @@ class ProductController extends CoreController
         }
     }
 
+
+
     /**
      * bestSellingProducts
      *
-     * @param  $request
+     * @param  Request $request
      * @return void
      */
 
@@ -437,9 +544,16 @@ class ProductController extends CoreController
         return $this->repository->getBestSellingProducts($request);
     }
 
+
+
+    /**
+     * popularProducts
+     *
+     * @param  Request $request
+     * @return object
+     */
     public function popularProducts(Request $request)
     {
-
         $limit = $request->limit ? $request->limit : 10;
         $language = $request->language ?? DEFAULT_LANGUAGE;
         $range = !empty($request->range) && $request->range !== 'undefined'  ? $request->range : '';
@@ -465,6 +579,14 @@ class ProductController extends CoreController
         return $products_query->take($limit)->get();
     }
 
+
+
+    /**
+     * calculateRentalPrice
+     *
+     * @param  Request $request
+     * @return void
+     */
     public function calculateRentalPrice(Request $request)
     {
         $isAvailable = true;
@@ -508,16 +630,146 @@ class ProductController extends CoreController
         return $this->repository->calculatePrice($bookedDay, $product_id, $variation_id, $quantity, $persons, $dropoff_location_id, $pickup_location_id, $deposits, $features);
     }
 
+
+
+    /**
+     * myWishlists
+     *
+     * @param  Request $request
+     * @return void
+     */
     public function myWishlists(Request $request)
     {
         $limit = $request->limit ? $request->limit : 10;
         return $this->fetchWishlists($request)->paginate($limit);
     }
 
+
+
+    /**
+     * fetchWishlists
+     *
+     * @param  Request $request
+     * @return object
+     */
     public function fetchWishlists(Request $request)
     {
         $user = $request->user();
         $wishlist = Wishlist::where('user_id', $user->id)->pluck('product_id');
         return $this->repository->whereIn('id', $wishlist);
+    }
+
+
+    /**
+     * draftedProducts
+     *
+     * @param  Request $request
+     * @return void
+     */
+    public function draftedProducts(Request $request)
+    {
+        $limit = $request->limit ? $request->limit : 15;
+
+        return $this->fetchDraftedProducts($request)->paginate($limit);
+    }
+
+    /**
+     * fetchDraftedProducts
+     *
+     * @param  Request $request
+     * @return mixed
+     */
+    public function fetchDraftedProducts(Request $request)
+    {
+        $user = $request->user() ?? null;;
+        $language = $request->language ? $request->language : DEFAULT_LANGUAGE;
+
+        $products_query = $this->repository->with(['type', 'shop'])->where('language', $language);
+
+        switch ($user) {
+            case $user->hasPermissionTo(Permission::SUPER_ADMIN):
+                return $products_query->whereIn('shop_id', $user->shops->pluck('id'));
+                break;
+
+            case $user->hasPermissionTo(Permission::STORE_OWNER):
+                if (isset($request->shop_id)) {
+                    return $products_query->where('shop_id', '=', $request->shop_id);
+                } else {
+                    return $products_query->whereIn('shop_id', $user->shops->pluck('id'));
+                }
+                break;
+
+            case $user->hasPermissionTo(Permission::STAFF):
+                if (isset($request->shop_id)) {
+                    return $products_query->where('shop_id', '=', $request->shop_id);
+                } else {
+                    return $products_query->where('shop_id', $user->managed_shop->id);
+                }
+                break;
+        }
+
+        return $products_query;
+    }
+
+    /**
+     * productStock
+     *
+     * @param  Request $request
+     * @return void
+     */
+    public function productStock(Request $request)
+    {
+        $limit = $request->limit ? $request->limit : 15;
+
+        return $this->fetchProductStock($request)->paginate($limit);
+    }
+
+    /**
+     * productStock
+     *
+     * @param  Request $request
+     * @return mixed
+     */
+    public function fetchProductStock(Request $request)
+    {
+        $user = $request->user();
+        $language = $request->language ? $request->language : DEFAULT_LANGUAGE;
+
+        $products_query = $this->repository->with(['type', 'shop'])->where('language', $language)->where('quantity', '<', 10);
+
+        switch ($user) {
+            case $user->hasPermissionTo(Permission::SUPER_ADMIN):
+                if (isset($request->shop_id)) {
+                    return $products_query->where('shop_id', '=', $request->shop_id);
+                } else {
+                    return $products_query;
+                }
+                break;
+
+            case $user->hasPermissionTo(Permission::STORE_OWNER):
+                if (isset($request->shop_id)) {
+                    // shop specific
+                    return $products_query->where('shop_id', '=', $request->shop_id);
+                } else {
+                    // overall shops
+                    return $products_query->whereIn('shop_id', $user->shops->pluck('id'));
+                }
+                break;
+
+            case $user->hasPermissionTo(Permission::STAFF):
+                if (isset($request->shop_id)) {
+                    return $products_query->where('shop_id', '=', $request->shop_id);
+                } else {
+                    return $products_query->where('shop_id', '=', null);
+                }
+                break;
+
+            default:
+                return $products_query->where('shop_id', '=', null);
+
+                break;
+        }
+
+        return $products_query;
     }
 }

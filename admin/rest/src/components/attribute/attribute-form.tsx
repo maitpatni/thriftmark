@@ -16,6 +16,7 @@ import {
 } from '@/data/attributes';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { attributeValidationSchema } from '@/components/attribute/attribute.validation-schema';
+import StickyFooterPanel from '@/components/ui/sticky-footer-panel';
 
 type FormValues = {
   name?: string | null;
@@ -37,7 +38,7 @@ export default function CreateOrUpdateAttributeForm({ initialValues }: IProps) {
     {
       slug: shop as string,
     },
-    { enabled: !!shop }
+    { enabled: !!shop },
   );
 
   const shopId = shopData?.id!;
@@ -48,6 +49,7 @@ export default function CreateOrUpdateAttributeForm({ initialValues }: IProps) {
     formState: { errors },
   } = useForm<FormValues>({
     defaultValues: initialValues ? initialValues : { name: '', values: [] },
+    //@ts-ignore
     resolver: yupResolver(attributeValidationSchema),
   });
   const { fields, append, remove } = useFieldArray({
@@ -80,7 +82,7 @@ export default function CreateOrUpdateAttributeForm({ initialValues }: IProps) {
             setErrorMessage(error?.response?.data?.message);
             animateScroll.scrollToTop();
           },
-        }
+        },
       );
     } else {
       updateAttribute({
@@ -108,7 +110,7 @@ export default function CreateOrUpdateAttributeForm({ initialValues }: IProps) {
         />
       ) : null}
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="my-5 flex flex-wrap border-b border-dashed border-border-base pb-8 sm:my-8">
+        <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
           <Description
             title={t('common:attribute')}
             details={`${
@@ -122,7 +124,7 @@ export default function CreateOrUpdateAttributeForm({ initialValues }: IProps) {
           <Card className="w-full sm:w-8/12 md:w-2/3">
             <Input
               label={t('form:input-label-name')}
-              {...register('name', { required: 'Name is required' })}
+              {...register('name', { required: 'form:error-name-required' })}
               error={t(errors.name?.message!)}
               variant="outline"
               className="mb-5"
@@ -130,7 +132,7 @@ export default function CreateOrUpdateAttributeForm({ initialValues }: IProps) {
           </Card>
         </div>
 
-        <div className="my-5 flex flex-wrap sm:my-8">
+        <div className="flex flex-wrap my-5 sm:my-8">
           <Description
             title={t('common:attribute-values')}
             details={`${
@@ -145,7 +147,7 @@ export default function CreateOrUpdateAttributeForm({ initialValues }: IProps) {
             <div>
               {fields.map((item: any & { id: string }, index) => (
                 <div
-                  className="border-b border-dashed border-border-200 py-5 last:border-0 md:py-8"
+                  className="py-5 border-b border-dashed border-border-200 last:border-0 md:py-8"
                   key={item.id}
                 >
                   <div className="grid grid-cols-1 gap-5 sm:grid-cols-5">
@@ -189,25 +191,31 @@ export default function CreateOrUpdateAttributeForm({ initialValues }: IProps) {
           </Card>
         </div>
 
-        <div className="mb-4 text-end">
-          {initialValues && (
-            <Button
-              variant="outline"
-              onClick={router.back}
-              className="me-4"
-              type="button"
-            >
-              {t('form:button-label-back')}
-            </Button>
-          )}
+        <StickyFooterPanel className="z-0">
+          <div className="text-end">
+            {initialValues && (
+              <Button
+                variant="outline"
+                onClick={router.back}
+                className="text-sm me-4 md:text-base"
+                type="button"
+              >
+                {t('form:button-label-back')}
+              </Button>
+            )}
 
-          <Button loading={creating || updating}>
-            {initialValues
-              ? t('form:item-description-update')
-              : t('form:item-description-add')}{' '}
-            {t('common:attribute')}
-          </Button>
-        </div>
+            <Button
+              loading={creating || updating}
+              disabled={creating || updating}
+              className="text-sm md:text-base"
+            >
+              {initialValues
+                ? t('form:item-description-update')
+                : t('form:item-description-add')}{' '}
+              {t('common:attribute')}
+            </Button>
+          </div>
+        </StickyFooterPanel>
       </form>
     </>
   );

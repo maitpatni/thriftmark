@@ -1,91 +1,40 @@
-import Input from '@/components/ui/input';
-import {
-  Control,
-  FieldErrors,
-  useForm,
-  useFormState,
-  useWatch,
-} from 'react-hook-form';
-import Button from '@/components/ui/button';
-import TextArea from '@/components/ui/text-area';
-import Label from '@/components/ui/label';
+import { CategoryDetailSuggestion } from '@/components/category/category-ai-prompt';
 import Card from '@/components/common/card';
-import Description from '@/components/ui/description';
 import * as categoriesIcon from '@/components/icons/category';
 import { EditIcon } from '@/components/icons/edit';
-import { getIcon } from '@/utils/get-icon';
-import { useRouter } from 'next/router';
-import { Config } from '@/config';
-import ValidationError from '@/components/ui/form-validation-error';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { AttachmentInput, Category, ItemProps } from '@/types';
-import { categoryIcons } from './category-icons';
-import { useTranslation } from 'next-i18next';
+import OpenAIButton from '@/components/openAI/openAI.button';
+import Button from '@/components/ui/button';
+import Description from '@/components/ui/description';
 import FileInput from '@/components/ui/file-input';
+import Input from '@/components/ui/input';
+import Label from '@/components/ui/label';
+import { useModalAction } from '@/components/ui/modal/modal.context';
 import SelectInput from '@/components/ui/select-input';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { categoryValidationSchema } from './category-validation-schema';
+import StickyFooterPanel from '@/components/ui/sticky-footer-panel';
+import TextArea from '@/components/ui/text-area';
+import { Config } from '@/config';
 import {
-  useCategoriesQuery,
   useCreateCategoryMutation,
-  useUpdateCategoryMutation,
+  useUpdateCategoryMutation
 } from '@/data/category';
-import { useTypesQuery } from '@/data/type';
 import { useSettingsQuery } from '@/data/settings';
-import { useModalAction } from '../ui/modal/modal.context';
-import OpenAIButton from '../openAI/openAI.button';
-import { join, split } from 'lodash';
+import { AttachmentInput, Category, ItemProps } from '@/types';
+import { getIcon } from '@/utils/get-icon';
 import { formatSlug } from '@/utils/use-slug';
-
-export const chatbotAutoSuggestion = ({ name }: { name: string }) => {
-  return [
-    {
-      id: 1,
-      title: `Introduce our new category: ${name} products that cater to [target audience].`,
-    },
-    {
-      id: 2,
-      title: `Explore our latest category: ${name} products designed to [address specific customer needs].`,
-    },
-    {
-      id: 3,
-      title: `Discover our fresh category: ${name} products that combine style, functionality, and affordability.`,
-    },
-    {
-      id: 4,
-      title: `Check out our newest addition: ${name} products that redefine [industry/segment] standards.`,
-    },
-    {
-      id: 5,
-      title: `Elevate your experience with our curated ${name} products.`,
-    },
-    {
-      id: 6,
-      title: `Enhance your lifestyle with our diverse range of ${name} products.`,
-    },
-    {
-      id: 7,
-      title: `Experience the innovation of our cutting-edge ${name} products.`,
-    },
-    {
-      id: 8,
-      title: `Simplify [specific task/activity] with our innovative ${name} products.`,
-    },
-    {
-      id: 9,
-      title: `Transform the way you [specific activity/task] with our game-changing ${name} products.`,
-    },
-    {
-      id: 10,
-      title: `Unleash the potential of your [target audience] with our exceptional ${name} products.`,
-    },
-  ];
-};
+import { yupResolver } from '@hookform/resolvers/yup';
+import { useTranslation } from 'next-i18next';
+import { useRouter } from 'next/router';
+import { useCallback, useMemo, useState } from 'react';
+import {
+  useForm
+} from 'react-hook-form';
+import { categoryIcons } from './category-icons';
+import { categoryValidationSchema } from './category-validation-schema';
 
 export const updatedIcons = categoryIcons.map((item: any) => {
   item.label = (
     <div className="flex items-center space-s-5">
-      <span className="flex h-5 w-5 items-center justify-center">
+      <span className="flex items-center justify-center w-5 h-5">
         {getIcon({
           iconList: categoriesIcon,
           iconName: item.value,
@@ -150,7 +99,7 @@ export default function CreateOrUpdateCategoriesForm({
           ...initialValues,
           icon: initialValues?.icon
             ? categoryIcons.find(
-                (singleIcon) => singleIcon.value === initialValues?.icon!
+                (singleIcon) => singleIcon.value === initialValues?.icon!,
               )
             : '',
           ...(isNewTranslation && {
@@ -158,6 +107,7 @@ export default function CreateOrUpdateCategoriesForm({
           }),
         }
       : defaultValues,
+    //@ts-ignore
     resolver: yupResolver(categoryValidationSchema),
   });
 
@@ -172,8 +122,8 @@ export default function CreateOrUpdateCategoriesForm({
   });
 
   const generateName = watch('name');
-  const autoSuggestionList = useMemo(() => {
-    return chatbotAutoSuggestion({ name: generateName ?? '' });
+  const categoryDetailSuggestionLists = useMemo(() => {
+    return CategoryDetailSuggestion({ name: generateName ?? '' });
   }, [generateName]);
 
   const handleGenerateDescription = useCallback(() => {
@@ -182,7 +132,7 @@ export default function CreateOrUpdateCategoriesForm({
       name: generateName,
       set_value: setValue,
       key: 'details',
-      suggestion: autoSuggestionList as ItemProps[],
+      suggestion: categoryDetailSuggestionLists as ItemProps[],
     });
   }, [generateName]);
 
@@ -232,7 +182,7 @@ export default function CreateOrUpdateCategoriesForm({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="my-5 flex flex-wrap border-b border-dashed border-border-base pb-8 sm:my-8">
+      <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
         <Description
           title={t('form:input-label-image')}
           details={t('form:category-image-helper-text')}
@@ -240,7 +190,7 @@ export default function CreateOrUpdateCategoriesForm({
         />
 
         <Card className="w-full sm:w-8/12 md:w-2/3">
-          <FileInput name="image" control={control} />
+          <FileInput name="image" control={control} multiple />
         </Card>
       </div>
 
@@ -252,11 +202,11 @@ export default function CreateOrUpdateCategoriesForm({
         />
 
         <Card className="w-full sm:w-8/12 md:w-2/3">
-          <FileInput name="banner_image" control={control} />
+          <FileInput name="banner_image" control={control} multiple />
         </Card>
       </div>
 
-      <div className="my-5 flex flex-wrap sm:my-8">
+      <div className="flex flex-wrap my-5 sm:my-8">
         <Description
           title={t('form:input-label-description')}
           details={`${
@@ -279,14 +229,14 @@ export default function CreateOrUpdateCategoriesForm({
           {isSlugEditable ? (
             <div className="relative mb-5">
               <Input
-                label={`${t('Slug')}`}
+                label={t('form:input-label-slug')}
                 {...register('slug')}
                 error={t(errors.slug?.message!)}
                 variant="outline"
                 disabled={isSlugDisable}
               />
               <button
-                className="absolute top-[27px] right-px z-10 flex h-[46px] w-11 items-center justify-center rounded-tr rounded-br border-l border-solid border-border-base bg-white px-2 text-body transition duration-200 hover:text-heading focus:outline-none"
+                className="absolute top-[27px] right-px z-0 flex h-[46px] w-11 items-center justify-center rounded-tr rounded-br border-l border-solid border-border-base bg-white px-2 text-body transition duration-200 hover:text-heading focus:outline-none"
                 type="button"
                 title={t('common:text-edit')}
                 onClick={() => setIsSlugDisable(false)}
@@ -296,7 +246,7 @@ export default function CreateOrUpdateCategoriesForm({
             </div>
           ) : (
             <Input
-              label={`${t('Slug')}`}
+              label={t('form:input-label-slug')}
               {...register('slug')}
               value={slugAutoSuggest}
               variant="outline"
@@ -308,7 +258,7 @@ export default function CreateOrUpdateCategoriesForm({
           <div className="relative">
             {options?.useAi && (
               <OpenAIButton
-                title="Generate Description With AI"
+                title={t('form:button-label-description-ai')}
                 onClick={handleGenerateDescription}
               />
             )}
@@ -331,24 +281,30 @@ export default function CreateOrUpdateCategoriesForm({
           </div>
         </Card>
       </div>
-      <div className="mb-4 text-end">
-        {initialValues && (
-          <Button
-            variant="outline"
-            onClick={router.back}
-            className="me-4"
-            type="button"
-          >
-            {t('form:button-label-back')}
-          </Button>
-        )}
+      <StickyFooterPanel className="z-0">
+        <div className="text-end">
+          {initialValues && (
+            <Button
+              variant="outline"
+              onClick={router.back}
+              className="text-sm me-4 md:text-base"
+              type="button"
+            >
+              {t('form:button-label-back')}
+            </Button>
+          )}
 
-        <Button loading={creating || updating}>
-          {initialValues
-            ? t('form:button-label-update-category')
-            : t('form:button-label-add-category')}
-        </Button>
-      </div>
+          <Button
+            loading={creating || updating}
+            disabled={creating || updating}
+            className="text-sm md:text-base"
+          >
+            {initialValues
+              ? t('form:button-label-update-category')
+              : t('form:button-label-add-category')}
+          </Button>
+        </div>
+      </StickyFooterPanel>
     </form>
   );
 }

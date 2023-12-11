@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Listeners;
+namespace Marvel\Listeners;
 
 use App\Events\QuestionAnswered;
 use App\Models\User;

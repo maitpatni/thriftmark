@@ -3,6 +3,7 @@
 namespace Marvel\Http\Controllers;
 
 use Exception;
+use Carbon\Carbon;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
 use Marvel\Traits\WalletsTrait;
@@ -29,6 +30,7 @@ use Marvel\Traits\PaymentStatusManagerWithOrderTrait;
 use Marvel\Traits\PaymentTrait;
 use Marvel\Traits\TranslationTrait;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Termwind\Components\BreakLine;
 
 class OrderController extends CoreController
 {
@@ -73,18 +75,49 @@ class OrderController extends CoreController
             throw new AuthorizationException(NOT_AUTHORIZED);
         }
 
-        if ($user && $user->hasPermissionTo(Permission::SUPER_ADMIN) && (!isset($request->shop_id) || $request->shop_id === 'undefined')) {
-            return $this->repository->with('children')->where('id', '!=', null)->where('parent_id', '=', null); //->paginate($limit);
-        } else if ($this->repository->hasPermission($user, $request->shop_id)) {
-            // if ($user && $user->hasPermissionTo(Permission::STORE_OWNER)) {
-            return $this->repository->with('children')->where('shop_id', '=', $request->shop_id)->where('parent_id', '!=', null); //->paginate($limit);
-            // } elseif ($user && $user->hasPermissionTo(Permission::STAFF)) {
-            //     return $this->repository->with('children')->where('shop_id', '=', $request->shop_id)->where('parent_id', '!=', null); //->paginate($limit);
-            // }
-        } else {
-            return $this->repository->with('children')->where('customer_id', '=', $user->id)->where('parent_id', '=', null); //->paginate($limit);
+        switch ($user) {
+            case $user->hasPermissionTo(Permission::SUPER_ADMIN):
+                return $this->repository->with('children')->where('id', '!=', null)->where('parent_id', '=', null);
+                break;
+
+            case $user->hasPermissionTo(Permission::STORE_OWNER):
+                if ($this->repository->hasPermission($user, $request->shop_id)) {
+                    return $this->repository->with('children')->where('shop_id', '=', $request->shop_id)->where('parent_id', '!=', null);
+                } else {
+                    $orders = $this->repository->with('children')->where('parent_id', '!=', null)->whereIn('shop_id', $user->shops->pluck('id'));
+                    return $orders;
+                }
+                break;
+
+            case $user->hasPermissionTo(Permission::STAFF):
+                if ($this->repository->hasPermission($user, $request->shop_id)) {
+                    return $this->repository->with('children')->where('shop_id', '=', $request->shop_id)->where('parent_id', '!=', null);
+                } else {
+                    $orders = $this->repository->with('children')->where('parent_id', '!=', null)->where('shop_id', '=', $user->shop_id);
+                    return $orders;
+                }
+                break;
+
+            default:
+                return $this->repository->with('children')->where('customer_id', '=', $user->id)->where('parent_id', '=', null);
+                break;
         }
+
+        // ********************* Old code *********************
+
+        // if ($user && $user->hasPermissionTo(Permission::SUPER_ADMIN) && (!isset($request->shop_id) || $request->shop_id === 'undefined')) {
+        //     return $this->repository->with('children')->where('id', '!=', null)->where('parent_id', '=', null); //->paginate($limit);
+        // } else if ($this->repository->hasPermission($user, $request->shop_id)) {
+        //     // if ($user && $user->hasPermissionTo(Permission::STORE_OWNER)) {
+        //     return $this->repository->with('children')->where('shop_id', '=', $request->shop_id)->where('parent_id', '!=', null); //->paginate($limit);
+        //     // } elseif ($user && $user->hasPermissionTo(Permission::STAFF)) {
+        //     //     return $this->repository->with('children')->where('shop_id', '=', $request->shop_id)->where('parent_id', '!=', null); //->paginate($limit);
+        //     // }
+        // } else {
+        //     return $this->repository->with('children')->where('customer_id', '=', $user->id)->where('parent_id', '=', null); //->paginate($limit);
+        // }
     }
+
 
     /**
      * Store a newly created resource in storage.
@@ -135,6 +168,7 @@ class OrderController extends CoreController
         try {
             $order = $this->repository->where('language', $language)->with([
                 'products',
+                'shop',
                 'children.shop',
                 'wallet_point',
             ])->where('id', $orderParam)->orWhere('tracking_number', $orderParam)->firstOrFail();
@@ -381,6 +415,9 @@ class OrderController extends CoreController
             $order = $this->repository->with(['products', 'children.shop', 'wallet_point', 'payment_intent'])
                 ->findOneByFieldOrFail('tracking_number', $tracking_number);
 
+            $isFinal = $this->checkOrderStatusIsFinal($order);
+            if ($isFinal) return;
+
             switch ($order->payment_gateway) {
 
                 case PaymentGatewayType::STRIPE:
@@ -402,20 +439,23 @@ class OrderController extends CoreController
                 case PaymentGatewayType::PAYSTACK:
                     $this->paystack($order, $request, $this->settings);
                     break;
+
+                case PaymentGatewayType::XENDIT:
+                    $this->xendit($order, $request, $this->settings);
+                    break;
+
                 case PaymentGatewayType::IYZICO:
-                    $this->paystack($order, $request, $this->settings);
+                    $this->iyzico($order, $request, $this->settings);
+                    break;
+
+                case PaymentGatewayType::BKASH:
+                    $this->bkash($order, $request, $this->settings);
                     break;
 
                 case PaymentGatewayType::PAYMONGO:
                     $this->paymongo($order, $request, $this->settings);
-                case PaymentGatewayType::XENDIT:
-                    $this->xendit($order, $request, $this->settings);
-                case PaymentGatewayType::IYZICO:
-                    $this->iyzico($order, $request, $this->settings);
                     break;
-                case PaymentGatewayType::BKASH:
-                    $this->bkash($order, $request, $this->settings);
-                    break;
+
                 case PaymentGatewayType::FLUTTERWAVE:
                     $this->flutterwave($order, $request, $this->settings);
                     break;

@@ -52,6 +52,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       props: {
         ...(await serverSideTranslations(locale, [
           'common',
+          'form',
           'table',
           'widgets',
         ])),

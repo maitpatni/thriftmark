@@ -33,7 +33,7 @@ export const useSettingsQuery = ({ language }: { language: string }) => {
   );
 
   return {
-    settings: data ?? {},
+    settings: data,
     error,
     loading: isLoading,
   };

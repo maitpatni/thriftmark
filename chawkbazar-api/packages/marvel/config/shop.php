@@ -26,6 +26,8 @@ return [
 
     'media_disk' => env('MEDIA_DISK'),
 
+    'version' => env('APP_VERSION', 12),
+
     'stripe_api_key' => env('STRIPE_API_KEY'),
 
     'app_notice_domain' => env('APP_NOTICE_DOMAIN', 'MARVEL_'),
@@ -101,8 +103,12 @@ return [
         'secret_key' => env('FLW_SECRET_KEY'),
         'secret_hash' => env('FLW_SECRET_HASH'),
     ],
-    
+
     'openai' => [
         'secret_Key' => env('OPENAI_SECRET_KEY'),
     ],
+
+    'pusher' => [
+        'enabled' => env('PUSHER_ENABLED', false),
+    ]
 ];

@@ -35,4 +35,24 @@ export const typeIconList = [
     value: 'Bakery',
     label: 'Bakery',
   },
+  {
+    value: 'BabyCare',
+    label: 'Baby Care',
+  },
+  {
+    value: 'Gadgets',
+    label: 'Gadgets',
+  },
+  {
+    value: 'Plant',
+    label: 'Plant',
+  },
+  {
+    value: 'HomeAppliance',
+    label: 'Home Appliance',
+  },
+  {
+    value: 'MicroGreens',
+    label: 'Micro Greens',
+  },
 ];

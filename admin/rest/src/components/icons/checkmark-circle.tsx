@@ -12,3 +12,26 @@ export const CheckMarkCircle = ({ ...props }) => {
     </svg>
   );
 };
+
+export const CheckMarkGhost = ({ ...props }) => {
+  return (
+    <svg
+      width="1em"
+      height="1em"
+      viewBox="0 0 20 20"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <path
+        opacity={0.2}
+        d="M17.5 10a7.5 7.5 0 11-15 0 7.5 7.5 0 0115 0z"
+        fill="currentColor"
+      />
+      <path
+        d="M13.567 7.683a.626.626 0 010 .884l-4.375 4.375a.626.626 0 01-.884 0l-1.875-1.875a.625.625 0 11.884-.884l1.433 1.433 3.933-3.933a.625.625 0 01.884 0zM18.125 10A8.125 8.125 0 1110 1.875 8.133 8.133 0 0118.125 10zm-1.25 0A6.875 6.875 0 1010 16.875 6.883 6.883 0 0016.875 10z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+};

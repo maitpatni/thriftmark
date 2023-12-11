@@ -44,7 +44,7 @@ export default function Cart() {
         </Scrollbar>
       ) : (
         <motion.div
-          layout
+          // layout
           initial="from"
           animate="to"
           exit="from"

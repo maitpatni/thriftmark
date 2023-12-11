@@ -7,6 +7,7 @@ import { useTranslation } from 'next-i18next';
 import TitleWithSort from '@/components/ui/title-with-sort';
 import { Switch } from '@headlessui/react';
 import { useRouter } from 'next/router';
+import { NoDataFound } from '@/components/icons/no-data-found';
 import {
   Manufacturer,
   MappedPaginatorInfo,
@@ -15,7 +16,7 @@ import {
 } from '@/types';
 import { Routes } from '@/config/routes';
 import { useIsRTL } from '@/utils/locals';
-import { useUpdateManufacturerMutation } from '@/data/manufacturer';
+import { useUpdateManufacturerMutationInList } from '@/data/manufacturer';
 import LanguageSwitcher from '@/components/ui/lang-action/action';
 
 type IProps = {
@@ -35,8 +36,7 @@ const ManufacturerList = ({
 }: IProps) => {
   const { t } = useTranslation();
   const router = useRouter();
-
-  const { alignRight } = useIsRTL();
+  const { alignLeft } = useIsRTL();
 
   const [sortingObj, setSortingObj] = useState<{
     sort: SortOrder;
@@ -63,26 +63,22 @@ const ManufacturerList = ({
 
   let columns = [
     {
-      title: t('table:table-item-id'),
-      dataIndex: 'id',
-      key: 'id',
-      align: 'center' as AlignType,
-      width: 64,
-    },
-    {
-      title: t('table:table-item-image'),
-      dataIndex: 'image',
-      key: 'image',
-      width: 74,
-      render: (image: Attachment) => (
-        <Image
-          src={image?.thumbnail ?? siteSettings.product.placeholder}
-          alt="coupon banner"
-          width={42}
-          height={42}
-          className="overflow-hidden rounded"
+      title: (
+        <TitleWithSort
+          title={t('table:table-item-id')}
+          ascending={
+            sortingObj.sort === SortOrder.Asc && sortingObj.column === 'id'
+          }
+          isActive={sortingObj.column === 'id'}
         />
       ),
+      className: 'cursor-pointer',
+      dataIndex: 'id',
+      key: 'id',
+      align: alignLeft,
+      width: 160,
+      onHeaderCell: () => onHeaderClick('id'),
+      render: (id: number) => `#${t('table:table-item-id')}: ${id}`,
     },
     {
       title: (
@@ -96,13 +92,32 @@ const ManufacturerList = ({
       ),
       dataIndex: 'name',
       key: 'name',
-      align: 'center' as AlignType,
+      width: 220,
+      align: alignLeft,
+      className: 'cursor-pointer',
       onHeaderCell: () => onHeaderClick('name'),
+      render: (name: string, { image }: { image: Attachment }) => {
+        return (
+          <div className="flex items-center">
+            <div className="relative aspect-square h-10 w-10 shrink-0 overflow-hidden rounded border border-border-200/80 bg-gray-100 me-2.5">
+              <Image
+                src={image?.thumbnail ?? siteSettings?.product?.placeholder}
+                alt={name}
+                fill
+                priority={true}
+                sizes="(max-width: 768px) 100vw"
+              />
+            </div>
+            <span className="truncate font-medium">{name}</span>
+          </div>
+        );
+      },
     },
     {
       title: t('table:table-item-products'),
       dataIndex: 'products_count',
       key: 'products_count',
+      width: 120,
       align: 'center' as AlignType,
     },
     {
@@ -110,10 +125,11 @@ const ManufacturerList = ({
       dataIndex: 'is_approved',
       key: 'approve',
       align: 'center' as AlignType,
+      width: 150,
       render: function Render(is_approved: boolean, record: any) {
         const { locale } = useRouter();
         const { mutate: updateManufacturer, isLoading: updating } =
-          useUpdateManufacturerMutation();
+          useUpdateManufacturerMutationInList();
 
         function handleOnClick() {
           updateManufacturer({
@@ -147,10 +163,18 @@ const ManufacturerList = ({
       },
     },
     {
+      title: t('table:table-item-slug'),
+      dataIndex: 'slug',
+      key: 'slug',
+      align: 'center',
+      width: 200,
+    },
+    {
       title: t('table:table-item-actions'),
       dataIndex: 'slug',
       key: 'actions',
       align: 'right' as AlignType,
+      width: 120,
       render: (slug: string, record: Manufacturer) => (
         <LanguageSwitcher
           slug={slug}
@@ -172,8 +196,17 @@ const ManufacturerList = ({
     <>
       <div className="mb-6 overflow-hidden rounded shadow">
         <Table
+          //@ts-ignore
           columns={columns}
-          emptyText={t('table:empty-table-data')}
+          emptyText={() => (
+            <div className="flex flex-col items-center py-7">
+              <NoDataFound className="w-52" />
+              <div className="mb-1 pt-6 text-base font-semibold text-heading">
+                {t('table:empty-table-data')}
+              </div>
+              <p className="text-[13px]">{t('table:empty-table-sorry-text')}</p>
+            </div>
+          )}
           data={manufacturers!}
           rowKey="id"
           scroll={{ x: 900 }}

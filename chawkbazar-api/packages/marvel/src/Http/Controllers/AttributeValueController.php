@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Marvel\Database\Repositories\AttributeValueRepository;
 use Marvel\Exceptions\MarvelException;
 use Marvel\Http\Requests\AttributeValueRequest;
+use Marvel\Http\Resources\AttributeValueResource;
 use Prettus\Validator\Exceptions\ValidatorException;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 
@@ -30,7 +31,8 @@ class AttributeValueController extends CoreController
      */
     public function index(Request $request)
     {
-        return $this->repository->with('attribute')->all();
+        $attributesValue = $this->repository->with('attribute')->all();
+        return AttributeValueResource::collection($attributesValue);
     }
 
     /**

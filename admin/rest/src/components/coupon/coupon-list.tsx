@@ -3,7 +3,6 @@ import Image from 'next/image';
 import { Table } from '@/components/ui/table';
 import { SortOrder } from '@/types';
 import { siteSettings } from '@/settings/site.settings';
-import { Attachment } from '@/types';
 import usePrice from '@/utils/use-price';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -12,12 +11,14 @@ import timezone from 'dayjs/plugin/timezone';
 import { useTranslation } from 'next-i18next';
 import { useState } from 'react';
 import TitleWithSort from '@/components/ui/title-with-sort';
-import { Coupon, MappedPaginatorInfo } from '@/types';
+import { Coupon, MappedPaginatorInfo, Attachment } from '@/types';
 import Link from '@/components/ui/link';
 import { Config } from '@/config';
 import { Routes } from '@/config/routes';
 import { useRouter } from 'next/router';
 import LanguageSwitcher from '@/components/ui/lang-action/action';
+import { NoDataFound } from '@/components/icons/no-data-found';
+import { useIsRTL } from '@/utils/locals';
 
 dayjs.extend(relativeTime);
 dayjs.extend(utc);
@@ -40,6 +41,7 @@ const CouponList = ({
 }: IProps) => {
   const { t } = useTranslation();
   const router = useRouter();
+  const { alignLeft } = useIsRTL();
   const [sortingObj, setSortingObj] = useState<{
     sort: SortOrder;
     column: string | null;
@@ -65,11 +67,22 @@ const CouponList = ({
 
   const columns = [
     {
-      title: t('table:table-item-id'),
+      title: (
+        <TitleWithSort
+          title={t('table:table-item-id')}
+          ascending={
+            sortingObj.sort === SortOrder.Asc && sortingObj.column === 'id'
+          }
+          isActive={sortingObj.column === 'id'}
+        />
+      ),
+      className: 'cursor-pointer',
       dataIndex: 'id',
       key: 'id',
-      align: 'center',
+      align: alignLeft,
       width: 120,
+      onHeaderCell: () => onHeaderClick('id'),
+      render: (id: number) => `#${t('table:table-item-id')}: ${id}`,
     },
     {
       title: t('table:table-item-banner'),
@@ -221,7 +234,15 @@ const CouponList = ({
         <Table
           //@ts-ignore
           columns={columns}
-          emptyText={t('table:empty-table-data')}
+          emptyText={() => (
+            <div className="flex flex-col items-center py-7">
+              <NoDataFound className="w-52" />
+              <div className="mb-1 pt-6 text-base font-semibold text-heading">
+                {t('table:empty-table-data')}
+              </div>
+              <p className="text-[13px]">{t('table:empty-table-sorry-text')}</p>
+            </div>
+          )}
           data={coupons}
           rowKey="id"
           scroll={{ x: 900 }}

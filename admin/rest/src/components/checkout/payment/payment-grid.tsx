@@ -22,13 +22,13 @@ const AVAILABLE_PAYMENT_METHODS_MAP: Record<
   PaymentMethodInformation
 > = {
   CASH: {
-    name: 'Cash',
+    name: 'common:payment-cash',
     value: 'CASH',
     icon: '',
     component: CashPayment,
   },
   CASH_ON_DELIVERY: {
-    name: 'Cash On Delivery',
+    name: 'common:text-cash-on-delivery',
     value: 'CASH_ON_DELIVERY',
     icon: '',
     component: CashOnDelivery,
@@ -54,11 +54,11 @@ const PaymentGrid: React.FC<{ className?: string }> = ({ className }) => {
       ) : null}
 
       <RadioGroup value={gateway} onChange={setGateway}>
-        <RadioGroup.Label className="block mb-5 text-base font-semibold text-heading">
+        <RadioGroup.Label className="mb-5 block text-base font-semibold text-heading">
           {t('text-choose-payment')}
         </RadioGroup.Label>
 
-        <div className="grid grid-cols-2 gap-4 mb-8 md:grid-cols-3">
+        <div className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-3">
           {Object.values(AVAILABLE_PAYMENT_METHODS_MAP).map(
             ({ name, icon, value }) => (
               <RadioGroup.Option value={value} key={value}>
@@ -74,11 +74,11 @@ const PaymentGrid: React.FC<{ className?: string }> = ({ className }) => {
                     {icon ? (
                       <>
                         {/* eslint-disable */}
-                        <img src={icon} alt={name} className="h-[30px]" />
+                        <img src={icon} alt={t(name)} className="h-[30px]" />
                       </>
                     ) : (
                       <span className="text-xs font-semibold text-heading">
-                        {name}
+                        {t(name)}
                       </span>
                     )}
                   </div>

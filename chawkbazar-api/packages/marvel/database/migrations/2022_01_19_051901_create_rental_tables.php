@@ -50,7 +50,7 @@ class CreateRentalTables extends Migration
             $table->json('image')->nullable();
             $table->boolean('is_approved')->default(false);
             $table->double('price')->nullable();
-            $table->enum('type', [ResourceType::DROPOFF_LOCATION, ResourceType::PICKUP_LOCATION, ResourceType::PERSON, ResourceType::DEPOSIT, ResourceType::FEATURES]);
+            $table->enum('type', ResourceType::getValues());
             $table->timestamps();
         });
 

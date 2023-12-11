@@ -9,6 +9,7 @@ import { adminOnly } from '@/utils/auth-utils';
 import { useWithdrawsQuery } from '@/data/withdraw';
 import { useState } from 'react';
 import { SortOrder } from '@/types';
+import PageHeading from '@/components/common/page-heading';
 
 export default function WithdrawsPage() {
   const { t } = useTranslation();
@@ -31,11 +32,9 @@ export default function WithdrawsPage() {
 
   return (
     <>
-      <Card className="mb-8 flex flex-col items-center justify-between md:flex-row">
-        <div className="mb-4 md:mb-0 md:w-1/4">
-          <h1 className="text-lg font-semibold text-heading">
-            {t('common:sidebar-nav-item-withdraws')}
-          </h1>
+      <Card className="mb-8 flex flex-row items-center justify-between">
+        <div className="md:w-1/4">
+          <PageHeading title={t('common:sidebar-nav-item-withdraws')} />
         </div>
       </Card>
 

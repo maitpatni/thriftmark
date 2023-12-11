@@ -1,10 +1,13 @@
 extend type Query {
     refunds(
         orderBy: String
+        search: String
+        searchJoin: String = "AND"
         sortedBy: String
         shop_id: Int @eq
         order_id: Int @eq
         customer_id: Int @eq
+        hasRefundReason: _ @whereHasConditions(columns: ["slug"])
     ): [Refund!]!
         @paginate(
             builder: "Marvel\\GraphQL\\Queries\\RefundQuery@fetchRefunds"
@@ -22,6 +25,8 @@ type Refund {
     status: RefundStatus
     shop: Shop @belongsTo
     order: Order @belongsTo
+    refund_reason_id: ID
+    refund_reason: RefundReason @belongsTo
     customer: User @belongsTo
     created_at: DateTime
     updated_at: DateTime

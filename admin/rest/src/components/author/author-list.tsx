@@ -1,17 +1,18 @@
 import Pagination from '@/components/ui/pagination';
-import Image from 'next/image';
 import { Table, AlignType } from '@/components/ui/table';
-import { siteSettings } from '@/settings/site.settings';
 import { useTranslation } from 'next-i18next';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import TitleWithSort from '@/components/ui/title-with-sort';
 import { Switch } from '@headlessui/react';
-import { Attachment, AuthorPaginator, SortOrder } from '@/types';
-import { useUpdateAuthorMutation } from '@/data/author';
+import { Attachment, SortOrder } from '@/types';
+import { useUpdateAuthorMutationInList } from '@/data/author';
 import { Author, MappedPaginatorInfo } from '@/types';
 import { Routes } from '@/config/routes';
 import LanguageSwitcher from '@/components/ui/lang-action/action';
+import { useIsRTL } from '@/utils/locals';
+import Avatar from '@/components/common/avatar';
+import { NoDataFound } from '@/components/icons/no-data-found';
 
 type IProps = {
   authors: Author[] | undefined;
@@ -30,7 +31,7 @@ const AuthorList = ({
 }: IProps) => {
   const { t } = useTranslation();
   const router = useRouter();
-
+  const { alignLeft } = useIsRTL();
   const [sortingObj, setSortingObj] = useState<{
     sort: SortOrder;
     column: string | null;
@@ -56,26 +57,22 @@ const AuthorList = ({
 
   let columns = [
     {
-      title: t('table:table-item-id'),
-      dataIndex: 'id',
-      key: 'id',
-      align: 'center' as AlignType,
-      width: 64,
-    },
-    {
-      title: t('table:table-item-image'),
-      dataIndex: 'image',
-      key: 'image',
-      width: 74,
-      render: (image: Attachment) => (
-        <Image
-          src={image?.thumbnail ?? siteSettings.product.placeholder}
-          alt="coupon banner"
-          width={42}
-          height={42}
-          className="overflow-hidden rounded"
+      title: (
+        <TitleWithSort
+          title={t('table:table-item-id')}
+          ascending={
+            sortingObj.sort === SortOrder.Asc && sortingObj.column === 'id'
+          }
+          isActive={sortingObj.column === 'id'}
         />
       ),
+      className: 'cursor-pointer',
+      dataIndex: 'id',
+      key: 'id',
+      align: alignLeft,
+      width: 150,
+      onHeaderCell: () => onHeaderClick('id'),
+      render: (id: number) => `#${t('table:table-item-id')}: ${id}`,
     },
     {
       title: (
@@ -89,13 +86,22 @@ const AuthorList = ({
       ),
       dataIndex: 'name',
       key: 'name',
-      align: 'center' as AlignType,
+      className: 'cursor-pointer',
+      align: alignLeft,
+      width: 220,
       onHeaderCell: () => onHeaderClick('name'),
+      render: (name: string, { image }: { image: Attachment }) => (
+        <div className="flex items-center">
+          <Avatar name={name} src={image.thumbnail} />
+          <span className="whitespace-nowrap font-medium ms-2.5">{name}</span>
+        </div>
+      ),
     },
     {
       title: t('table:table-item-products'),
       dataIndex: 'products_count',
       key: 'products_count',
+      width: 160,
       align: 'center' as AlignType,
     },
     {
@@ -103,12 +109,14 @@ const AuthorList = ({
       dataIndex: 'is_approved',
       key: 'approve',
       align: 'center' as AlignType,
+      width: 160,
       render: function Render(is_approved: boolean, record: any) {
         const { mutate: updateAuthor, isLoading: updating } =
-          useUpdateAuthorMutation();
+          useUpdateAuthorMutationInList();
 
         function handleOnClick() {
           updateAuthor({
+            language: router?.locale,
             id: record?.id,
             name: record?.name,
             is_approved: !is_approved,
@@ -140,6 +148,7 @@ const AuthorList = ({
       title: t('table:table-item-actions'),
       dataIndex: 'slug',
       key: 'actions',
+      width: 120,
       align: 'right' as AlignType,
       render: (slug: string, record: Author) => (
         <LanguageSwitcher
@@ -162,8 +171,17 @@ const AuthorList = ({
     <>
       <div className="mb-6 overflow-hidden rounded shadow">
         <Table
+          //@ts-ignore
           columns={columns}
-          emptyText={t('table:empty-table-data')}
+          emptyText={() => (
+            <div className="flex flex-col items-center py-7">
+              <NoDataFound className="w-52" />
+              <div className="mb-1 pt-6 text-base font-semibold text-heading">
+                {t('table:empty-table-data')}
+              </div>
+              <p className="text-[13px]">{t('table:empty-table-sorry-text')}</p>
+            </div>
+          )}
           data={authors}
           rowKey="id"
           scroll={{ x: 900 }}

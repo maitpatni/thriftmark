@@ -16,7 +16,7 @@ import AuthorList from '@/components/author/author-list';
 import { useAuthorsQuery } from '@/data/author';
 import { SortOrder } from '@/types';
 import { Config } from '@/config';
-
+import PageHeading from '@/components/common/page-heading';
 export default function Authors() {
   const { t } = useTranslation();
   const { locale } = useRouter();
@@ -46,11 +46,9 @@ export default function Authors() {
 
   return (
     <>
-      <Card className="mb-8 flex flex-col items-center xl:flex-row">
-        <div className="mb-4 md:w-1/4 xl:mb-0">
-          <h1 className="text-xl font-semibold text-heading">
-            {t('common:text-authors')}
-          </h1>
+      <Card className="mb-8 flex flex-col items-center md:flex-row">
+        <div className="mb-4 md:mb-0 md:w-1/4">
+          <PageHeading title={t('common:text-authors')} />
         </div>
 
         <div className="flex w-full flex-col items-center space-y-4 ms-auto md:flex-row md:space-y-0 xl:w-1/2">

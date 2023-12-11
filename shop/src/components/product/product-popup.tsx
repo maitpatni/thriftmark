@@ -150,7 +150,7 @@ export default function ProductPopup({ productSlug }: { productSlug: string }) {
           <div className="pb-5">
             <div
               className="mb-2 md:mb-2.5 -mt-1.5 flex w-full items-start justify-between space-x-8 rtl:space-x-reverse"
-              role="button"
+              // role="button"
             >
               <h2
                 className="text-lg font-semibold text-heading md:text-xl lg:text-2xl hover:text-black"
@@ -161,9 +161,7 @@ export default function ProductPopup({ productSlug }: { productSlug: string }) {
 
               {me && (
                 <div>
-                  <FavoriteButton
-                    productId={product?.id}
-                  />
+                  <FavoriteButton productId={product?.id} />
                 </div>
               )}
             </div>

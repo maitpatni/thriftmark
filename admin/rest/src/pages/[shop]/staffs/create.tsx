@@ -34,7 +34,7 @@ export default function AddStaffPage() {
   }
   return (
     <>
-      <div className="flex py-5 border-b border-dashed border-border-base sm:py-8">
+      <div className="flex border-b border-dashed border-border-base pb-5 md:pb-7">
         <h1 className="text-lg font-semibold text-heading">
           {t('form:form-title-create-staff')}
         </h1>
