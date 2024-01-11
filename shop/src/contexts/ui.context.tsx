@@ -1,53 +1,27 @@
 import React from 'react';
 import { CartProvider } from '@store/quick-cart/cart.context';
+import { DRAWER_VIEWS, drawerAtom } from '@store/drawer-atom';
+import { useAtom } from 'jotai';
 
 export interface State {
-  displaySidebar: boolean;
-  displayFilter: boolean;
   displayModal: boolean;
-  displayCart: boolean;
   displayGallery: boolean;
-  displayShop: boolean;
   displaySearch: boolean;
   modalView: string;
   modalData: any;
-  drawerView: string | null;
   toastText: string;
 }
 
 const initialState = {
-  displaySidebar: false,
-  displayFilter: false,
   displayModal: false,
-  displayCart: false,
   displayGallery: false,
-  displayShop: false,
   displaySearch: false,
   modalView: 'LOGIN_VIEW',
-  drawerView: null,
   modalData: null,
   toastText: '',
 };
 
 type Action =
-  | {
-      type: 'OPEN_SIDEBAR';
-    }
-  | {
-      type: 'CLOSE_SIDEBAR';
-    }
-  | {
-      type: 'OPEN_CART';
-    }
-  | {
-      type: 'CLOSE_CART';
-    }
-  | {
-      type: 'OPEN_SHOP';
-    }
-  | {
-      type: 'CLOSE_SHOP';
-    }
   | {
       type: 'OPEN_SEARCH';
     }
@@ -59,12 +33,6 @@ type Action =
       text: ToastText;
     }
   | {
-      type: 'OPEN_FILTER';
-    }
-  | {
-      type: 'CLOSE_FILTER';
-    }
-  | {
       type: 'OPEN_MODAL';
     }
   | {
@@ -73,10 +41,6 @@ type Action =
   | {
       type: 'SET_MODAL_VIEW';
       view: MODAL_VIEWS;
-    }
-  | {
-      type: 'SET_DRAWER_VIEW';
-      view: DRAWER_VIEWS;
     }
   | {
       type: 'SET_MODAL_DATA';
@@ -110,8 +74,8 @@ type MODAL_VIEWS =
   | 'SELECT_PRODUCT_VARIATION'
   | 'DELETE_CARD_MODAL'
   | 'WISHLIST_MODAL'
-  | 'GALLERY_VIEW';
-type DRAWER_VIEWS = 'CART_SIDEBAR' | 'MOBILE_MENU';
+  | 'GALLERY_VIEW'
+  | 'NEWSLETTER_MODAL';
 type ToastText = string;
 
 export const UIContext = React.createContext<State | any>(initialState);
@@ -120,31 +84,6 @@ UIContext.displayName = 'UIContext';
 
 function uiReducer(state: State, action: Action) {
   switch (action.type) {
-    case 'OPEN_SIDEBAR': {
-      return {
-        ...state,
-        displaySidebar: true,
-      };
-    }
-    case 'CLOSE_SIDEBAR': {
-      return {
-        ...state,
-        displaySidebar: false,
-        drawerView: null,
-      };
-    }
-    case 'OPEN_CART': {
-      return {
-        ...state,
-        displayCart: true,
-      };
-    }
-    case 'CLOSE_CART': {
-      return {
-        ...state,
-        displayCart: false,
-      };
-    }
     case 'OPEN_SEARCH': {
       return {
         ...state,
@@ -155,30 +94,6 @@ function uiReducer(state: State, action: Action) {
       return {
         ...state,
         displaySearch: false,
-      };
-    }
-    case 'OPEN_FILTER': {
-      return {
-        ...state,
-        displayFilter: true,
-      };
-    }
-    case 'CLOSE_FILTER': {
-      return {
-        ...state,
-        displayFilter: false,
-      };
-    }
-    case 'OPEN_SHOP': {
-      return {
-        ...state,
-        displayShop: true,
-      };
-    }
-    case 'CLOSE_SHOP': {
-      return {
-        ...state,
-        displayShop: false,
       };
     }
     case 'OPEN_MODAL': {
@@ -198,12 +113,6 @@ function uiReducer(state: State, action: Action) {
       return {
         ...state,
         modalView: action.view,
-      };
-    }
-    case 'SET_DRAWER_VIEW': {
-      return {
-        ...state,
-        drawerView: action.view,
       };
     }
     case 'SET_MODAL_DATA': {
@@ -242,30 +151,18 @@ function uiReducer(state: State, action: Action) {
 
 export const UIProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
   const [state, dispatch] = React.useReducer(uiReducer, initialState);
-
-  const openSidebar = () => dispatch({ type: 'OPEN_SIDEBAR' });
-  const closeSidebar = () => dispatch({ type: 'CLOSE_SIDEBAR' });
-  const toggleSidebar = () =>
-    state.displaySidebar
-      ? dispatch({ type: 'CLOSE_SIDEBAR' })
-      : dispatch({ type: 'OPEN_SIDEBAR' });
-  const closeSidebarIfPresent = () =>
-    state.displaySidebar && dispatch({ type: 'CLOSE_CART' });
-  const openCart = () => dispatch({ type: 'OPEN_CART' });
-  const closeCart = () => dispatch({ type: 'CLOSE_CART' });
-  const toggleCart = () =>
-    state.displaySidebar
-      ? dispatch({ type: 'CLOSE_CART' })
-      : dispatch({ type: 'OPEN_CART' });
-  const closeCartIfPresent = () =>
-    state.displaySidebar && dispatch({ type: 'CLOSE_CART' });
-
-  const openFilter = () => dispatch({ type: 'OPEN_FILTER' });
-  const closeFilter = () => dispatch({ type: 'CLOSE_FILTER' });
-
-  const openShop = () => dispatch({ type: 'OPEN_SHOP' });
-  const closeShop = () => dispatch({ type: 'CLOSE_SHOP' });
-
+  const [_, setDrawerView] = useAtom(drawerAtom);
+  const openSidebar = ({ view, data }: { view: DRAWER_VIEWS; data?: any }) =>
+    setDrawerView({
+      view,
+      display: true,
+      data,
+    });
+  const closeSidebar = () =>
+    setDrawerView({
+      view: '',
+      display: false,
+    });
   const openModal = () => dispatch({ type: 'OPEN_MODAL' });
   const closeModal = () => dispatch({ type: 'CLOSE_MODAL' });
   const openSearch = () => dispatch({ type: 'OPEN_SEARCH' });
@@ -278,8 +175,6 @@ export const UIProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
 
   const setModalView = (view: MODAL_VIEWS) =>
     dispatch({ type: 'SET_MODAL_VIEW', view });
-  const setDrawerView = (view: DRAWER_VIEWS) =>
-    dispatch({ type: 'SET_DRAWER_VIEW', view });
   const setModalData = (data: any) =>
     dispatch({ type: 'SET_MODAL_DATA', data });
 
@@ -288,28 +183,17 @@ export const UIProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
       ...state,
       openSidebar,
       closeSidebar,
-      toggleSidebar,
-      closeSidebarIfPresent,
-      openCart,
-      closeCart,
-      toggleCart,
-      closeCartIfPresent,
-      openFilter,
-      closeFilter,
-      openShop,
-      closeShop,
       openModal,
       closeModal,
       openSearch,
       closeSearch,
       setModalView,
-      setDrawerView,
       setUserAvatar,
       setModalData,
       openGallery,
       closeGallery,
     }),
-    [state]
+    [state],
   );
 
   return <UIContext.Provider value={value} {...props} />;

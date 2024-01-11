@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
+use Marvel\Console\MarvelVerification;
 use Marvel\Database\Models\Product;
 use Marvel\Database\Models\Profile;
 use Marvel\Database\Models\Settings;
@@ -130,8 +131,9 @@ class UserController extends CoreController
     {
         $user = $request->user();
         $is_active = $request->is_active === 'true' ? true : false;
+        $admins = User::permission(Permission::SUPER_ADMIN)->pluck('id')->toArray();
         if ($this->repository->hasPermission($user)) {
-            return $this->repository->permission(Permission::STORE_OWNER)->where('is_active', $is_active);
+            return $this->repository->permission(Permission::STORE_OWNER)->where('is_active', $is_active)->whereNotIn('id', $admins);
         }
         return $this->repository->permission(null);
     }
@@ -145,9 +147,9 @@ class UserController extends CoreController
     public function customers(Request $request)
     {
         $limit = $request->limit ? $request->limit : 15;
-        return $this->repository->with(['profile', 'address', 'permissions'])->whereHas('permissions', function ($query) {
-            $query->where('name', Permission::CUSTOMER);
-        })->paginate($limit);
+        $userWithOtherPermissions = User::permission([Permission::SUPER_ADMIN, Permission::STORE_OWNER, Permission::STAFF])->pluck('id')->toArray();
+        return $this->repository->with(['profile', 'address', 'permissions'])
+            ->permission(Permission::CUSTOMER)->whereNotIn('id', $userWithOtherPermissions)->paginate($limit);
     }
 
 
@@ -755,56 +757,45 @@ class UserController extends CoreController
     {
         try {
             $licenseKey = $request->license_key;
-            $isValid = $this->licenseKeyValidator($licenseKey);
-            if (!$isValid) {
+            $language = $request['language'] ?? DEFAULT_LANGUAGE;
+            $marvel = new MarvelVerification($licenseKey);
+            if (!$marvel->getTrust()) {
                 throw new MarvelNotFoundException("Invalid Key");
             }
-            return $this->modifySettingsData();
+            return $marvel->modifySettingsData($language);
         } catch (MarvelException $th) {
             throw new MarvelException("Invalid Key");
         }
-    }
-
-    private function licenseKeyValidator(string $licenseKey): bool
-    {
-        $apiData = getConfigFromApi($licenseKey);
-        $isValidated = $apiData["trust"];
-        $this->appData = [
-            ...$apiData,
-            'last_checking_time' => Carbon::now(),
-            'trust' => $isValidated,
-            'license_key' => $licenseKey,
-        ];
-        setConfig($this->appData);
-
-        if (!$isValidated) {
-            throw new MarvelNotFoundException(NOT_FOUND);
-        }
-        return true;
-    }
-    private function modifySettingsData(): void
-    {
-        $language = isset(request()['language']) ? request()['language'] : DEFAULT_LANGUAGE;
-        Cache::flush();
-        $settings = Settings::getData($language);
-        $settings->update([
-            'options' => [
-                ...$settings->options,
-                'app_settings' => [
-                    'last_checking_time' => $this->appData['last_checking_time'],
-                    'trust' => $this->appData['trust'],
-                ]
-            ]
-        ]);
     }
     public function fetchUsersByPermission(Request $request)
     {
         $user = $request->user() ?? null;
         $permission = strtolower($request->permission) ?? true;
         $is_active = $request->is_active ?? true;
-        if ($this->repository->hasPermission($user)) {
-            return $this->repository->permission($permission)->where('is_active', $is_active);
+        $query = $this->repository->where('is_active', $is_active);
+        if (!$this->repository->hasPermission($user)) {
+            return $query->permission(null);
         }
-        return $this->repository->permission(null);
+        switch ($permission) {
+            case Permission::SUPER_ADMIN:
+                $query->permission($permission);
+                break;
+            case Permission::STORE_OWNER:
+                $excludeUsers = User::permission(Permission::SUPER_ADMIN)->pluck('id')->toArray();
+                $query->permission($permission)->whereNotIn('id', $excludeUsers);
+                break;
+            case Permission::STAFF:
+                $query->permission($permission);
+                break;
+            case Permission::CUSTOMER:
+                $excludeUsers = User::permission([Permission::SUPER_ADMIN, Permission::STORE_OWNER, Permission::STAFF])
+                    ->pluck('id')->toArray();
+                $query->permission($permission)->whereNotIn('id', $excludeUsers);
+                break;
+            default:
+                $query->permission(null);
+                break;
+        }
+        return $query;
     }
 }

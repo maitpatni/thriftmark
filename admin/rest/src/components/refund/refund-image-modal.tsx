@@ -3,18 +3,8 @@ import { useModalState } from '@/components/ui/modal/modal.context';
 import { useIsRTL } from '@/utils/locals';
 import { ChevronLeft } from '@/components/icons/chevron-left';
 import { ChevronRight } from '@/components/icons/chevron-right';
-import {
-  Swiper,
-  SwiperSlide,
-  SwiperOptions,
-  Navigation,
-} from '@/components/ui/slider';
+import { Swiper, SwiperSlide, Navigation } from '@/components/ui/slider';
 import useSwiperRef from '@/utils/use-swiper-ref';
-
-const swiperParams: SwiperOptions = {
-  slidesPerView: 1,
-  spaceBetween: 0,
-};
 
 const RefundImageModal = () => {
   const { data } = useModalState();
@@ -32,7 +22,7 @@ const RefundImageModal = () => {
           initialSlide={data?.initSlide}
           onSwiper={(swiper) => {
             setTimeout(() => {
-              swiper.navigation.init();
+              swiper?.navigation?.init();
             }, 100);
           }}
           loop={data?.images?.length > 1}
@@ -40,7 +30,8 @@ const RefundImageModal = () => {
             prevEl,
             nextEl,
           }}
-          {...swiperParams}
+          spaceBetween={0}
+          slidesPerView={1}
         >
           {data?.images?.map((item: any) => (
             <SwiperSlide
@@ -61,22 +52,22 @@ const RefundImageModal = () => {
           <>
             <div
               ref={prevRef}
-              className="refund-gallery-prev absolute top-2/4 z-10 -mt-4 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-border-200 border-opacity-70 bg-light text-heading shadow-xl transition-all duration-200 start-2 hover:bg-gray-100 md:-mt-5 md:h-9 md:w-9 md:start-3"
+              className="absolute z-10 flex items-center justify-center w-8 h-8 -mt-4 transition-all duration-200 border rounded-full shadow-xl cursor-pointer refund-gallery-prev top-2/4 border-border-200 border-opacity-70 bg-light text-heading start-2 hover:bg-gray-100 md:-mt-5 md:h-9 md:w-9 md:start-3"
             >
               {isRTL ? (
-                <ChevronRight className="h-4 w-4" />
+                <ChevronRight className="w-4 h-4" />
               ) : (
-                <ChevronLeft className="h-4 w-4" />
+                <ChevronLeft className="w-4 h-4" />
               )}
             </div>
             <div
               ref={nextRef}
-              className="refund-gallery-next absolute top-2/4 z-10 -mt-4 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-border-200 border-opacity-70 bg-light text-heading shadow-xl transition-all duration-200 end-2 hover:bg-gray-100 md:-mt-5 md:h-9 md:w-9 md:end-3"
+              className="absolute z-10 flex items-center justify-center w-8 h-8 -mt-4 transition-all duration-200 border rounded-full shadow-xl cursor-pointer refund-gallery-next top-2/4 border-border-200 border-opacity-70 bg-light text-heading end-2 hover:bg-gray-100 md:-mt-5 md:h-9 md:w-9 md:end-3"
             >
               {isRTL ? (
-                <ChevronLeft className="h-4 w-4" />
+                <ChevronLeft className="w-4 h-4" />
               ) : (
-                <ChevronRight className="h-4 w-4" />
+                <ChevronRight className="w-4 h-4" />
               )}
             </div>
           </>

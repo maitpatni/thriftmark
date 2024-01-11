@@ -10,6 +10,7 @@ import {
   Order,
   InvoiceTranslatedText,
   CreateOrderInput,
+  GenerateInvoiceDownloadUrlInput,
 } from '@/types';
 import { orderClient } from './client/order';
 import { useRouter } from 'next/router';
@@ -17,7 +18,7 @@ import { Routes } from '@/config/routes';
 
 export const useOrdersQuery = (
   params: Partial<OrderQueryOptions>,
-  options: any = {}
+  options: any = {},
 ) => {
   const { data, error, isLoading } = useQuery<OrderPaginator, Error>(
     [API_ENDPOINTS.ORDERS, params],
@@ -26,7 +27,7 @@ export const useOrdersQuery = (
     {
       keepPreviousData: true,
       ...options,
-    }
+    },
   );
   return {
     orders: data?.data ?? [],
@@ -45,7 +46,10 @@ export const useOrderQuery = ({
 }) => {
   const { data, error, isLoading } = useQuery<Order, Error>(
     [API_ENDPOINTS.ORDERS, { id, language }],
-    () => orderClient.get({ id, language })
+    () => orderClient.get({ id, language }),
+    {
+      enabled: Boolean(id), // Set to true to enable or false to disable
+    },
   );
 
   return {
@@ -123,14 +127,16 @@ export const useDownloadInvoiceMutation = (
     order_id,
     isRTL,
     language,
-  }: { order_id: string; isRTL: boolean; language: string },
-  options: any = {}
+    shop_id,
+  }: Partial<{ order_id: string; isRTL: boolean; language: string; shop_id: string }>,
+  options: any = {},
 ) => {
   const { t } = useTranslation();
-  const formattedInput = {
+  const formattedInput: GenerateInvoiceDownloadUrlInput = {
     order_id,
-    is_rtl: isRTL,
+    is_rtl: isRTL as boolean,
     language,
+    shop_id,
     translated_text: {
       subtotal: t('order-sub-total'),
       discount: t('order-discount'),
@@ -151,6 +157,24 @@ export const useDownloadInvoiceMutation = (
     () => orderClient.downloadInvoice(formattedInput),
     {
       ...options,
-    }
+    },
   );
 };
+
+export function useOrderSeen() {
+  const queryClient = useQueryClient();
+  const { t } = useTranslation('common');
+  const {
+    mutate: readOrderNotice,
+    isLoading,
+    isSuccess,
+  } = useMutation(orderClient.orderSeen, {
+    onSuccess: () => { },
+    // Always refetch after error or success:
+    onSettled: () => {
+      queryClient.invalidateQueries(API_ENDPOINTS.ORDER_SEEN);
+    },
+  });
+
+  return { readOrderNotice, isLoading, isSuccess };
+}

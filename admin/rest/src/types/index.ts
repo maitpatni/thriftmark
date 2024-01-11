@@ -75,6 +75,14 @@ export enum AddressType {
   Billing = 'billing',
   Shipping = 'shipping',
 }
+export enum RefundPolicyTarget {
+  vendor = 'vendor',
+  customer = 'customer',
+}
+export enum RefundPolicyStatus {
+  Approved = 'approved',
+  Pending = 'pending',
+}
 
 export interface GoogleMapLocation {
   lat?: number | string;
@@ -108,6 +116,25 @@ export enum OrderStatus {
   FAILED = 'order-failed',
   AT_LOCAL_FACILITY = 'order-at-local-facility',
   OUT_FOR_DELIVERY = 'order-out-for-delivery',
+}
+
+export enum FlashSaleType {
+  PERCENTAGE = 'percentage',
+  FIXED_RATE = 'fixed_rate',
+  DEFAULT = 'percentage',
+  // WALLET_POINT_GIFT = 'wallet_point_gift',
+  // FREE_SHIPPING = 'free_shipping',
+}
+
+export interface TodayTotalOrderByStatus {
+  pending: number;
+  processing: number;
+  complete: number;
+  cancelled: number;
+  refunded: number;
+  failed: number;
+  localFacility: number;
+  outForDelivery: number;
 }
 
 export enum PaymentStatus {
@@ -172,13 +199,18 @@ export interface LoginInput {
 export interface AuthResponse {
   token: string;
   permissions: string[];
+  role: string;
 }
-
+export interface BannerImage {
+  key: string;
+  image: Attachment[];
+}
 export interface Type {
   id: string;
   name: string;
   icon: string;
   slug: string;
+  images: BannerImage[];
   promotional_sliders?: AttachmentInput[];
   settings?: TypeSettings;
   products?: ProductPaginator;
@@ -405,6 +437,18 @@ export interface User {
   email_verified: boolean;
 }
 
+export interface Domain {
+  id: String;
+  url: String;
+}
+export interface LicenseAdditionalData {
+  quotaExceeded: boolean;
+  supportValid: boolean;
+  licenseValid: boolean;
+  licenseRemaining: string;
+  purchaseUrl: string;
+}
+
 export interface UpdateUser {
   name?: string;
   profile?: UserProfileInput;
@@ -494,15 +538,94 @@ export interface StoreNoticeInput {
   received_by?: string[];
 }
 
+export interface FAQs {
+  id: string;
+  translated_languages: string[];
+  language: string;
+  faq_title: string;
+  slug: string;
+  faq_description: string;
+  shop_id?: string;
+  user_id: string;
+  created_at: string;
+  updated_at: string;
+  deleted_at?: string;
+}
+
+export interface FAQsInput {
+  faq_title: string;
+  faq_description: string;
+  shop_id?: string;
+  language?: string;
+  slug?: string;
+}
+
+export interface FlashSale {
+  id: string;
+  title: string;
+  slug: string;
+  description: string;
+  start_date: string;
+  end_date: string;
+  image?: Attachment;
+  cover_image?: Attachment;
+  type: string;
+  rate: string;
+  sale_status: boolean;
+  sale_builder: any;
+  language: string;
+  translated_languages: string[];
+  products: Product[];
+  deleted_at?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface FlashSaleInput {
+  title: string;
+  description: string;
+  start_date: string;
+  end_date: string;
+  language?: string;
+  slug?: string;
+  image?: AttachmentInput;
+  cover_image?: AttachmentInput;
+  type: string;
+  rate: string;
+  sale_status: boolean;
+  sale_builder: any;
+}
+
+export interface TermsAndConditions {
+  id: string;
+  translated_languages: string[];
+  language: string;
+  title: string;
+  slug: string;
+  description: string;
+  shop_id?: string;
+  user_id: string;
+  created_at: string;
+  updated_at: string;
+  deleted_at?: string;
+  is_approved?: boolean;
+}
+
+export interface TermsAndConditionsInput {
+  title: string;
+  description: string;
+  shop_id?: string;
+}
+
 export interface StoreNoticeUserToNotifyInput {
   type: string;
 }
 export interface WalletPoint {
-  id: number
-  amount: number
-  order_id: number
-  created_at: string
-  updated_at: string
+  id: number;
+  amount: number;
+  order_id: number;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Order {
@@ -534,6 +657,22 @@ export interface Order {
   order_status: string;
   payment_status: string;
   shop_id?: string;
+  shop?: Shop;
+  note?: string;
+}
+
+export interface NotifyLogs {
+  id: string;
+  receiver: string;
+  sender: string;
+  notify_type: string;
+  notify_receiver_type: string;
+  is_read: boolean;
+  notify_text: string;
+}
+
+export interface ReadAllNotifyLogs {
+  set_all_read: boolean;
 }
 
 export interface OrderProductPivot {
@@ -601,6 +740,7 @@ export interface Product {
   created_at: string;
   updated_at: string;
   ratings: number;
+  in_flash_sale: boolean;
 }
 
 export interface CreateProduct {
@@ -636,6 +776,7 @@ export interface CreateProduct {
   length?: string;
   width?: string;
   shop_id?: string;
+  in_flash_sale: boolean;
 }
 
 export interface AttributeProductPivot {
@@ -722,14 +863,28 @@ export interface CreateAuthorInput {
   shop_id?: string;
   socials?: ShopSocialInput[];
 }
+export interface CreateRefundPolicyInput {
+  title: string;
+  slug: string;
+  target: string;
+  status: string;
+  language: string;
+  description?: string;
+  shop_id?: string;
+}
+export interface CreateRefundReasonInput {
+  name: string;
+  slug: string;
+  language: string;
+}
 
 export interface CreateCategoryInput {
   name: string;
   type_id?: string;
   parent?: number;
   details?: string;
-  image?: AttachmentInput;
-  banner_image?: AttachmentInput;
+  image?: AttachmentInput[];
+  banner_image?: AttachmentInput[];
   icon?: string;
 }
 
@@ -828,6 +983,16 @@ export interface CreateOrderInput {
   card?: CardInput;
   billing_address?: UserAddressInput;
   shipping_address?: UserAddressInput;
+}
+
+export interface CreateNotifyLogsInput {
+  id: string;
+  receiver: string;
+  sender: string;
+  notify_type: string;
+  notify_receiver_type: string;
+  is_read: boolean;
+  notify_text: string;
 }
 
 export interface CreateManufacturerInput {
@@ -933,6 +1098,7 @@ export interface SettingsOptions {
   guestCheckout: boolean;
   smsEvent?: SmsEvent;
   emailEvent?: EmailEvent;
+  pushNotification?: PushNotification;
   server_info?: ServerInfo;
 }
 
@@ -967,7 +1133,7 @@ export interface Conversations {
   created_at: string;
   updated_at: string;
   shop_id: number;
-  unseen: boolean;
+  unseen?: boolean;
   user_id: string;
   user: User;
   shop: Shop;
@@ -1103,6 +1269,7 @@ export interface SettingsOptions {
   maximumQuestionLimit?: number;
   deliveryTime?: DeliveryTime[];
   logo?: Attachment;
+  collapseLogo?: Attachment;
   taxClass?: string;
   shippingClass?: string;
   seo?: SeoSettings;
@@ -1110,11 +1277,24 @@ export interface SettingsOptions {
   facebook?: FacebookSettings;
   useEnableGateway?: boolean;
   currencyOptions?: SettingCurrencyOptions;
-  guestCheckout: boolean
-  smsEvent?: SmsEvent
-  emailEvent?: EmailEvent
+  guestCheckout: boolean;
+  smsEvent?: SmsEvent;
+  emailEvent?: EmailEvent;
+  pushNotification?: PushNotification;
   server_info?: ServerInfo;
   mailchimpSubscribeText?: string;
+  enableTerms?: boolean;
+  maintenance: Maintenance;
+  isUnderMaintenance: boolean;
+}
+
+export interface Maintenance {
+  image: Attachment;
+  title: string;
+  description: string;
+  start: string;
+  until: string;
+  isUnderMaintenance: boolean;
 }
 
 export interface ServerInfo {
@@ -1152,16 +1332,30 @@ export interface SettingsOptionsInput {
   facebook?: FacebookSettingsInput;
   currencyOptions?: SettingCurrencyOptions;
   useEnableGateway?: boolean;
-  guestCheckout: boolean;
+  guestCheckout?: boolean;
   smsEvent?: SmsEvent;
   emailEvent?: EmailEvent;
+  pushNotification?: PushNotification;
   server_info?: ServerInfo;
+  useGoogleMap?: boolean;
+  enableTerms?: boolean;
+  isProductReview?: boolean;
 }
 
 export interface SmsEvent {
   admin?: SmsAdminEvent;
   vendor?: SmsVendorEvent;
   customer?: SmsCustomerEvent;
+}
+
+export interface PushNotification {
+  all?: PushNotificationEvent;
+}
+
+export interface PushNotificationEvent {
+  storeNotice?: boolean;
+  order?: boolean;
+  message?: boolean;
 }
 
 export interface SmsAdminEvent {
@@ -1230,6 +1424,7 @@ export interface ContactDetailsInput {
   contact?: string;
   location?: LocationInput;
   website?: string;
+  emailAddress?: string;
 }
 
 export interface RegisterInput {
@@ -1237,7 +1432,7 @@ export interface RegisterInput {
   password: string;
   name: string;
   shop_id?: number;
-  permission: Permission;
+  // permission: Permission;
 }
 
 export interface ChangePasswordInput {
@@ -1271,6 +1466,9 @@ export interface BlockUserInput {
 export interface WalletPointsInput {
   customer_id: string;
   points: number;
+}
+export interface KeyInput {
+  license_key: string;
 }
 
 export declare type AddStaffInput = {
@@ -1335,6 +1533,36 @@ export interface TypeSettingsInput {
   isHome?: boolean;
   layoutType?: string;
   productCard?: string;
+  bestSelling: {
+    enable?: boolean;
+    title?: string;
+  };
+  popularProducts: {
+    enable?: boolean;
+    title?: string;
+  };
+  category: {
+    enable?: boolean;
+    title?: string;
+  };
+  handpickedProducts: {
+    enable?: boolean;
+    title?: string;
+    products?: Product[];
+    enableSlider?: boolean;
+  };
+  newArrival: {
+    enable?: boolean;
+    title?: string;
+  };
+  authors: {
+    enable?: boolean;
+    title?: string;
+  };
+  manufactures: {
+    enable?: boolean;
+    title?: string;
+  };
 }
 
 export interface ReplyQuestion {
@@ -1346,6 +1574,36 @@ export interface TypeSettings {
   isHome?: boolean;
   layoutType?: string;
   productCard?: string;
+  bestSelling: {
+    enable?: boolean;
+    title?: string;
+  };
+  popularProducts: {
+    enable?: boolean;
+    title?: string;
+  };
+  category: {
+    enable?: boolean;
+    title?: string;
+  };
+  handpickedProducts: {
+    enable?: boolean;
+    title?: string;
+    products?: Product[];
+    enableSlider?: boolean;
+  };
+  newArrival: {
+    enable?: boolean;
+    title?: string;
+  };
+  authors: {
+    enable?: boolean;
+    title?: string;
+  };
+  manufactures: {
+    enable?: boolean;
+    title?: string;
+  };
 }
 
 export interface UserAddressUpsertInput {
@@ -1353,6 +1611,44 @@ export interface UserAddressUpsertInput {
   default?: boolean;
   address: UserAddressInput;
   type: string;
+}
+export interface Refund {
+  id: number;
+  amount: number;
+  status: string;
+  title?: string;
+  description?: string;
+  images?: Attachment;
+  order_id?: Order;
+  customer_id?: User;
+  refund_policy_id?: number;
+}
+
+export interface RefundPolicy {
+  id: string;
+  title: string;
+  slug: string;
+  target: string;
+  status: string;
+  description?: string;
+  language: string;
+  shop_id?: string;
+  shop?: Shop;
+  refunds?: Refund[];
+  translated_languages: Array<string>;
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string;
+}
+export interface RefundReason {
+  id: string;
+  name: string;
+  slug: string;
+  language: string;
+  translated_languages: Array<string>;
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string;
 }
 
 export interface SocialInput {
@@ -1372,6 +1668,7 @@ export interface CategoryQueryOptions extends QueryOptions {
   type: string;
   name: string;
   parent: number | null;
+  self: string;
 }
 
 export interface ConversationQueryOptions extends QueryOptions {
@@ -1394,12 +1691,16 @@ export interface InvoiceTranslatedText {
   quantity: string;
   invoice_no: string;
   date: string;
+  paid_from_wallet: number;
+  amount_due: number;
 }
 
 export interface GenerateInvoiceDownloadUrlInput {
-  order_id: string;
+  order_id?: string;
   translated_text?: InvoiceTranslatedText;
   is_rtl: boolean;
+  language?: string;
+  shop_id?: string | number;
 }
 
 export interface AttributeQueryOptions extends QueryOptions {
@@ -1426,10 +1727,22 @@ export interface AuthorQueryOptions extends QueryOptions {
   name: string;
   is_approved?: boolean;
 }
+export interface RefundPolicyQueryOptions extends QueryOptions {
+  title: string;
+  target: string;
+  status: string;
+}
+export interface RefundReasonQueryOptions extends QueryOptions {
+  name: string;
+}
 
 export interface TypeQueryOptions extends QueryOptions {
   name: string;
   search?: string;
+}
+
+export interface AnalyticsQueryOptions extends QueryOptions {
+  days?: number;
 }
 
 export interface ProductQueryOptions extends QueryOptions {
@@ -1447,10 +1760,15 @@ export interface ProductQueryOptions extends QueryOptions {
   max_price: string;
   rating: string;
   question: string;
+  user_id: string;
+  flash_sale_builder: boolean;
+  product_type: string;
 }
 
 export interface UserQueryOptions extends QueryOptions {
   name: string;
+  search?: string;
+  is_active?: boolean;
 }
 
 export interface ManufacturerQueryOptions extends QueryOptions {
@@ -1479,6 +1797,17 @@ export interface OrderQueryOptions extends QueryOptions {
   name: string;
   shop_id: string;
   tracking_number: string;
+  refund_reason: string;
+  with: string;
+}
+
+export interface NotifyLogsQueryOptions extends QueryOptions {
+  notify_type: string;
+  notify_receiver_type?: string;
+  sender?: string;
+  receiver: string;
+  set_all_read?: boolean;
+  is_read?: boolean;
 }
 
 export interface CouponQueryOptions extends QueryOptions {
@@ -1486,7 +1815,29 @@ export interface CouponQueryOptions extends QueryOptions {
 }
 export interface StoreNoticeQueryOptions extends QueryOptions {
   notice: string;
+  shops: string;
+  'users.id': string;
+}
+
+export interface FAQsQueryOptions extends QueryOptions {
+  faq_title: string;
   shop_id: string;
+}
+
+export interface FlashSaleQueryOptions extends QueryOptions {
+  title?: string;
+  shop_id?: string;
+  slug?: string;
+}
+
+export interface TermsAndConditionsQueryOptions extends QueryOptions {
+  title: string;
+  shop_id: string;
+  is_approved?: boolean;
+}
+
+export interface VendorQueryOptionsType extends QueryOptionsType {
+  is_active?: boolean;
 }
 
 export interface MessageQueryOptions extends QueryOptions {
@@ -1511,6 +1862,7 @@ export interface ReviewQueryOptions extends Omit<QueryOptions, 'language'> {
 export interface ShopQueryOptions extends Omit<QueryOptions, 'language'> {
   name: string;
   parent: number | null;
+  is_active?: boolean;
 }
 
 export interface GoogleMapLocation {
@@ -1528,7 +1880,7 @@ export interface GoogleMapLocation {
   formattedAddress?: string;
 }
 export interface SettingCurrencyOptions {
-  formation?: string;
+  formation?: any;
   fractions?: number;
 }
 
@@ -1541,56 +1893,62 @@ export interface ItemProps {
   title: string;
 }
 
+export interface ShopPaginator extends PaginatorInfo<Shop> {}
 
-export interface ShopPaginator extends PaginatorInfo<Shop> { }
+export interface WithdrawPaginator extends PaginatorInfo<Withdraw> {}
 
-export interface WithdrawPaginator extends PaginatorInfo<Withdraw> { }
+export interface UserPaginator extends PaginatorInfo<User> {}
 
-export interface UserPaginator extends PaginatorInfo<User> { }
+export interface LicensedDomainPaginator extends PaginatorInfo<Domain> {}
 
-export interface QuestionPaginator extends PaginatorInfo<Question> { }
+export interface QuestionPaginator extends PaginatorInfo<Question> {}
 
-export interface StaffPaginator extends PaginatorInfo<User> { }
+export interface StaffPaginator extends PaginatorInfo<User> {}
 
-export interface OrderPaginator extends PaginatorInfo<Order> { }
+export interface OrderPaginator extends PaginatorInfo<Order> {}
 
-export interface CouponPaginator extends PaginatorInfo<Coupon> { }
+export interface NotifyLogsPaginator extends PaginatorInfo<NotifyLogs> {}
 
-export interface StoreNoticePaginator extends PaginatorInfo<StoreNotice> { }
+export interface CouponPaginator extends PaginatorInfo<Coupon> {}
 
-export interface ProductPaginator extends PaginatorInfo<Product> { }
+export interface StoreNoticePaginator extends PaginatorInfo<StoreNotice> {}
 
-export interface CategoryPaginator extends PaginatorInfo<Category> { }
+export interface FAQsPaginator extends PaginatorInfo<FAQs> {}
+
+export interface FlashSalePaginator extends PaginatorInfo<FlashSale> {}
+
+export interface TermsAndConditionsPaginator
+  extends PaginatorInfo<TermsAndConditions> {}
+
+export interface ProductPaginator extends PaginatorInfo<Product> {}
+
+export interface CategoryPaginator extends PaginatorInfo<Category> {}
+
+export interface TaxPaginator extends PaginatorInfo<Tax> {}
 
 export interface ReviewPaginator extends PaginatorInfo<Review> {}
-export interface TaxPaginator extends PaginatorInfo<Tax> { }
 
-export interface ReviewPaginator extends PaginatorInfo<Review> { }
-
-export interface TagPaginator extends PaginatorInfo<Tag> { }
-
-export interface TypePaginator extends PaginatorInfo<Type> {}
+export interface TagPaginator extends PaginatorInfo<Tag> {}
 
 export interface AttributePaginator extends PaginatorInfo<Attribute> {}
 
-export interface TaxPaginator extends PaginatorInfo<Tax> {}
-export interface AttributeValuePaginator extends PaginatorInfo<AttributeValue> {}
-export interface AttributePaginator extends PaginatorInfo<Attribute> { }
-
 export interface AttributeValuePaginator
-  extends PaginatorInfo<AttributeValue> { }
+  extends PaginatorInfo<AttributeValue> {}
 
-export interface ShippingPaginator extends PaginatorInfo<Shipping> { }
+export interface ShippingPaginator extends PaginatorInfo<Shipping> {}
+
+export interface AuthorPaginator extends PaginatorInfo<Author> {}
+
+export interface RefundPolicyPaginator extends PaginatorInfo<RefundPolicy> {}
+
+export interface RefundReasonPaginator extends PaginatorInfo<RefundReason> {}
+
+export interface ManufacturerPaginator extends PaginatorInfo<Manufacturer> {}
 
 export interface OrderStatusPaginator extends PaginatorInfo<OrderStatus> {}
 
-export interface AuthorPaginator extends PaginatorInfo<Author> {}
-export interface AuthorPaginator extends PaginatorInfo<Author> { }
+export interface ConversionPaginator extends PaginatorInfo<Conversations> {}
 
-export interface ManufacturerPaginator extends PaginatorInfo<Manufacturer> { }
+export interface MessagePaginator extends PaginatorInfo<Message> {}
 
-export interface OrderStatusPaginator extends PaginatorInfo<OrderStatus> { }
-
-export interface ConversionPaginator extends PaginatorInfo<Conversations> { }
-
-export interface MessagePaginator extends PaginatorInfo<Message> { }
+export interface TypePaginator extends PaginatorInfo<Type> {}

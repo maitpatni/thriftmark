@@ -11,6 +11,8 @@ import { ShopPaginator, SortOrder } from '@/types';
 import TitleWithSort from '@/components/ui/title-with-sort';
 import Link from '@/components/ui/link';
 import { Shop, MappedPaginatorInfo } from '@/types';
+import Avatar from '@/components/common/avatar';
+import { NoDataFound } from '@/components/icons/no-data-found';
 
 type IProps = {
   shops: Shop[] | undefined;
@@ -29,7 +31,6 @@ const ShopList = ({
 }: IProps) => {
   const { t } = useTranslation();
   const { alignLeft, alignRight } = useIsRTL();
-
   const [sortingObj, setSortingObj] = useState<{
     sort: SortOrder;
     column: string | null;
@@ -55,49 +56,49 @@ const ShopList = ({
 
   const columns = [
     {
-      title: t('table:table-item-logo'),
-      dataIndex: 'logo',
-      key: 'logo',
-      align: 'center',
-      width: 74,
-      render: (logo: any, record: any) => (
-        <Image
-          src={logo?.thumbnail ?? siteSettings.product.placeholder}
-          alt={record?.name}
-          width={42}
-          height={42}
-          className="overflow-hidden rounded"
-        />
-      ),
+      title: t('table:table-item-id'),
+      dataIndex: 'id',
+      key: 'id',
+      align: alignLeft,
+      width: 130,
+      render: (id: number) => `#${t('table:table-item-id')}: ${id}`,
     },
     {
       title: (
         <TitleWithSort
-          title={t('table:table-item-title')}
+          title={t('table:table-item-shop')}
           ascending={
             sortingObj.sort === SortOrder.Asc && sortingObj.column === 'name'
           }
           isActive={sortingObj.column === 'name'}
         />
       ),
-      className: 'cursor-pointer',
       dataIndex: 'name',
       key: 'name',
       align: alignLeft,
+      width: 250,
+      className: 'cursor-pointer',
       onHeaderCell: () => onHeaderClick('name'),
-      render: (name: any, { slug }: any) => (
-        <Link href={`/${slug}`}>
-          <span className="whitespace-nowrap">{name}</span>
-        </Link>
+      render: (name: any, { slug, logo }: any) => (
+        <div className="flex items-center">
+          <div className="relative aspect-square h-10 w-10 shrink-0 overflow-hidden rounded border border-border-200/80 bg-gray-100 me-2.5">
+            <Image
+              src={logo?.thumbnail ?? siteSettings?.product?.placeholder}
+              alt={name}
+              fill
+              priority={true}
+              sizes="(max-width: 768px) 100vw"
+            />
+          </div>
+          <Link href={`/${slug}`}>
+            <span className="truncate whitespace-nowrap font-medium">
+              {name}
+            </span>
+          </Link>
+        </div>
       ),
     },
-    {
-      title: t('table:table-item-owner-name'),
-      dataIndex: 'owner',
-      key: 'owner',
-      align: 'center',
-      render: (owner: any) => owner.name,
-    },
+
     {
       title: (
         <TitleWithSort
@@ -113,8 +114,10 @@ const ShopList = ({
       dataIndex: 'products_count',
       key: 'products_count',
       align: 'center',
+      width: 180,
       onHeaderCell: () => onHeaderClick('products_count'),
     },
+
     {
       title: (
         <TitleWithSort
@@ -131,6 +134,22 @@ const ShopList = ({
       key: 'orders_count',
       align: 'center',
       onHeaderCell: () => onHeaderClick('orders_count'),
+      width: 180,
+    },
+    {
+      title: t('table:table-item-owner-name'),
+      dataIndex: 'owner',
+      key: 'owner',
+      align: alignLeft,
+      width: 250,
+      render: (owner: any) => (
+        <div className="flex items-center">
+          <Avatar name={owner?.name} src={owner?.profile?.avatar?.thumbnail} />
+          <span className="whitespace-nowrap font-medium ms-2">
+            {owner?.name}
+          </span>
+        </div>
+      ),
     },
     {
       title: (
@@ -147,11 +166,16 @@ const ShopList = ({
       dataIndex: 'is_active',
       key: 'is_active',
       align: 'center',
+      width: 150,
       onHeaderCell: () => onHeaderClick('is_active'),
       render: (is_active: boolean) => (
         <Badge
           textKey={is_active ? 'common:text-active' : 'common:text-inactive'}
-          color={is_active ? 'bg-accent' : 'bg-red-500'}
+          color={
+            is_active
+              ? 'bg-accent/10 !text-accent'
+              : 'bg-status-failed/10 text-status-failed'
+          }
         />
       ),
     },
@@ -160,6 +184,7 @@ const ShopList = ({
       dataIndex: 'id',
       key: 'actions',
       align: alignRight,
+      width: 120,
       render: (id: string, { slug, is_active }: any) => {
         return (
           <ActionButtons
@@ -179,10 +204,18 @@ const ShopList = ({
         <Table
           //@ts-ignore
           columns={columns}
-          emptyText={t('table:empty-table-data')}
+          emptyText={() => (
+            <div className="flex flex-col items-center py-7">
+              <NoDataFound className="w-52" />
+              <div className="mb-1 pt-6 text-base font-semibold text-heading">
+                {t('table:empty-table-data')}
+              </div>
+              <p className="text-[13px]">{t('table:empty-table-sorry-text')}</p>
+            </div>
+          )}
           data={shops}
           rowKey="id"
-          scroll={{ x: 800 }}
+          scroll={{ x: 1000 }}
         />
       </div>
 

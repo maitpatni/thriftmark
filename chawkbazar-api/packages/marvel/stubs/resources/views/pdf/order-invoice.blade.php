@@ -12,13 +12,13 @@
     @if ($language === 'bd')
         <style type="text/css">
             body {
-                font-family: Arial, sans-serif, bangla;
+                font-family: Arial, DejaVu Sans, sans-serif, 'bangla';
             }
         </style>
     @endif
     <style type="text/css">
         body {
-            font-family: Arial, sans-serif, bangla;
+            font-family: Arial, DejaVu Sans, sans-serif, 'bangla';
         }
     </style>
 </head>
@@ -33,13 +33,15 @@
         $authorDetails = $settings['contactDetails'];
         $authorLocation = $authorDetails['location'];
         $currency = isset($settings['currency']) ? $settings['currency'] : 'USD';
-        
+        $currencyOptions = isset($settings['currencyOptions']) ? $settings['currencyOptions'] : ['formation' => 'en-US', 'fractions' => 2];
+        $locale = $currencyOptions['formation'] ?? 'en-US';
+
         $amountDue = $order->payment_status !== 'payment-success' ? $order->paid_total - intval($order?->wallet_point?->amount) : 0;
-        
+
         if ($order->order_status === 'order-completed') {
             $amountDue = 0;
         }
-        
+
         if ($order->parent_id) {
             $parentOrder = $order->parent_order;
         } else {
@@ -226,7 +228,7 @@
                 <li
                     style="{{ $is_rtl ? ' direction: rtl; float: right; text-align: left;' : 'float: left; text-align: right;' }} width: 30%; display: inline-block; border-bottom: solid 1px #d4d4d4;">
                     <div style="display: block; padding: 7px; box-sizing: broder-box;">
-                        @money($product->pivot['unit_price'], $currency)
+                        {{ formatCurrency($product->pivot['unit_price'], $currency, $locale) }}
                     </div>
                 </li>
                 <li style="clear: both;"></li>
@@ -247,12 +249,12 @@
                         {{ $translated_text['subtotal'] }} : </div>
                     <div
                         style="display: block; width: 50%; {{ $is_rtl ? ' direction: rtl; float: left; text-align: left;' : 'float: right; text-align: right;' }} color: #6b7280; font-size:14px;">
-                        @money($order->amount, $currency)
+                        {{ formatCurrency($order->amount, $currency, $locale) }}
                     </div>
                     <div style="clear: both;"></div>
                 </div>
+                <br>
             @endif
-
             @if (isset($order->discount))
                 <div style="padding: 3px 0px; box-sizing: border-box;">
                     <div
@@ -261,11 +263,12 @@
 
                     <div
                         style="display: block; width: 50%; {{ $is_rtl ? ' direction: rtl; float: left; text-align: left;' : 'float: right; text-align: right;' }} color: #6b7280; font-size:14px;">
-                        @money($order->discount, $currency)</div>
+                        {{ formatCurrency($order->discount, $currency, $locale) }}
+                    </div>
                     <div style="clear: both;"></div>
                 </div>
+                <br>
             @endif
-
             @if (isset($order->sales_tax))
                 <div style="padding: 3px 0px; box-sizing: border-box;">
                     <div
@@ -274,11 +277,11 @@
 
                     <div
                         style="display: block; width: 50%; {{ $is_rtl ? ' direction: rtl; float: left; text-align: left;' : 'float: right; text-align: right;' }} color: #6b7280; font-size:14px;">
-                        @money($order->sales_tax + $order->cancelled_tax, $currency)</div>
-                    <div style="clear: both;"></div>
-                </div>
+                        {{ formatCurrency($order->sales_tax + $order->cancelled_tax, $currency, $locale) }}
+                        <div style="clear: both;"></div>
+                    </div>
+                    <br>
             @endif
-
             @if (isset($order->delivery_fee))
                 <div style="padding: 3px 0px; box-sizing: border-box;">
                     <div
@@ -287,11 +290,13 @@
 
                     <div
                         style="display: block; width: 50%; {{ $is_rtl ? ' direction: rtl; float: left; text-align: left;' : 'float: right; text-align: right;' }} color: #6b7280; font-size:14px;">
-                        @money($order->delivery_fee + $order->cancelled_delivery_fee, $currency)</div>
+                        {{ formatCurrency($order->sales_tax + $order->cancelled_tax, $currency, $locale) }}
+                    </div>
+
                     <div style="clear: both;"></div>
                 </div>
+                <br>
             @endif
-
             @if (isset($order->cancelled_amount) && $order->cancelled_amount > 0 && $order->cancelled_tax > 0)
                 <div style="padding: 3px 0px; box-sizing: border-box;">
                     <div
@@ -302,9 +307,12 @@
 
                     <div
                         style="display: block; width: 30%; {{ $is_rtl ? ' direction: rtl; float: left; text-align: left;' : 'float: right; text-align: right;' }}  color: #6b7280; font-size:14px;">
-                        - @money($order->cancelled_tax, $currency)</div>
+                        - {{ formatCurrency($order->cancelled_tax, $currency, $locale) }}
+                    </div>
+
                     <div style="clear: both;"></div>
                 </div>
+                <br>
             @endif
             @if (isset($order->cancelled_amount) && $order->cancelled_amount > 0 && $order->cancelled_delivery_fee > 0)
                 <div style="padding: 3px 0px; box-sizing: border-box;">
@@ -316,11 +324,13 @@
 
                     <div
                         style="display: block; width: 23%; {{ $is_rtl ? ' direction: rtl; float: left; text-align: left;' : 'float: right; text-align: right;' }}  color: #6b7280; font-size:14px;">
-                        - @money($order->cancelled_delivery_fee, $currency)</div>
+                        - {{ formatCurrency($order->cancelled_delivery_fee, $currency, $locale) }}
+                    </div>
+
                     <div style="clear: both;"></div>
                 </div>
+                <br>
             @endif
-
             @if (isset($order->cancelled_amount) && $order->cancelled_amount > 0)
                 <div style="padding: 3px 0px; box-sizing: border-box;">
                     <div
@@ -330,11 +340,13 @@
 
                     <div
                         style="display: block; width: 30%; {{ $is_rtl ? ' direction: rtl; float: left; text-align: left;' : 'float: right; text-align: right;' }}  color: #6b7280; font-size:14px;">
-                        - @money($order->cancelled_amount - $order->cancelled_tax - $order->cancelled_delivery_fee, $currency)</div>
+                        -{{ formatCurrency($order->cancelled_amount - $order->cancelled_tax - $order->cancelled_delivery_fee, $currency, $locale) }}
+                    </div>
+
                     <div style="clear: both;"></div>
                 </div>
+                <br>
             @endif
-
             @if (isset($order->total))
                 <div style="padding: 3px 0px; box-sizing: border-box;">
                     <div
@@ -343,9 +355,12 @@
 
                     <div
                         style="display: block; width: 50%; {{ $is_rtl ? ' direction: rtl; float: left; text-align: left;' : 'float: right; text-align: right;' }} font-weight: bold; color: #000000; font-size:14px;">
-                        @money($order->total, $currency)</div>
+                        {{ formatCurrency($order->total, $currency, $locale) }}
+                    </div>
+
                     <div style="clear: both;"></div>
                 </div>
+                <br>
             @endif
             @if (isset($order?->wallet_point?->amount) && !$order->shop_id)
                 <div style="padding: 3px 0px; box-sizing: border-box;">
@@ -355,9 +370,12 @@
 
                     <div
                         style="display: block; width: 50%; {{ $is_rtl ? ' direction: rtl; float: left; text-align: left;' : 'float: right; text-align: right;' }} color: #6b7280; font-size:14px;">
-                        @money($order?->wallet_point?->amount, $currency)</div>
+                        {{ formatCurrency($order?->wallet_point?->amount, $currency, $locale) }}
+                    </div>
+
                     <div style="clear: both;"></div>
                 </div>
+                <br>
             @endif
             @if (!$order->shop_id)
                 <div style="padding: 3px 0px; box-sizing: border-box;">
@@ -367,7 +385,9 @@
 
                     <div
                         style="display: block; width: 50%; {{ $is_rtl ? ' direction: rtl; float: left; text-align: left;' : 'float: right; text-align: right;' }} color: #6b7280; font-size:14px;">
-                        @money($amountDue, $currency)</div>
+                        {{ formatCurrency($amountDue, $currency, $locale) }}
+                    </div>
+
                     <div style="clear: both;"></div>
                 </div>
             @endif

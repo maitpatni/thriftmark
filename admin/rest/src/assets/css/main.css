@@ -70,12 +70,12 @@
 		/*
     * text color used for body/base text -> gray-500
     */
-		--text-base: 107, 114, 128;
+    --text-base: 102, 102, 102;
 
 		/*
     * dark base text color  -> gray-600
     */
-		--text-base-dark: 75, 85, 99;
+    --text-base-dark: 51, 51, 51;
 
 		/*
     * muted text color -> gray-400
@@ -272,6 +272,10 @@
 
   a {
     @apply no-underline;
+  }
+
+  body {
+    @apply font-body;
   }
 }
 @import './custom-plugins.css';

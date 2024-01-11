@@ -2,35 +2,36 @@
 
 namespace Marvel\Http\Controllers;
 
-use Exception;
+use Barryvdh\DomPDF\Facade\Pdf as PDF;
 use Carbon\Carbon;
+use Dompdf\Options;
+use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Support\Facades\DB;
-use Marvel\Traits\WalletsTrait;
-use Illuminate\Support\Str;
-use Illuminate\Http\Request;
-use Marvel\Enums\Permission;
-use Marvel\Exports\OrderExport;
-use Illuminate\Http\JsonResponse;
-use Marvel\Database\Models\Order;
-use Maatwebsite\Excel\Facades\Excel;
-use Marvel\Database\Models\Settings;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Marvel\Database\Repositories\OrderRepository;
-use Marvel\Exceptions\MarvelException;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Maatwebsite\Excel\Facades\Excel;
 use Marvel\Database\Models\DownloadToken;
+use Marvel\Database\Models\Order;
+use Marvel\Database\Models\Settings;
+use Marvel\Database\Repositories\OrderRepository;
+use Marvel\Enums\PaymentGatewayType;
+use Marvel\Enums\Permission;
+use Marvel\Exceptions\MarvelException;
+use Marvel\Exports\OrderExport;
 use Marvel\Http\Requests\OrderCreateRequest;
 use Marvel\Http\Requests\OrderUpdateRequest;
-use niklasravnsborg\LaravelPdf\Facades\Pdf as PDF;
-use Marvel\Enums\PaymentGatewayType;
 use Marvel\Traits\OrderManagementTrait;
 use Marvel\Traits\PaymentStatusManagerWithOrderTrait;
 use Marvel\Traits\PaymentTrait;
 use Marvel\Traits\TranslationTrait;
+use Marvel\Traits\WalletsTrait;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Termwind\Components\BreakLine;
+
 
 class OrderController extends CoreController
 {
@@ -393,6 +394,11 @@ class OrderController extends CoreController
                 'language' => $payloads['language'],
             ];
             $pdf = PDF::loadView('pdf.order-invoice', $invoiceData);
+            $options = new Options();
+            $options->setIsPhpEnabled(true);
+            $options->setIsJavascriptEnabled(true);
+            $pdf->getDomPDF()->setOptions($options);
+            
             $filename = 'invoice-order-' . $payloads['order_id'] . '.pdf';
 
             return $pdf->download($filename);

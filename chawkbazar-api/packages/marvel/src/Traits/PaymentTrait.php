@@ -10,7 +10,9 @@ use Marvel\Database\Models\Settings;
 use Marvel\Exceptions\MarvelException;
 use Marvel\Database\Models\PaymentMethod;
 use Marvel\Database\Models\PaymentIntent;
+use Marvel\Enums\OrderStatus;
 use Marvel\Enums\PaymentGatewayType;
+use Marvel\Enums\PaymentStatus;
 use Marvel\Events\PaymentMethods;
 use Marvel\Facades\Payment;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -363,5 +365,6 @@ trait PaymentTrait
                 $child_order->save();
             }
         }
+        $this->orderStatusManagementOnPayment($order, OrderStatus::PROCESSING, $payment_status);
     }
 }

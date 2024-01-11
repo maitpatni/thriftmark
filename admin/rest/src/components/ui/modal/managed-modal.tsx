@@ -2,6 +2,17 @@ import StoreNoticeDeleteView from '@/components/store-notice/store-notice-delete
 import Modal from '@/components/ui/modal/modal';
 import dynamic from 'next/dynamic';
 import { MODAL_VIEWS, useModalAction, useModalState } from './modal.context';
+
+const FlashSaleDeleteView = dynamic(
+  () => import('@/components/flash-sale/flash-sale-delete-view')
+);
+const FaqsDeleteView = dynamic(
+  () => import('@/components/faqs/faq-delete-view')
+);
+const TermsAndConditionsDeleteView = dynamic(
+  () =>
+    import('@/components/terms-and-conditions/terms-and-conditions-delete-view')
+);
 const TagDeleteView = dynamic(() => import('@/components/tag/tag-delete-view'));
 const TaxDeleteView = dynamic(() => import('@/components/tax/tax-delete-view'));
 const BanCustomerView = dynamic(
@@ -94,17 +105,35 @@ const AuthorDeleteView = dynamic(
 const ManufacturerDeleteView = dynamic(
   () => import('@/components/manufacturer/manufacturer-delete-view')
 );
+const RefundPolicyDeleteView = dynamic(
+  () => import('@/components/refund-policy/refund-policy-delete-view')
+);
+const RefundReasonDeleteView = dynamic(
+  () => import('@/components/refund-reason/refund-reason-delete-view')
+);
 
 const ProductVariation = dynamic(
   () => import('@/components/product/variation/variation')
 );
 const AbuseReport = dynamic(() => import('@/components/reviews/abuse-report'));
-const OpenAiModal = dynamic(
-  () => import('@/components/openAI/openAI.modal')
-);
+const OpenAiModal = dynamic(() => import('@/components/openAI/openAI.modal'));
 const ComposerMessage = dynamic(
   () => import('@/components/message/compose-message')
 );
+
+const ApproveTermView = dynamic(
+  () => import('@/components/terms-and-conditions/approve-term-view')
+);
+const DisApproveTermView = dynamic(
+  () => import('@/components/terms-and-conditions/disapprove-term-view')
+);
+const SearchModal = dynamic(
+  () => import('@/components/layouts/topbar/search-modal')
+);
+const DescriptionView = dynamic(
+  () => import('@/components/shop-single/description-modal')
+);
+
 
 function renderModal(view: MODAL_VIEWS | undefined, data: any) {
   switch (view) {
@@ -176,6 +205,26 @@ function renderModal(view: MODAL_VIEWS | undefined, data: any) {
       return <OpenAiModal />;
     case 'COMPOSE_MESSAGE':
       return <ComposerMessage />;
+    case 'DELETE_FAQ':
+      return <FaqsDeleteView />;
+    case 'DELETE_TERMS_AND_CONDITIONS':
+      return <TermsAndConditionsDeleteView />;
+    case 'TERM_APPROVE_VIEW':
+      return <ApproveTermView />;
+    case 'TERM_DISAPPROVE_VIEW':
+      return <DisApproveTermView />;
+    case 'SEARCH_VIEW':
+      return <SearchModal />;
+    case 'DELETE_FLASH_SALE':
+      return <FlashSaleDeleteView />;
+    case 'DESCRIPTION_VIEW':
+      return <DescriptionView />;
+    case 'DELETE_REFUND_POLICY':
+      return <RefundPolicyDeleteView />;
+    case 'DELETE_REFUND_REASON':
+      return <RefundReasonDeleteView />;
+
+
     default:
       return null;
   }

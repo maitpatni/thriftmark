@@ -3,6 +3,7 @@ import { getLayout } from '@components/layout/layout-three';
 import NewArrivalsProductFeed from '@components/product/feeds/new-arrivals-product-feed';
 import { useEffect } from 'react';
 import { useUI } from '@contexts/ui.context';
+
 export { getStaticProps } from '@framework/homepage/standard';
 
 export default function Home() {

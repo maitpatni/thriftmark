@@ -5,10 +5,11 @@ const Link: React.FC<
     className?: string;
     children?: React.ReactNode;
     title?: string;
+    target?: string;
   }
-> = ({ children, className, title, ...props }) => {
+> = ({ children, className, title, target, ...props }) => {
   return (
-    <NextLink {...props} title={title} className={className}>
+    <NextLink {...props} target={target} title={title} className={className}>
       {children}
     </NextLink>
   );

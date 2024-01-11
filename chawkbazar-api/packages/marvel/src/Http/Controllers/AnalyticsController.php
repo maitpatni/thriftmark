@@ -37,7 +37,7 @@ class AnalyticsController extends CoreController
             // }
             $shops = $user?->shops->pluck('id') ?? [];
             $dbRevenueQuery = DB::table('orders as A')
-                ->whereDate('A.created_at', '>', Carbon::now()->subDays(30))
+                ->whereDate('A.created_at', '<', Carbon::now())
                 ->where('A.order_status', OrderStatus::COMPLETED)
                 ->where('A.parent_id', '!=', null)
                 ->join('orders as B', 'A.parent_id', '=', 'B.id')
@@ -63,7 +63,7 @@ class AnalyticsController extends CoreController
                     ->sum('paid_total');
             }
 
-            $totalRefundQuery = DB::table('refunds')->whereDate('created_at', '>', Carbon::now()->subDays(30));
+            $totalRefundQuery = DB::table('refunds')->whereDate('created_at', '<', Carbon::now());
             if ($user && $user->hasPermissionTo(Permission::SUPER_ADMIN)) {
                 $totalRefunds = $totalRefundQuery->where('shop_id', null)->sum('amount');
             } else {
@@ -94,12 +94,14 @@ class AnalyticsController extends CoreController
             } else {
                 $todaysRevenue = $todaysRevenueQuery->whereIn('A.shop_id', $shops)->get()->sum('paid_total');
             }
-            $totalOrdersQuery = DB::table('orders')->whereDate('created_at', '>', Carbon::now()->subDays(30));
+
+            $totalOrdersQuery = DB::table('orders')->whereDate('created_at', '<', Carbon::now());
             if ($user && $user->hasPermissionTo(Permission::SUPER_ADMIN)) {
                 $totalOrders = $totalOrdersQuery->where('parent_id', null)->count();
             } else {
                 $totalOrders = $totalOrdersQuery->whereIn('shop_id', $shops)->count();
             }
+
             if ($user && $user->hasPermissionTo(Permission::SUPER_ADMIN)) {
                 $totalVendors = User::whereHas('permissions', function ($query) {
                     $query->where('name', Permission::STORE_OWNER);
@@ -108,6 +110,7 @@ class AnalyticsController extends CoreController
             } else {
                 $totalShops = Shop::where('owner_id', '=', $user->id)->count();
             }
+
             $newCustomers = User::permission(Permission::CUSTOMER)->whereDate('created_at', '>', Carbon::now()->subDays(30))->count();
 
             $totalYearSaleByMonth = $this->getTotalYearSaleByMonth($user);

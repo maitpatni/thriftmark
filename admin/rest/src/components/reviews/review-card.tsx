@@ -34,7 +34,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
       <div className="mb-3 flex items-center text-xs text-gray-500">
         {t('common:text-by')}{' '}
         <span className="font-semibold capitalize text-heading ltr:ml-1 rtl:mr-1">
-          {user?.name}
+          {user?.name ? user?.name : t('common:text-guest')}
         </span>
         {user?.is_active && (
           <CheckedIcon className="h-[13px] w-[13px] text-gray-700 ltr:ml-1 rtl:mr-1" />
@@ -42,7 +42,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
       </div>
       <p className="text-sm leading-6 text-heading">{comment}</p>
       {photos && !isEmpty(photos) && (
-        <div className="space-s-2 flex items-start pt-3">
+        <div className="flex items-start pt-3 space-s-2">
           {photos?.map((photo: any, idx: any) => (
             <div className="mb-1" key={idx}>
               <Image
@@ -65,11 +65,11 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
       )}
       <div className="mt-3 flex items-center space-x-4">
         <span className="flex items-center text-xs tracking-wider text-gray-400 transition">
-          <LikeIcon className="me-1.5 h-4 w-4" />
+          <LikeIcon className="h-4 w-4 me-1.5" />
           {positive_feedbacks_count}
         </span>
         <span className="flex items-center text-xs tracking-wider text-gray-400 transition">
-          <DislikeIcon className="me-1.5 h-4 w-4" />
+          <DislikeIcon className="h-4 w-4 me-1.5" />
           {negative_feedbacks_count}
         </span>
       </div>

@@ -11,6 +11,9 @@ import pick from 'lodash/pick';
 import SwitchInput from '@/components/ui/switch-input';
 import Label from '@/components/ui/label';
 import { adminOnly, getAuthCredentials, hasAccess } from '@/utils/auth-utils';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { profileValidationSchema } from './profile-validation-schema';
+import PhoneNumberInput from '@/components/ui/phone-input';
 
 type FormValues = {
   name: string;
@@ -41,6 +44,8 @@ export default function ProfileUpdate({ me }: any) {
     control,
     formState: { errors },
   } = useForm<FormValues>({
+    //@ts-ignore
+    resolver: yupResolver(profileValidationSchema),
     defaultValues: {
       ...(me &&
         pick(me, [
@@ -81,7 +86,7 @@ export default function ProfileUpdate({ me }: any) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="my-5 flex flex-wrap border-b border-dashed border-border-base pb-8 sm:my-8">
+      <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
         <Description
           title={t('form:input-label-avatar')}
           details={t('form:avatar-help-text')}
@@ -93,14 +98,14 @@ export default function ProfileUpdate({ me }: any) {
         </Card>
       </div>
       {permission ? (
-        <div className="my-5 flex flex-wrap border-b border-dashed border-border-base pb-8 sm:my-8">
+        <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
           <Description
             title={t('form:form-notification-title')}
             details={t('form:form-notification-description')}
             className="w-full px-0 pb-5 sm:w-4/12 sm:py-8 sm:pe-4 md:w-1/3 md:pe-5"
           />
 
-          <Card className="mb-5 w-full sm:w-8/12 md:w-2/3">
+          <Card className="w-full mb-5 sm:w-8/12 md:w-2/3">
             <Input
               label={t('form:input-notification-email')}
               {...register('profile.notifications.email')}
@@ -114,7 +119,7 @@ export default function ProfileUpdate({ me }: any) {
                 name="profile.notifications.enable"
                 control={control}
               />
-              <Label className="mb-0">
+              <Label className="!mb-0.5">
                 {t('form:input-enable-notification')}
               </Label>
             </div>
@@ -123,14 +128,14 @@ export default function ProfileUpdate({ me }: any) {
       ) : (
         ''
       )}
-      <div className="my-5 flex flex-wrap border-b border-dashed border-border-base pb-8 sm:my-8">
+      <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
         <Description
           title={t('form:form-title-information')}
           details={t('form:profile-info-help-text')}
           className="w-full px-0 pb-5 sm:w-4/12 sm:py-8 sm:pe-4 md:w-1/3 md:pe-5"
         />
 
-        <Card className="mb-5 w-full sm:w-8/12 md:w-2/3">
+        <Card className="w-full mb-5 sm:w-8/12 md:w-2/3">
           <Input
             label={t('form:input-label-name')}
             {...register('name')}
@@ -145,12 +150,11 @@ export default function ProfileUpdate({ me }: any) {
             variant="outline"
             className="mb-6"
           />
-          <Input
+          <PhoneNumberInput
             label={t('form:input-label-contact')}
             {...register('profile.contact')}
+            control={control}
             error={t(errors.profile?.contact?.message!)}
-            variant="outline"
-            className="mb-5"
           />
         </Card>
         <div className="w-full text-end">

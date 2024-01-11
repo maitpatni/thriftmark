@@ -25,56 +25,12 @@ import NoticeReceivedByInput from '@/components/store-notice/store-notice-receiv
 import { getAuthCredentials } from '@/utils/auth-utils';
 import { find } from 'lodash';
 import { useSettingsQuery } from '@/data/settings';
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo } from 'react';
 import { useModalAction } from '@/components/ui/modal/modal.context';
 import OpenAIButton from '@/components/openAI/openAI.button';
 import { ItemProps } from '@/types';
-
-export const chatbotAutoSuggestion = ({ name }: { name: string }) => {
-  return [
-    {
-      id: 1,
-      title: `Write a notice for store customers about ${name} changes to store hours during the upcoming holiday season.`,
-    },
-    {
-      id: 2,
-      title: `Write a notice for store employees about ${name} the implementation of a new inventory management system.`,
-    },
-    {
-      id: 3,
-      title: `Write a notice for store customers about a ${name} limited-time sale on select merchandise.`,
-    },
-    {
-      id: 4,
-      title: `Write a notice for store employees about a ${name} mandatory staff meeting to discuss safety procedures.`,
-    },
-    {
-      id: 5,
-      title: `Write a notice for store vendors about ${name} changes to the payment process for goods and services.`,
-    },
-    {
-      id: 6,
-      title: `Write a notice for store customers about a ${name} temporary closure due to renovations.`,
-    },
-    {
-      id: 7,
-      title: `Write a notice for store employees about ${name} the launch of a new employee training program.`,
-    },
-    {
-      id: 8,
-      title: `Write a notice for store vendors about a ${name} deadline for submitting new product proposals.`,
-    },
-    {
-      id: 9,
-      title: `Write a notice for store customers about a ${name} change in store policy regarding returns and exchanges.`,
-    },
-    {
-      id: 10,
-      title: `Write a notice for store employees about a ${name} change in management and leadership structure.`,
-    },
-  ];
-};
-
+import StickyFooterPanel from '@/components/ui/sticky-footer-panel';
+import { StoreNoticeDescriptionSuggestions } from '@/components/store-notice/store-notice-ai-prompt';
 
 type user = {
   id: string;
@@ -125,7 +81,7 @@ export default function CreateOrUpdateStoreNoticeForm({
   const noticeReceived =
     initialValues?.shops || initialValues?.users
       ? //@ts-ignore
-      initialValues?.shops.concat(initialValues?.users)
+        initialValues?.shops.concat(initialValues?.users)
       : [];
 
   if (superAdmin) {
@@ -151,25 +107,26 @@ export default function CreateOrUpdateStoreNoticeForm({
     // @ts-ignore
     defaultValues: initialValues
       ? {
-        ...initialValues,
-        effective_from: new Date(initialValues.effective_from!),
-        expired_at: new Date(initialValues?.expired_at!),
-        priority: initialValues?.priority
-          ? priorityType?.find(
-            (priority) => priority.value === initialValues?.priority!
-          )
-          : { name: '', value: '' },
-        type: initialValues?.type
-          ? noticeTypes &&
-          noticeTypes?.find(
-            (type: any) => type.value === initialValues.type!
-          )
-          : { name: '', value: '' },
-        received_by: noticeReceived ? noticeReceived : [],
-      }
+          ...initialValues,
+          effective_from: new Date(initialValues.effective_from!),
+          expired_at: new Date(initialValues?.expired_at!),
+          priority: initialValues?.priority
+            ? priorityType?.find(
+                (priority) => priority.value === initialValues?.priority!,
+              )
+            : { name: '', value: '' },
+          type: initialValues?.type
+            ? noticeTypes &&
+              noticeTypes?.find(
+                (type: any) => type.value === initialValues.type!,
+              )
+            : { name: '', value: '' },
+          received_by: noticeReceived ? noticeReceived : [],
+        }
       : {
-        priority: priorityType[0],
-      },
+          priority: priorityType[0],
+        },
+    //@ts-ignore
     resolver: yupResolver(storeNoticeValidationSchema),
   });
 
@@ -182,12 +139,12 @@ export default function CreateOrUpdateStoreNoticeForm({
   const { usersOrShops } = useUsersOrShopsQuery();
   let shopIndexFind: any = find(
     usersOrShops,
-    (x: any) => x.slug === router.query.shop
+    (x: any) => x.slug === router.query.shop,
   );
 
   const noticeName = watch('notice');
-  const autoSuggestionList = useMemo(() => {
-    return chatbotAutoSuggestion({ name: noticeName ?? '' });
+  const storeNoticeDescriptionSuggestionLists = useMemo(() => {
+    return StoreNoticeDescriptionSuggestions({ name: noticeName ?? '' });
   }, [noticeName]);
 
   const handleGenerateDescription = useCallback(() => {
@@ -196,7 +153,7 @@ export default function CreateOrUpdateStoreNoticeForm({
       name: noticeName,
       set_value: setValue,
       key: 'description',
-      suggestion: autoSuggestionList as ItemProps[],
+      suggestion: storeNoticeDescriptionSuggestionLists as ItemProps[],
     });
   }, [noticeName]);
 
@@ -237,7 +194,7 @@ export default function CreateOrUpdateStoreNoticeForm({
   };
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="my-5 flex flex-wrap sm:my-8">
+      <div className="flex flex-wrap my-5 sm:my-8">
         <Description
           title={t('form:input-label-description')}
           details={`${
@@ -277,7 +234,7 @@ export default function CreateOrUpdateStoreNoticeForm({
             {/* {options?.useAi && (
               <div
                 onClick={handleGenerateDescription}
-                className="absolute right-0 -top-1 z-10 cursor-pointer text-sm font-medium text-accent hover:text-accent-hover"
+                className="absolute right-0 z-10 text-sm font-medium cursor-pointer -top-1 text-accent hover:text-accent-hover"
               >
                 Generate
               </div>
@@ -285,7 +242,7 @@ export default function CreateOrUpdateStoreNoticeForm({
 
             {options?.useAi && (
               <OpenAIButton
-                title="Generate Description With AI"
+                title={t('form:button-label-description-ai')}
                 onClick={handleGenerateDescription}
               />
             )}
@@ -301,8 +258,8 @@ export default function CreateOrUpdateStoreNoticeForm({
             />
           </div>
 
-          <div className="mb-4 flex flex-col sm:flex-row">
-            <div className="mb-5 w-full p-0 sm:mb-0 sm:w-1/2 sm:pe-2">
+          <div className="flex flex-col mb-4 sm:flex-row">
+            <div className="w-full p-0 mb-5 sm:mb-0 sm:w-1/2 sm:pe-2">
               <Label>{`${t('form:store-notice-active-from')}*`}</Label>
 
               <Controller
@@ -384,24 +341,30 @@ export default function CreateOrUpdateStoreNoticeForm({
           )}
         </Card>
       </div>
-      <div className="mb-4 text-end">
-        {initialValues && (
-          <Button
-            variant="outline"
-            onClick={router.back}
-            className="me-4"
-            type="button"
-          >
-            {t('form:button-label-back')}
-          </Button>
-        )}
+      <StickyFooterPanel className="z-0">
+        <div className="text-end">
+          {initialValues && (
+            <Button
+              variant="outline"
+              onClick={router.back}
+              className="text-sm me-4 md:text-base"
+              type="button"
+            >
+              {t('form:button-label-back')}
+            </Button>
+          )}
 
-        <Button loading={updating || creating}>
-          {initialValues
-            ? t('form:button-label-update-store-notice')
-            : t('form:button-label-add-store-notice')}
-        </Button>
-      </div>
+          <Button
+            loading={updating || creating}
+            disabled={updating || creating}
+            className="text-sm md:text-base"
+          >
+            {initialValues
+              ? t('form:button-label-update-store-notice')
+              : t('form:button-label-add-store-notice')}
+          </Button>
+        </div>
+      </StickyFooterPanel>
     </form>
   );
 }

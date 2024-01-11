@@ -1,28 +1,29 @@
-import StickyBox from 'react-sticky-box';
-import Text from '@components/ui/text';
-import { useRouter } from 'next/router';
-import Image from 'next/image';
-import { useUI } from '@contexts/ui.context';
-import { getDirection } from '@utils/get-direction';
+import ShopSidebar from '@components/shops/shop-sidebar';
 import Container from '@components/ui/container';
-import { Drawer } from '@components/common/drawer/drawer';
-import ShopSidebar from './shop-sidebar';
-import ShopSidebarDrawer from './shop-sidebar-drawer';
-import { Shop } from '@type/index';
+import Text from '@components/ui/text';
+import { useUI } from '@contexts/ui.context';
 import { productPlaceholder } from '@lib/placeholders';
+import { Shop } from '@type/index';
 import { useTranslation } from 'next-i18next';
-import ShopProductsGrid from '@components/shops/shop-products-grid';
+import Image from 'next/image';
+import { useCallback } from 'react';
+import StickyBox from 'react-sticky-box';
 
 type Props = {
   data: Shop;
+  children: React.ReactNode;
 };
 
-const ShopsSingleDetails: React.FC<Props> = ({ data }) => {
-  const { openShop, displayShop, closeShop } = useUI();
-  const { locale } = useRouter();
+const ShopsSingleDetails: React.FC<Props> = ({ data, children }) => {
   const { t } = useTranslation();
-  const dir = getDirection(locale);
-  const contentWrapperCSS = dir === 'ltr' ? { left: 0 } : { right: 0 };
+  const { openSidebar } = useUI();
+
+  const handleSidebar = useCallback((view: string) => {
+    return openSidebar({
+      view,
+      data,
+    });
+  }, []);
 
   return (
     <>
@@ -40,7 +41,7 @@ const ShopsSingleDetails: React.FC<Props> = ({ data }) => {
           <Text variant="heading">{data?.name}</Text>
           <button
             className="text-sm font-semibold transition-all text-heading opacity-80 hover:opacity-100"
-            onClick={openShop}
+            onClick={() => handleSidebar('DISPLAY_SHOP_SINGLE_SIDE_BAR')}
           >
             {t('text-more-info')}
           </button>
@@ -70,21 +71,10 @@ const ShopsSingleDetails: React.FC<Props> = ({ data }) => {
               </div>
             )}
 
-            <ShopProductsGrid shopId={data?.id} />
+            {children}
           </div>
         </div>
       </Container>
-      <Drawer
-        placement={dir === 'rtl' ? 'right' : 'left'}
-        open={displayShop}
-        onClose={closeShop}
-        handler={false}
-        showMask={true}
-        level={null}
-        contentWrapperStyle={contentWrapperCSS}
-      >
-        <ShopSidebarDrawer data={data} />
-      </Drawer>
     </>
   );
 };

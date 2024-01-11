@@ -11,6 +11,7 @@ import Link from '@/components/ui/link';
 import { Routes } from '@/config/routes';
 import { BackIcon } from '@/components/icons/back-icon';
 import { RESPONSIVE_WIDTH } from '@/utils/constants';
+import { ExternalLinkIconNew } from '@/components/icons/external-link';
 interface Props {
   className?: string;
   shop: Shop;
@@ -18,18 +19,19 @@ interface Props {
 
 const HeaderView = ({ className, shop, ...rest }: Props) => {
   const router = useRouter();
+  const { locale } = router;
   const { width } = useWindowSize();
   const { permissions } = getAuthCredentials();
   let adminPermission = hasAccess(adminOnly, permissions);
   const routes = adminPermission
     ? Routes.message.list
-    : `${Routes?.dashboard}?tab=1`;
+    : `${Routes?.ownerDashboardMessage}`;
   return (
     <>
       <div
         className={cn(
-          'relative flex shrink-0 items-center border-b border-solid border-b-[#E5E7EB] bg-white p-2 sm:h-20 sm:pl-6 sm:pr-9',
-          width >= RESPONSIVE_WIDTH ? 'justify-between' : '',
+          'relative flex shrink-0 items-center border-b border-solid border-b-[#E7E7E7] bg-white pb-6',
+          width >= RESPONSIVE_WIDTH ? '' : '',
           className
         )}
         {...rest}
@@ -45,19 +47,37 @@ const HeaderView = ({ className, shop, ...rest }: Props) => {
           ''
         )}
         <div
-          className={`flex ${
+          className={`flex items-center gap-2 ${
             adminPermission ? 'cursor-pointer' : ''
-          } items-center`}
+          }`}
           onClick={() => (adminPermission ? router.push(`/${shop?.slug}`) : '')}
         >
           <Avatar
-            src={shop?.logo?.thumbnail ?? siteSettings?.avatar?.placeholder}
+            src={shop?.logo?.original}
             {...rest}
-            alt={shop?.name}
+            name={shop?.name as string}
+            className={cn(
+              'relative h-10 w-10 border-0',
+              shop?.logo?.original
+                ? ''
+                : 'bg-muted-black text-base font-medium text-white'
+            )}
           />
-          <h2 className="ml-2 text-xs font-semibold text-[#64748B]">
-            {shop?.name}
-          </h2>
+          {shop?.name ? (
+            <h2 className="flex items-center gap-2 text-lg font-semibold capitalize text-muted-black">
+              {shop?.name}
+              <Link
+                href={`${process.env.NEXT_PUBLIC_SHOP_URL}/${locale}/shops/${shop?.slug}`}
+                target="_blank"
+                className="text-xl text-[#929292] transition-colors duration-300 hover:text-opacity-60"
+                title={shop?.name}
+              >
+                <ExternalLinkIconNew />
+              </Link>
+            </h2>
+          ) : (
+            ''
+          )}
         </div>
         {/* {adminPermission ? (
           <PopOver

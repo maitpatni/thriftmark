@@ -1,31 +1,31 @@
-import { Attachment, Product } from '@type/index';
-import React, { useCallback, useMemo, useState } from 'react';
-import isEmpty from 'lodash/isEmpty';
-import { ROUTES } from '@lib/routes';
-import { useUI } from '@contexts/ui.context';
-import Button from '@components/ui/button';
-import Image from 'next/image';
 import Counter from '@components/common/counter';
 import { ProductAttributes } from '@components/product/product-attributes';
-import { generateCartItem } from '@utils/generate-cart-item';
-import usePrice from '@lib/use-price';
-import { getVariations } from '@framework/utils/get-variations';
-import { useTranslation } from 'next-i18next';
-import isEqual from 'lodash/isEqual';
 import VariationPrice from '@components/product/product-variant-price';
-import { useCart } from '@store/quick-cart/cart.context';
-import { toast } from 'react-toastify';
-import isMatch from 'lodash/isMatch';
-import dynamic from 'next/dynamic';
-import { useUser } from '@framework/auth';
-import Link from '@components/ui/link';
-import classNames from 'classnames';
+import Button from '@components/ui/button';
 import Gallery from '@components/ui/gallery/gallery';
+import Link from '@components/ui/link';
+import { useUI } from '@contexts/ui.context';
+import { useUser } from '@framework/auth';
+import { getVariations } from '@framework/utils/get-variations';
+import { ROUTES } from '@lib/routes';
+import usePrice from '@lib/use-price';
+import { useCart } from '@store/quick-cart/cart.context';
+import { Attachment, Product } from '@type/index';
+import { generateCartItem } from '@utils/generate-cart-item';
+import classNames from 'classnames';
 import { isArray } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
+import isEqual from 'lodash/isEqual';
+import isMatch from 'lodash/isMatch';
+import { useTranslation } from 'next-i18next';
+import dynamic from 'next/dynamic';
+import Image from 'next/image';
+import React, { useCallback, useMemo, useState } from 'react';
+import { toast } from 'react-toastify';
 
 const FavoriteButton = dynamic(
   () => import('@components/product/favorite-button'),
-  { ssr: false }
+  { ssr: false },
 );
 
 type Props = {
@@ -34,7 +34,12 @@ type Props = {
 
 const WishlistModal: React.FC<Props> = ({ data: product }) => {
   const { t } = useTranslation('common');
-  const { closeModal, openCart } = useUI();
+  const { closeModal, openSidebar } = useUI();
+  const openCart = useCallback(() => {
+    return openSidebar({
+      view: 'DISPLAY_CART',
+    });
+  }, []);
 
   const { addItemToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
@@ -54,7 +59,7 @@ const WishlistModal: React.FC<Props> = ({ data: product }) => {
     return !isEmpty(variations)
       ? !isEmpty(attributes) &&
           Object.keys(variations).every((variation) =>
-            attributes.hasOwnProperty(variation)
+            attributes.hasOwnProperty(variation),
           )
       : true;
   }, [attributes, variations]);
@@ -64,8 +69,8 @@ const WishlistModal: React.FC<Props> = ({ data: product }) => {
       return product?.variation_options?.find((o: any) =>
         isEqual(
           o.options.map((v: any) => v.value).sort(),
-          Object.values(attributes).sort()
-        )
+          Object.values(attributes).sort(),
+        ),
       );
     }
     return {};
@@ -197,7 +202,7 @@ const WishlistModal: React.FC<Props> = ({ data: product }) => {
           <div
             className={classNames(
               'flex gap-2 mb-6 items-center',
-              priceClassName
+              priceClassName,
             )}
           >
             {!isEmpty(variations) ? (

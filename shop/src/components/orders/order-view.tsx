@@ -1,14 +1,15 @@
-import dayjs from "dayjs";
-import Link from "@components/ui/link";
-import usePrice from "@lib/use-price";
-import { formatAddress } from "@lib/format-address";
-import { formatString } from "@lib/format-string";
-import { ROUTES } from "@lib/routes";
-import { useTranslation } from "next-i18next";
-import Badge from "@components/ui/badge";
-import { OrderItems } from "@components/orders/order-items";
-import SuborderItems from "@components/orders/suborder-items";
+import dayjs from 'dayjs';
+import Link from '@components/ui/link';
+import usePrice from '@lib/use-price';
+import { formatAddress } from '@lib/format-address';
+import { formatString } from '@lib/format-string';
+import { ROUTES } from '@lib/routes';
+import { useTranslation } from 'next-i18next';
+import Badge from '@components/ui/badge';
+import { OrderItems } from '@components/orders/order-items';
+import SuborderItems from '@components/orders/suborder-items';
 import OrderViewHeader from '@components/orders/order-view-header';
+import { isEmpty } from 'lodash';
 
 export default function OrderView({ order, loadingStatus }: any) {
   const { t } = useTranslation('common');
@@ -22,12 +23,15 @@ export default function OrderView({ order, loadingStatus }: any) {
   const { price: discount } = usePrice({ amount: order?.discount ?? 0 });
   return (
     <div className="max-w-[1280px] mx-auto mb-14 lg:mb-16">
-      {!loadingStatus ?
-      <OrderViewHeader
-        order={order}
-        // buttonSize="small"
-        loading={loadingStatus}
-      /> : ''}
+      {!loadingStatus ? (
+        <OrderViewHeader
+          order={order}
+          // buttonSize="small"
+          loading={loadingStatus}
+        />
+      ) : (
+        ''
+      )}
       <div className="w-full mx-auto shadow-sm">
         {/* <div className="flex flex-col sm:flex-row items-center justify-between mb-6">
           <div className="mt-5 sm:mt-0 ltr:mr-auto rtl:ml-auto order-2 sm:order-1 text-heading font-semibold flex items-center">
@@ -179,7 +183,7 @@ export default function OrderView({ order, loadingStatus }: any) {
         <div className="mt-11">
           <OrderItems products={order?.products} />
         </div>
-        {order?.children?.length ? (
+        {!isEmpty(order?.children) ? (
           <div className="mt-11">
             <h2 className="text-lg lg:text-xl xl:text-2xl font-bold text-heading mb-3 lg:mb-5 xl:mb-6">
               {t('text-sub-orders')}
@@ -191,9 +195,7 @@ export default function OrderView({ order, loadingStatus }: any) {
                   {t('text-message-sub-order')}
                 </p>
               </div>
-              {Array.isArray(order?.children) && order?.children.length && (
-                <SuborderItems items={order?.children} />
-              )}
+              <SuborderItems items={order?.children} />
             </div>
           </div>
         ) : null}

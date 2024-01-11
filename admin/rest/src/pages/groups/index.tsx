@@ -1,21 +1,21 @@
 import Card from '@/components/common/card';
-import Layout from '@/components/layouts/admin';
+import PageHeading from '@/components/common/page-heading';
 import Search from '@/components/common/search';
 import TypeList from '@/components/group/group-list';
+import Layout from '@/components/layouts/admin';
 import ErrorMessage from '@/components/ui/error-message';
 import LinkButton from '@/components/ui/link-button';
 import Loader from '@/components/ui/loader/loader';
+import { Config } from '@/config';
+import { Routes } from '@/config/routes';
+import { useTypesQuery } from '@/data/type';
 import { SortOrder } from '@/types';
-import { useState } from 'react';
+import { adminOnly } from '@/utils/auth-utils';
+import { GetStaticProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { GetStaticProps } from 'next';
-import { useTypesQuery } from '@/data/type';
-import { Routes } from '@/config/routes';
 import { useRouter } from 'next/router';
-import { adminOnly } from '@/utils/auth-utils';
-import { Config } from '@/config';
-
+import { useState } from 'react';
 export default function TypesPage() {
   const { locale } = useRouter();
   const { t } = useTranslation();
@@ -38,11 +38,9 @@ export default function TypesPage() {
 
   return (
     <>
-      <Card className="mb-8 flex flex-col items-center xl:flex-row">
-        <div className="mb-4 md:w-1/4 xl:mb-0">
-          <h1 className="text-xl font-semibold text-heading">
-            {t('common:sidebar-nav-item-groups')}
-          </h1>
+      <Card className="mb-8 flex flex-col items-center md:flex-row">
+        <div className="mb-4 md:mb-0 md:w-1/4">
+          <PageHeading title={t('common:sidebar-nav-item-groups')} />
         </div>
 
         <div className="flex w-full flex-col items-center space-y-4 ms-auto md:flex-row md:space-y-0 xl:w-1/2">

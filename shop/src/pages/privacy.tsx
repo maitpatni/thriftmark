@@ -1,6 +1,5 @@
-import { getLayout } from '@components/layout/layout';
-
-export { getStaticProps } from '@framework/homepage/standard';
+import { getLayout } from "@components/layout/layout";
+import { GetStaticProps } from "next";
 
 export default function PrivacyPage() {
   return (

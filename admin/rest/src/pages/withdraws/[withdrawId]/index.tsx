@@ -103,7 +103,7 @@ const Withdraw = () => {
                 options={WithdrawStatus}
                 placeholder={t('form:input-placeholder-order-status')}
                 rules={{
-                  required: 'Status is required',
+                  required: 'form:error-status-required',
                 }}
               />
 

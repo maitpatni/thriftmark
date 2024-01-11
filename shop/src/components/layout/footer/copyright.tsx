@@ -1,9 +1,8 @@
-import Container from "@components/ui/container";
-import { useTranslation } from "next-i18next";
+import Container from '@components/ui/container';
+import { useSettings } from '@framework/settings';
 import socialIcons from "@components/icons/social-icon";
-import { useSettings } from "@contexts/settings.context";
+import { useTranslation } from "next-i18next";
 import { getIcon } from "@lib/get-icon";
-import Image from 'next/image';
 
 const year = new Date().getFullYear();
 

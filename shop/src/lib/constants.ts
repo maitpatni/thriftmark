@@ -1,3 +1,5 @@
+import { atom } from 'jotai';
+
 export const CART_KEY = 'chawk-cart';
 export const TOKEN = 'token';
 export const AUTH_TOKEN = 'auth_token';
@@ -8,7 +10,15 @@ export const CUSTOMER = 'customer';
 export const CHECKOUT = 'chawkbazar-checkout';
 export const RTL_LANGUAGES: ReadonlyArray<string> = ['ar', 'he'];
 export const EMAIL_VERIFIED = 'EMAIL_VERIFIED';
-
+export const AUTH_CRED = 'AUTH_CRED_SHOP';
+export const STORE_OWNER = 'store_owner';
+export const STAFF = 'staff';
+export const isMultiLangEnable =
+  process.env.NEXT_PUBLIC_ENABLE_MULTI_LANG === 'true' &&
+  !!process.env.NEXT_PUBLIC_AVAILABLE_LANGUAGES;
+export const checkIsMaintenanceModeComing = atom(false);
+export const checkIsMaintenanceModeStart = atom(false);
+export const RESPONSIVE_WIDTH = 1024 as number;
 export const ORDER_STATUS = [
   { name: 'Order Pending', status: 'order-pending', serial: 1 },
   { name: 'Order Processing', status: 'order-processing', serial: 2 },

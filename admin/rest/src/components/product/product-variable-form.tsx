@@ -1,5 +1,13 @@
 import Input from '@/components/ui/input';
-import { useFieldArray, useFormContext } from 'react-hook-form';
+import {
+  useFormContext,
+  useWatch,
+  FieldArrayWithId,
+  FieldValues,
+  FieldArrayPath,
+  FieldArray,
+  FieldArrayMethodProps,
+} from 'react-hook-form';
 import Button from '@/components/ui/button';
 import Description from '@/components/ui/description';
 import Card from '@/components/common/card';
@@ -17,17 +25,32 @@ import { getCartesianProduct, filterAttributes } from './form-utils';
 import { useRouter } from 'next/router';
 import { Config } from '@/config';
 import { useSettingsQuery } from '@/data/settings';
+import { isObject } from 'lodash';
+import Alert from '@/components/ui/alert';
 
 type IProps = {
   initialValues?: Product | null;
   shopId: string | undefined;
   settings: Settings | undefined;
+  name: string;
+  fields: FieldArrayWithId<FieldValues, FieldArrayPath<FieldValues>, 'id'>[];
+  append: (
+    value:
+      | Partial<FieldArray<FieldValues, FieldArrayPath<FieldValues>>>
+      | Partial<FieldArray<FieldValues, FieldArrayPath<FieldValues>>>[],
+    options?: FieldArrayMethodProps,
+  ) => void;
+  remove: (index?: number | number[]) => void;
 };
 
 export default function ProductVariableForm({
   shopId,
   initialValues,
   settings,
+  name,
+  fields,
+  append,
+  remove,
 }: IProps) {
   const { t } = useTranslation();
   const { locale } = useRouter();
@@ -40,7 +63,7 @@ export default function ProductVariableForm({
   const upload_max_filesize = options?.server_info?.upload_max_filesize / 1024;
 
   const { attributes, loading } = useAttributesQuery({
-    shop_id: initialValues ? initialValues.shop_id : shopId,
+    shop_id: initialValues ? initialValues?.shop_id : shopId,
     language: locale,
   });
   const {
@@ -51,14 +74,11 @@ export default function ProductVariableForm({
     getValues,
     formState: { errors },
   } = useFormContext();
-  // This field array will keep all the attribute dropdown fields
-  const { fields, append, remove } = useFieldArray({
-    shouldUnregister: true,
+  const variations = useWatch({
     control,
-    name: 'variations',
+    name: name,
   });
-  const variations = watch('variations');
-  const cartesianProduct = getCartesianProduct(getValues('variations'));
+  const cartesianProduct = getCartesianProduct(getValues(name));
   return (
     <div className="my-5 flex flex-wrap sm:my-8">
       <Description
@@ -71,12 +91,13 @@ export default function ProductVariableForm({
         className="w-full px-0 pb-5 sm:w-4/12 sm:py-8 sm:pe-4 md:w-1/3 md:pe-5"
       />
       <Card className="w-full p-0 sm:w-8/12 md:w-2/3 md:p-0">
-        <div className="mb-5 border-t border-dashed border-border-200 md:mb-8">
+        <div className="mb-5 md:mb-8">
           <Title className="mt-8 mb-0 px-5 text-center text-lg uppercase md:px-8">
             {t('form:form-title-options')}
           </Title>
           <div>
             {fields?.map((field: any, index: number) => {
+              let watchAttr = watch(`variations.${index}.attribute`)?.values;
               return (
                 <div
                   key={field.id}
@@ -87,14 +108,15 @@ export default function ProductVariableForm({
                       {t('form:form-title-options')} {index + 1}
                     </Title>
                     <button
-                      onClick={() => remove(index)}
+                      onClick={() => {
+                        return remove(index);
+                      }}
                       type="button"
                       className="text-sm text-red-500 transition-colors duration-200 hover:text-red-700 focus:outline-none"
                     >
                       {t('form:button-label-remove')}
                     </button>
                   </div>
-
                   <div className="grid grid-cols-fit gap-5">
                     <div className="mt-5">
                       <Label>{t('form:input-label-attribute-name')}*</Label>
@@ -118,7 +140,7 @@ export default function ProductVariableForm({
                         defaultValue={field.value}
                         getOptionLabel={(option: any) => option.value}
                         getOptionValue={(option: any) => option.id}
-                        options={watch(`variations.${index}.attribute`)?.values}
+                        options={watchAttr}
                       />
                     </div>
                   </div>
@@ -129,7 +151,7 @@ export default function ProductVariableForm({
 
           <div className="px-5 md:px-8">
             <Button
-              disabled={fields.length === attributes?.length}
+              disabled={fields?.length === attributes?.length}
               onClick={(e: any) => {
                 e.preventDefault();
                 append({ attribute: '', value: [] });
@@ -158,7 +180,12 @@ export default function ProductVariableForm({
                         <span className="font-normal text-blue-600">
                           {Array.isArray(fieldAttributeValue)
                             ? fieldAttributeValue?.map((a) => a.value).join('/')
-                            : fieldAttributeValue.value}
+                            : fieldAttributeValue?.title}
+
+                          {isObject(fieldAttributeValue)
+                            ? // @ts-ignore
+                              fieldAttributeValue?.value
+                            : ''}
                         </span>
                       </Title>
                       <TitleAndOptionsInput
@@ -178,8 +205,10 @@ export default function ProductVariableForm({
                           label={`${t('form:input-label-price')}*`}
                           type="number"
                           {...register(`variation_options.${index}.price`)}
-                          // @ts-ignore
-                          error={t(errors.variation_options?.[index]?.price?.message)}
+                          error={t(
+                            // @ts-ignore
+                            errors.variation_options?.[index]?.price?.message,
+                          )}
                           variant="outline"
                           className="mb-5"
                         />
@@ -187,8 +216,11 @@ export default function ProductVariableForm({
                           label={t('form:input-label-sale-price')}
                           type="number"
                           {...register(`variation_options.${index}.sale_price`)}
-                          // @ts-ignore
-                          error={t(errors.variation_options?.[index]?.sale_price?.message )}
+                          error={t(
+                            // @ts-ignore
+                            errors.variation_options?.[index]?.sale_price
+                              ?.message,
+                          )}
                           variant="outline"
                           className="mb-5"
                         />
@@ -200,17 +232,23 @@ export default function ProductVariableForm({
                               : ''
                           }
                           {...register(`variation_options.${index}.sku`)}
-                          // @ts-ignore
-                          error={t(errors.variation_options?.[index]?.sku?.message)}
+                          error={t(
+                            // @ts-ignore
+                            errors.variation_options?.[index]?.sku?.message,
+                          )}
                           variant="outline"
                           className="mb-5"
+                          inputClassName="uppercase"
                         />
                         <Input
                           label={`${t('form:input-label-quantity')}*`}
                           type="number"
                           {...register(`variation_options.${index}.quantity`)}
-                          // @ts-ignore
-                          error={t(errors.variation_options?.[index]?.quantity?.message)}
+                          error={t(
+                            // @ts-ignore
+                            errors.variation_options?.[index]?.quantity
+                              ?.message,
+                          )}
                           variant="outline"
                           className="mb-5"
                         />
@@ -244,15 +282,32 @@ export default function ProductVariableForm({
                               helperText={t('form:text-upload-digital-file')}
                               defaultValue={{}}
                             />
-                            <ValidationError
-                            // @ts-ignore
-                              message={t(errors?.variation_options?.[index]?.digital_file_input?.message)}
+                            {
+                              // @ts-ignore
+                              errors?.variation_options?.[index]
+                                ?.digital_file_input && (
+                                <ValidationError
+                                  // message={t(
+                                  //   errors?.variation_options?.[index]?.digital_file_input?.original?.message
+                                  // )}
+                                  message={t(
+                                    'form:error-digital-file-is-required',
+                                  )}
+                                />
+                              )
+                            }
+
+                            <Alert
+                              message={t('form:info-about-digital-product')}
+                              variant="info"
+                              closeable={false}
+                              className="mt-5 mb-5"
                             />
 
                             <input
                               type="hidden"
                               {...register(
-                                `variation_options.${index}.digital_file`
+                                `variation_options.${index}.digital_file`,
                               )}
                             />
                           </div>
@@ -261,14 +316,17 @@ export default function ProductVariableForm({
                       <div className="mt-5 mb-5">
                         <Checkbox
                           {...register(`variation_options.${index}.is_disable`)}
-                          // @ts-ignore
-                          error={t(errors.variation_options?.[index]?.is_disable?.message )}
+                          error={t(
+                            // @ts-ignore
+                            errors.variation_options?.[index]?.is_disable
+                              ?.message,
+                          )}
                           label={t('form:input-label-disable-variant')}
                         />
                       </div>
                     </div>
                   );
-                }
+                },
               )}
             </div>
           )}

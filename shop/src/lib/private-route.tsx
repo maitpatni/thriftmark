@@ -8,6 +8,10 @@ import { useHasMounted } from './use-has-mounted';
 import dynamic from 'next/dynamic';
 import { useToken } from './use-token';
 import VerifyEmail from 'src/pages/verify-email';
+import axios from 'axios';
+import NotFound from '@components/404/not-found';
+import { useSettings } from '@framework/settings';
+import { ROUTES } from '@lib/routes';
 const Spinner = dynamic(
   () => import('@components/ui/loaders/spinner/spinner'),
   { ssr: false }
@@ -19,10 +23,26 @@ const PrivateRoute: React.FC<{ children?: React.ReactNode }> = ({
   const router = useRouter();
   const [isAuthorized] = useAtom(authorizationAtom);
   const hasMounted = useHasMounted();
-  const { me, loading } = useUser();
+  const { me, loading, error } = useUser();
   const { getEmailVerified } = useToken();
   const { emailVerified } = getEmailVerified();
+  const { data } = useSettings();
   const isUser = !!me;
+
+  if (axios.isAxiosError(error)) {
+    if (error?.response?.status === 417) {
+      return (
+        <div className="py-10">
+          <NotFound
+            text={`${data?.options?.siteTitle} ${process.env.NEXT_PUBLIC_VERSION}`}
+            subTitle={`This copy of ${data?.options?.siteTitle} is not genuine.`}
+            linkTitle="Please contact with site admin."
+            link={ROUTES.CONTACT}
+          />
+        </div>
+      );
+    }
+  }
 
   if (!isUser && !isAuthorized && hasMounted) {
     return (

@@ -24,14 +24,14 @@ export const settingsValidationSchema = yup.object().shape({
     .number()
     .moreThan(-1, 'form:error-free-shipping-amount-must-positive')
     .typeError('form:error-amount-number'),
-  // maxShopDistance: yup
-  //   .number()
-  //   .positive('form:error-max-shop-distance-must-positive')
-  //   .required('form:error-max-shop-distance')
-  //   .typeError('form:error-max-shop-distance'),
+  maxShopDistance: yup
+    .number()
+    .positive('form:error-max-shop-distance-must-positive')
+    .required('form:error-max-shop-distance')
+    .typeError('form:error-max-shop-distance'),
   deliveryTime: yup
     .array()
-    .min(1, 'add-at-least-one-delivery-time')
+    .min(1, 'form:error-add-at-least-one-delivery-time')
     .of(
       yup.object().shape({
         title: yup.string().required('form:error-title-required'),

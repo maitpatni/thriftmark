@@ -37,75 +37,34 @@ import { locationAtom } from '@/utils/use-location';
 import { useModalAction } from '../ui/modal/modal.context';
 import { shopValidationSchema } from './shop-validation-schema';
 import { formatSlug } from '@/utils/use-slug';
+import StickyFooterPanel from '@/components/ui/sticky-footer-panel';
+import { socialIcon } from '@/settings/site.settings';
+import { ShopDescriptionSuggestion } from '@/components/shop/shop-ai-prompt';
+import PhoneNumberInput from '@/components/ui/phone-input';
 
-export const chatbotAutoSuggestion = ({ name }: { name: string }) => {
-  return [
-    {
-      id: 1,
-      title: `Create a compelling description of ${name}, highlighting the unique products or services you offer.`,
-    },
-    {
-      id: 2,
-      title: `Craft an enticing ${name} shop description that captures the essence of your brand and its mission.`,
-    },
-    {
-      id: 3,
-      title: `Develop a concise and engaging overview of ${name}, showcasing its distinct offerings and benefits.`,
-    },
-    {
-      id: 4,
-      title: `Write a captivating shop description that intrigues customers and makes them eager to explore your products.`,
-    },
-    {
-      id: 5,
-      title: `Design a compelling narrative that tells the story of ${name}, connecting with customers on a personal level.`,
-    },
-    {
-      id: 6,
-      title: `Construct a persuasive shop description that emphasizes the value and quality customers can expect from your offerings.`,
-    },
-    {
-      id: 7,
-      title: `Shape a concise and memorable shop description that sets you apart from competitors and resonates with your target audience.`,
-    },
-    {
-      id: 8,
-      title: `Build an alluring shop description that conveys the unique experience customers will have when shopping with you.`,
-    },
-    {
-      id: 9,
-      title: `Create a description that showcases the passion, expertise, and attention to detail that define ${name} and its products.`,
-    },
-    {
-      id: 10,
-      title: `Craft an enticing shop overview that invites customers to embark on a journey of discovery through your carefully curated selection.`,
-    },
-  ];
-};
-
-const socialIcon = [
-  {
-    value: 'FacebookIcon',
-    label: 'Facebook',
-  },
-  {
-    value: 'InstagramIcon',
-    label: 'Instagram',
-  },
-  {
-    value: 'TwitterIcon',
-    label: 'Twitter',
-  },
-  {
-    value: 'YouTubeIcon',
-    label: 'Youtube',
-  },
-];
+// const socialIcon = [
+//   {
+//     value: 'FacebookIcon',
+//     label: 'Facebook',
+//   },
+//   {
+//     value: 'InstagramIcon',
+//     label: 'Instagram',
+//   },
+//   {
+//     value: 'TwitterIcon',
+//     label: 'Twitter',
+//   },
+//   {
+//     value: 'YouTubeIcon',
+//     label: 'Youtube',
+//   },
+// ];
 
 export const updatedIcons = socialIcon.map((item: any) => {
   item.label = (
     <div className="flex items-center text-body space-s-4">
-      <span className="flex h-4 w-4 items-center justify-center">
+      <span className="flex items-center justify-center w-4 h-4">
         {getIcon({
           iconList: socialIcons,
           iconName: item.value,
@@ -148,24 +107,25 @@ const ShopForm = ({ initialValues }: { initialValues?: any }) => {
     shouldUnregister: true,
     ...(initialValues
       ? {
-        defaultValues: {
-          ...initialValues,
-          logo: getFormattedImage(initialValues.logo),
-          cover_image: getFormattedImage(initialValues.cover_image),
-          settings: {
-            ...initialValues?.settings,
-            socials: initialValues?.settings?.socials
-              ? initialValues?.settings?.socials.map((social: any) => ({
-                icon: updatedIcons?.find(
-                  (icon) => icon?.value === social?.icon
-                ),
-                url: social?.url,
-              }))
-              : [],
+          defaultValues: {
+            ...initialValues,
+            logo: getFormattedImage(initialValues.logo),
+            cover_image: getFormattedImage(initialValues.cover_image),
+            settings: {
+              ...initialValues?.settings,
+              socials: initialValues?.settings?.socials
+                ? initialValues?.settings?.socials.map((social: any) => ({
+                    icon: updatedIcons?.find(
+                      (icon) => icon?.value === social?.icon,
+                    ),
+                    url: social?.url,
+                  }))
+                : [],
+            },
           },
-        },
-      }
+        }
       : {}),
+    //@ts-ignore
     resolver: yupResolver(shopValidationSchema),
   });
   const router = useRouter();
@@ -180,8 +140,8 @@ const ShopForm = ({ initialValues }: { initialValues?: any }) => {
   });
 
   const generateName = watch('name');
-  const autoSuggestionList = useMemo(() => {
-    return chatbotAutoSuggestion({ name: generateName ?? '' });
+  const shopDescriptionSuggestionLists = useMemo(() => {
+    return ShopDescriptionSuggestion({ name: generateName ?? '' });
   }, [generateName]);
 
   const handleGenerateDescription = useCallback(() => {
@@ -190,7 +150,7 @@ const ShopForm = ({ initialValues }: { initialValues?: any }) => {
       name: generateName,
       set_value: setValue,
       key: 'description',
-      suggestion: autoSuggestionList as ItemProps[],
+      suggestion: shopDescriptionSuggestionLists as ItemProps[],
     });
   }, [generateName]);
 
@@ -211,9 +171,9 @@ const ShopForm = ({ initialValues }: { initialValues?: any }) => {
       location: { ...omit(values?.settings?.location, '__typename') },
       socials: values?.settings?.socials
         ? values?.settings?.socials?.map((social: any) => ({
-          icon: social?.icon?.value,
-          url: social?.url,
-        }))
+            icon: social?.icon?.value,
+            url: social?.url,
+          }))
         : [],
     };
     if (initialValues) {
@@ -239,7 +199,7 @@ const ShopForm = ({ initialValues }: { initialValues?: any }) => {
     }
   }
 
-  const isGoogleMapActive = options?.useGoogleMap
+  const isGoogleMapActive = options?.useGoogleMap;
 
   const coverImageInformation = (
     <span>
@@ -252,7 +212,7 @@ const ShopForm = ({ initialValues }: { initialValues?: any }) => {
   return (
     <>
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
-        <div className="my-5 flex flex-wrap border-b border-dashed border-border-base pb-8 sm:my-8">
+        <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
           <Description
             title={t('form:input-label-logo')}
             details={t('form:shop-logo-help-text')}
@@ -264,7 +224,7 @@ const ShopForm = ({ initialValues }: { initialValues?: any }) => {
           </Card>
         </div>
 
-        <div className="my-5 flex flex-wrap border-b border-dashed border-border-base pb-8 sm:my-8">
+        <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
           <Description
             title={t('form:shop-cover-image-title')}
             details={coverImageInformation}
@@ -275,7 +235,7 @@ const ShopForm = ({ initialValues }: { initialValues?: any }) => {
             <FileInput name="cover_image" control={control} multiple={false} />
           </Card>
         </div>
-        <div className="my-5 flex flex-wrap border-b border-dashed border-border-base pb-8 sm:my-8">
+        <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
           <Description
             title={t('form:shop-basic-info')}
             details={t('form:shop-basic-info-help-text')}
@@ -288,19 +248,20 @@ const ShopForm = ({ initialValues }: { initialValues?: any }) => {
               variant="outline"
               className="mb-5"
               error={t(errors.name?.message!)}
+              required
             />
 
             {isSlugEditable ? (
               <div className="relative mb-5">
                 <Input
-                  label={`${t('Slug')}`}
+                  label={t('form:input-label-slug')}
                   {...register('slug')}
                   error={t(errors.slug?.message!)}
                   variant="outline"
                   disabled={isSlugDisable}
                 />
                 <button
-                  className="absolute top-[27px] right-px z-10 flex h-[46px] w-11 items-center justify-center rounded-tr rounded-br border-l border-solid border-border-base bg-white px-2 text-body transition duration-200 hover:text-heading focus:outline-none"
+                  className="absolute top-[27px] right-px z-0 flex h-[46px] w-11 items-center justify-center rounded-tr rounded-br border-l border-solid border-border-base bg-white px-2 text-body transition duration-200 hover:text-heading focus:outline-none"
                   type="button"
                   title={t('common:text-edit')}
                   onClick={() => setIsSlugDisable(false)}
@@ -310,7 +271,7 @@ const ShopForm = ({ initialValues }: { initialValues?: any }) => {
               </div>
             ) : (
               <Input
-                label={`${t('Slug')}`}
+                label={t('form:input-label-slug')}
                 {...register('slug')}
                 value={slugAutoSuggest}
                 variant="outline"
@@ -322,7 +283,7 @@ const ShopForm = ({ initialValues }: { initialValues?: any }) => {
             <div className="relative">
               {options?.useAi && (
                 <OpenAIButton
-                  title="Generate Description With AI"
+                  title={t('form:button-label-description-ai')}
                   onClick={handleGenerateDescription}
                 />
               )}
@@ -335,7 +296,7 @@ const ShopForm = ({ initialValues }: { initialValues?: any }) => {
             </div>
           </Card>
         </div>
-        <div className="my-5 flex flex-wrap border-b border-dashed border-gray-300 pb-8 sm:my-8">
+        <div className="flex flex-wrap pb-8 my-5 border-b border-gray-300 border-dashed sm:my-8">
           <Description
             title={t('form:shop-payment-info')}
             details={t('form:payment-info-helper-text')}
@@ -349,6 +310,7 @@ const ShopForm = ({ initialValues }: { initialValues?: any }) => {
               variant="outline"
               className="mb-5"
               error={t(errors.balance?.payment_info?.name?.message!)}
+              required
             />
             <Input
               label={t('form:input-label-account-holder-email')}
@@ -356,6 +318,7 @@ const ShopForm = ({ initialValues }: { initialValues?: any }) => {
               variant="outline"
               className="mb-5"
               error={t(errors.balance?.payment_info?.email?.message!)}
+              required
             />
             <Input
               label={t('form:input-label-bank-name')}
@@ -363,16 +326,18 @@ const ShopForm = ({ initialValues }: { initialValues?: any }) => {
               variant="outline"
               className="mb-5"
               error={t(errors.balance?.payment_info?.bank?.message!)}
+              required
             />
             <Input
               label={t('form:input-label-account-number')}
               {...register('balance.payment_info.account')}
               variant="outline"
               error={t(errors.balance?.payment_info?.account?.message!)}
+              required
             />
           </Card>
         </div>
-        <div className="my-5 flex flex-wrap border-b border-dashed border-gray-300 pb-8 sm:my-8">
+        <div className="flex flex-wrap pb-8 my-5 border-b border-gray-300 border-dashed sm:my-8">
           <Description
             title={t('form:shop-address')}
             details={t('form:shop-address-helper-text')}
@@ -397,7 +362,7 @@ const ShopForm = ({ initialValues }: { initialValues?: any }) => {
                         setValue('address.zip', location?.zip);
                         setValue(
                           'address.street_address',
-                          location?.street_address
+                          location?.street_address,
                         );
                       }}
                       data={getValues('settings.location')!}
@@ -444,15 +409,15 @@ const ShopForm = ({ initialValues }: { initialValues?: any }) => {
           </Card>
         </div>
 
-        {/* {permissions?.includes(STORE_OWNER) ? (
-          <div className="my-5 flex flex-wrap border-b border-dashed border-border-base pb-8 sm:my-8">
+        {permissions?.includes(STORE_OWNER) ? (
+          <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
             <Description
               title={t('form:form-notification-title')}
               details={t('form:form-notification-description')}
               className="w-full px-0 pb-5 sm:w-4/12 sm:py-8 sm:pe-4 md:w-1/3 md:pe-5"
             />
 
-            <Card className="mb-5 w-full sm:w-8/12 md:w-2/3">
+            <Card className="w-full mb-5 sm:w-8/12 md:w-2/3">
               <Input
                 label={t('form:input-notification-email')}
                 {...register('settings.notifications.email')}
@@ -468,7 +433,7 @@ const ShopForm = ({ initialValues }: { initialValues?: any }) => {
                   control={control}
                   disabled={permissions?.includes(SUPER_ADMIN)}
                 />
-                <Label className="mb-0">
+                <Label className="!mb-0.5">
                   {t('form:input-enable-notification')}
                 </Label>
               </div>
@@ -476,8 +441,8 @@ const ShopForm = ({ initialValues }: { initialValues?: any }) => {
           </div>
         ) : (
           ''
-        )} */}
-        <div className="my-5 flex flex-wrap border-b border-dashed border-gray-300 pb-8 sm:my-8">
+        )}
+        <div className="flex flex-wrap pb-8 my-5 border-b border-gray-300 border-dashed sm:my-8">
           <Description
             title={t('form:shop-settings')}
             details={t('form:shop-settings-helper-text')}
@@ -485,11 +450,11 @@ const ShopForm = ({ initialValues }: { initialValues?: any }) => {
           />
 
           <Card className="w-full sm:w-8/12 md:w-2/3">
-            <Input
+            <PhoneNumberInput
               label={t('form:input-label-contact')}
+              required
               {...register('settings.contact')}
-              variant="outline"
-              className="mb-5"
+              control={control}
               error={t(errors.settings?.contact?.message!)}
             />
             <Input
@@ -498,11 +463,12 @@ const ShopForm = ({ initialValues }: { initialValues?: any }) => {
               variant="outline"
               className="mb-5"
               error={t(errors.settings?.website?.message!)}
+              required
             />
           </Card>
         </div>
 
-        <div className="my-5 flex flex-wrap border-b border-dashed border-gray-300 pb-8 sm:my-8">
+        <div className="flex flex-wrap pb-8 my-5 border-b border-gray-300 border-dashed sm:my-8">
           <Description
             title={t('form:social-settings')}
             details={t('form:social-settings-helper-text')}
@@ -511,10 +477,10 @@ const ShopForm = ({ initialValues }: { initialValues?: any }) => {
 
           <Card className="w-full sm:w-8/12 md:w-2/3">
             <div>
-              {fields.map(
+              {fields?.map(
                 (item: ShopSocialInput & { id: string }, index: number) => (
                   <div
-                    className="border-b border-dashed border-border-200 py-5 first:pt-0 first:mt-0 first:border-t-0 last:border-b-0 md:py-8 md:first:mt-0"
+                    className="py-5 border-b border-dashed border-border-200 first:mt-0 first:border-t-0 first:pt-0 last:border-b-0 md:py-8 md:first:mt-0"
                     key={item.id}
                   >
                     <div className="grid grid-cols-1 gap-5 sm:grid-cols-5">
@@ -540,7 +506,11 @@ const ShopForm = ({ initialValues }: { initialValues?: any }) => {
                         label={t('form:input-label-url')}
                         variant="outline"
                         {...register(`settings.socials.${index}.url` as const)}
+                        error={t(
+                          errors?.settings?.socials?.[index]?.url?.message!,
+                        )}
                         defaultValue={item.url!} // make sure to set up defaultValue
+                        required
                       />
                       <button
                         onClick={() => {
@@ -553,29 +523,31 @@ const ShopForm = ({ initialValues }: { initialValues?: any }) => {
                       </button>
                     </div>
                   </div>
-                )
+                ),
               )}
             </div>
             <Button
               type="button"
               onClick={() => append({ icon: '', url: '' })}
-              className="w-full sm:w-auto"
+              className="w-full text-sm sm:w-auto md:text-base"
             >
               {t('form:button-label-add-social')}
             </Button>
           </Card>
         </div>
 
-        <div className="mb-5 text-end">
-          <Button
-            loading={creating || updating}
-            disabled={creating || updating}
-          >
-            {initialValues
-              ? t('form:button-label-update')
-              : t('form:button-label-save')}
-          </Button>
-        </div>
+        <StickyFooterPanel className="z-0">
+          <div className="mb-5 text-end">
+            <Button
+              loading={creating || updating}
+              disabled={creating || updating}
+            >
+              {initialValues
+                ? t('form:button-label-update')
+                : t('form:button-label-save')}
+            </Button>
+          </div>
+        </StickyFooterPanel>
       </form>
     </>
   );

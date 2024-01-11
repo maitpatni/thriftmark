@@ -1,7 +1,7 @@
 import Card from '@/components/common/card';
 import Layout from '@/components/layouts/admin';
 import Search from '@/components/common/search';
-import CustomerList from '@/components/user/user-list';
+import UserList from '@/components/user/user-list';
 import LinkButton from '@/components/ui/link-button';
 import { useState } from 'react';
 import ErrorMessage from '@/components/ui/error-message';
@@ -12,8 +12,9 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { Routes } from '@/config/routes';
 import { SortOrder } from '@/types';
 import { adminOnly } from '@/utils/auth-utils';
+import PageHeading from '@/components/common/page-heading';
 
-export default function Customers() {
+export default function AllUsersPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [page, setPage] = useState(1);
   const { t } = useTranslation();
@@ -45,27 +46,26 @@ export default function Customers() {
     <>
       <Card className="mb-8 flex flex-col items-center md:flex-row">
         <div className="mb-4 md:mb-0 md:w-1/4">
-          <h1 className="text-lg font-semibold text-heading">
-            {t('form:input-label-customers')}
-          </h1>
+          <PageHeading title={t('form:input-label-users')} />
         </div>
 
-        <div className="flex w-full items-center ms-auto md:w-3/4">
+        <div className="flex w-full flex-col items-center space-y-4 ms-auto md:w-3/4 md:flex-row md:space-y-0 xl:w-2/4">
           <Search
             onSearch={handleSearch}
             placeholderText={t('form:input-placeholder-search-name')}
           />
+
           <LinkButton
             href={`${Routes.user.create}`}
-            className="h-12 ms-4 md:ms-6"
+            className="h-12 w-full md:w-auto md:ms-6"
           >
-            <span>+ {t('form:button-label-add-customer')}</span>
+            <span>+ {t('form:button-label-add-user')}</span>
           </LinkButton>
         </div>
       </Card>
 
       {loading ? null : (
-        <CustomerList
+        <UserList
           customers={users}
           paginatorInfo={paginatorInfo}
           onPagination={handlePagination}
@@ -77,10 +77,10 @@ export default function Customers() {
   );
 }
 
-Customers.authenticate = {
+AllUsersPage.authenticate = {
   permissions: adminOnly,
 };
-Customers.Layout = Layout;
+AllUsersPage.Layout = Layout;
 
 export const getStaticProps = async ({ locale }: any) => ({
   props: {

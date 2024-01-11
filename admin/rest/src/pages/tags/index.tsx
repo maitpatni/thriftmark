@@ -9,16 +9,19 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import TagList from '@/components/tag/tag-list';
 import { adminOnly } from '@/utils/auth-utils';
-import { SortOrder } from '@/types';
+import { SortOrder, Type } from '@/types';
 import { Routes } from '@/config/routes';
 import { useTagsQuery } from '@/data/tag';
 import { useRouter } from 'next/router';
 import { Config } from '@/config';
+import PageHeading from '@/components/common/page-heading';
+import TypeFilter from '@/components/category/type-filter';
 
 export default function Tags() {
   const { t } = useTranslation();
   const { locale } = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
+  const [type, setType] = useState('');
   const [page, setPage] = useState(1);
   const [orderBy, setOrder] = useState('created_at');
   const [sortedBy, setColumn] = useState<SortOrder>(SortOrder.Desc);
@@ -34,6 +37,7 @@ export default function Tags() {
     name: searchTerm,
     page,
     language: locale,
+    type,
   });
 
   if (loading) return <Loader text={t('common:text-loading')} />;
@@ -49,14 +53,12 @@ export default function Tags() {
 
   return (
     <>
-      <Card className="mb-8 flex flex-col items-center xl:flex-row">
-        <div className="mb-4 md:w-1/4 xl:mb-0">
-          <h1 className="text-xl font-semibold text-heading">
-            {t('common:sidebar-nav-item-tags')}
-          </h1>
+      <Card className="mb-8 flex flex-col items-center md:flex-row">
+        <div className="mb-4 md:mb-0 md:w-1/4">
+          <PageHeading title={t('common:sidebar-nav-item-tags')} />
         </div>
 
-        <div className="flex w-full flex-col items-center space-y-4 ms-auto md:flex-row md:space-y-0 xl:w-1/2">
+        <div className="flex w-full flex-col items-center space-y-4 ms-auto md:w-1/2 md:flex-row md:space-y-0">
           <Search
             onSearch={handleSearch}
             placeholderText={t('form:input-placeholder-search-name')}

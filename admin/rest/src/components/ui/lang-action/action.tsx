@@ -10,6 +10,9 @@ export type LanguageSwitcherProps = {
   deleteModalView?: string | any;
   routes: any;
   className?: string | undefined;
+  enablePreviewMode?: boolean;
+  isShop?: boolean;
+  shopSlug?: string;
 };
 
 export default function LanguageSwitcher({
@@ -18,11 +21,17 @@ export default function LanguageSwitcher({
   deleteModalView,
   routes,
   className,
+  enablePreviewMode,
+  isShop,
+  shopSlug,
 }: LanguageSwitcherProps) {
   const { enableMultiLang } = Config;
   const {
     query: { shop },
   } = useRouter();
+
+  const preview = `${process.env.NEXT_PUBLIC_SHOP_URL}/products/preview/${slug}`;
+
   return (
     <>
       {enableMultiLang ? (
@@ -32,11 +41,16 @@ export default function LanguageSwitcher({
           deleteModalView={deleteModalView}
           routes={routes}
           className={className}
+          enablePreviewMode={enablePreviewMode}
+          isShop={isShop}
+          shopSlug={shopSlug}
         />
       ) : (
         <ActionButtons
           id={record?.id}
           editUrl={routes.editWithoutLang(slug, shop)}
+          previewUrl={preview}
+          enablePreviewMode={enablePreviewMode}
           deleteModalView={deleteModalView}
         />
       )}

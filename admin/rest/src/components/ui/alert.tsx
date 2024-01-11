@@ -1,5 +1,6 @@
 import cn from 'classnames';
 import { CloseIcon } from '@/components/icons/close-icon';
+import { twMerge } from 'tailwind-merge';
 
 type AlertProps = {
   message: string | undefined | null;
@@ -15,6 +16,8 @@ type AlertProps = {
   closeable?: boolean;
   onClose?: () => void;
   className?: string;
+  children?: React.ReactNode;
+  childClassName?: string;
 };
 
 const variantClasses = {
@@ -34,24 +37,31 @@ const Alert: React.FC<AlertProps> = ({
   variant = 'info',
   className,
   onClose,
+  children,
+  childClassName,
 }) => {
   return (
     <div
-      className={cn(
-        'relative flex items-center justify-between rounded py-4 px-5 shadow-sm',
-        variantClasses[variant],
-        className
+      className={twMerge(
+        cn(
+          'relative flex items-center justify-between rounded py-4 px-5 shadow-sm',
+          variantClasses[variant],
+          className
+        )
       )}
       role="alert"
     >
-      <p className="text-sm">{message}</p>
+      <div className={twMerge(cn(childClassName))}>
+        <p className="text-sm">{message}</p>
+        {children}
+      </div>
       {closeable && (
         <button
           data-dismiss="alert"
           aria-label="Close"
           onClick={onClose}
           title="Close alert"
-          className="-me-0.5 end-2 absolute top-1/2 -mt-3 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-red-500 transition-colors duration-200 hover:bg-gray-300 hover:bg-opacity-25 focus:bg-gray-300 focus:bg-opacity-25 focus:outline-none"
+          className="absolute top-1/2 -mt-3 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-red-500 transition-colors duration-200 -me-0.5 end-2 hover:bg-gray-300 hover:bg-opacity-25 focus:bg-gray-300 focus:bg-opacity-25 focus:outline-none"
         >
           <span aria-hidden="true">
             <CloseIcon className="h-3 w-3" />

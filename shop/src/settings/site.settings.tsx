@@ -4,6 +4,18 @@ import { CNFlag } from "@components/icons/CNFlag";
 import { USFlag } from "@components/icons/USFlag";
 import { DEFlag } from "@components/icons/DEFlag";
 import { ESFlag } from "@components/icons/ESFlag";
+import { ROUTES } from '@lib/routes';
+import { CardsIcon } from '@components/icons/my-account/cards';
+import { ChangePasswordIcon } from '@components/icons/my-account/change-password';
+import { HomeIcon } from '@components/icons/my-account/home';
+import { OrdersIcon } from '@components/icons/my-account/orders';
+import {
+  ProfileIcon,
+  ProfileIconNew,
+} from '@components/icons/my-account/profile';
+import { WishlistIcon } from '@components/icons/my-account/wishlist';
+import { DownloadsIcon } from '@components/icons/my-account/downloads';
+import { IoCallOutline } from 'react-icons/io5';
 
 export const siteSettings = {
   name: 'Thriftmark',
@@ -69,6 +81,9 @@ export const siteSettings = {
       return `/assets/placeholder/products/product-${variant}.svg`;
     },
   },
+  avatar: {
+    placeholder: '/avatar-placeholder.svg',
+  },
   homePageBlocks: {
     flashSale: {
       slug: 'flash-sale',
@@ -80,4 +95,46 @@ export const siteSettings = {
       slug: 'on-sale',
     },
   },
+  accountMenu: [
+    {
+      slug: ROUTES.ACCOUNT,
+      name: 'text-dashboard',
+      icon: <HomeIcon className="text-lg md:text-xl" />,
+    },
+    {
+      slug: ROUTES.ACCOUNT_CONTACT_NUMBER,
+      name: 'text-contact-number',
+      icon: <ProfileIconNew className="text-lg md:text-xl" />,
+    },
+    {
+      slug: ROUTES.ACCOUNT_ORDERS,
+      name: 'text-orders',
+      icon: <OrdersIcon className="text-lg md:text-xl" />,
+    },
+    {
+      slug: ROUTES.DOWNLOADS,
+      name: 'text-downloads',
+      icon: <DownloadsIcon className="text-lg md:text-xl" />,
+    },
+    {
+      slug: ROUTES.WISHLISTS,
+      name: 'text-wishlist',
+      icon: <WishlistIcon className="text-lg md:text-xl" />,
+    },
+    {
+      slug: ROUTES.ACCOUNT_CARDS,
+      name: 'text-cards',
+      icon: <CardsIcon className="text-lg md:text-xl" />,
+    },
+    {
+      slug: ROUTES.ACCOUNT_ADDRESS,
+      name: 'text-account-address',
+      icon: <ProfileIcon className="text-lg md:text-xl" />,
+    },
+    {
+      slug: ROUTES.ACCOUNT_CHANGE_PASSWORD,
+      name: 'text-change-password',
+      icon: <ChangePasswordIcon className="text-lg md:text-xl" />,
+    },
+  ],
 };

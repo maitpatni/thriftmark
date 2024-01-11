@@ -7,7 +7,7 @@ const StickerCard = ({
   titleTransKey,
   subtitleTransKey,
   icon,
-  iconBgStyle,
+  color,
   price,
   indicator,
   indicatorText,
@@ -17,26 +17,27 @@ const StickerCard = ({
 }: any) => {
   const { t } = useTranslation('widgets');
   return (
-    <div className="flex h-full w-full flex-col rounded bg-light p-7">
-      <div className="mb-auto flex w-full justify-between pb-8">
-        <div className="flex w-full flex-col">
-          <span className="mb-1 text-base font-semibold text-heading">
+    <div
+      className="flex h-full w-full flex-col rounded-lg border border-b-4 border-border-200 bg-light p-5 md:p-6"
+      style={{ borderBottomColor: color }}
+    >
+      <div className="mb-auto flex w-full items-center justify-between">
+        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded bg-gray-100/80 me-3">
+          {icon}
+        </div>
+        <div className="flex w-full flex-col text-end">
+          <span className="mb-1 text-base font-normal text-body">
             {t(titleTransKey)}
           </span>
-          <span className="text-xs font-semibold text-body">
+          {/* <span className="text-xs font-semibold text-body">
             {t(subtitleTransKey)}
+          </span> */}
+          <span className="mb-2 text-2xl font-semibold text-heading">
+            {price}
           </span>
-        </div>
-
-        <div
-          className="ms-3 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-gray-200"
-          style={iconBgStyle}
-        >
-          {icon}
         </div>
       </div>
 
-      <span className="mb-2 text-xl font-semibold text-heading">{price}</span>
       {indicator === 'up' && (
         <span
           className="mb-12 inline-block text-sm font-semibold text-body"

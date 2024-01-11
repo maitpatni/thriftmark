@@ -346,5 +346,12 @@
   "text-cash-on-delivery": "Barzahlung bei Lieferung",
   "text-payment-order": "Bitte klicken Sie auf Bestellung aufgeben, um die Bestellung und Zahlung vorzunehmen",
   "text-read-more": "Weiterlesen",
-  "text-less": "Weniger"
+  "text-less": "Weniger",
+  "text-title-days": "tage",
+  "text-title-hours": "std.",
+  "text-title-minutes": "protokoll",
+  "text-title-seconds": "sekunden",
+  "text-title-change-language": "Sprache ändern",
+  "text-title-language": "Sprache",
+  "text-maintenance-mode-title": "Der Wartungsmodus beginnt in"
 }

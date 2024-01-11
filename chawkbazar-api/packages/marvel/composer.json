@@ -31,7 +31,6 @@
         "spatie/period": "2.4.0",
         "kodeine/laravel-meta": "2.2.1",
         "maatwebsite/excel": "3.1.48",
-        "niklasravnsborg/laravel-pdf": "4.1.0",
         "cknow/laravel-money": "7.2.0",
         "mollie/laravel-mollie": "2.25.0",
         "mll-lab/graphql-php-scalars": "5.4.1",

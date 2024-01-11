@@ -346,5 +346,12 @@
   "text-cash-on-delivery": "מזומן במשלוח",
   "text-payment-order": "אנא לחץ על בצע הזמנה כדי לבצע הזמנה ותשלום",
   "text-read-more": "קרא עוד",
-  "text-less": "פחות"
+  "text-less": "פחות",
+  "text-title-days": "ימים",
+  "text-title-hours": "שעה (ות",
+  "text-title-minutes": "דקות",
+  "text-title-seconds": "שניות",
+  "text-title-change-language": "שנה שפה",
+  "text-title-language": "שפה",
+  "text-maintenance-mode-title": "מצב תחזוקה מתחיל ב"
 }

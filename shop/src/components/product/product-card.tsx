@@ -5,8 +5,6 @@ import { useUI } from '@contexts/ui.context';
 import usePrice from '@lib/use-price';
 import { Product } from '@type/index';
 import { siteSettings } from '@settings/site.settings';
-import { useRouter } from "next/router";
-import { ROUTES } from "@lib/routes";
 
 interface ProductProps {
   product: Product;
@@ -31,7 +29,6 @@ const ProductCard: FC<ProductProps> = ({
   variant = 'list',
   imgLoading,
 }) => {
-  const router = useRouter();
   const { openModal, setModalView, setModalData } = useUI();
   const { name, image, min_price, max_price, product_type, description } =
     product ?? {};
@@ -50,9 +47,9 @@ const ProductCard: FC<ProductProps> = ({
   });
 
   function handlePopupView() {
-    router.push(`${ROUTES.PRODUCT}/${product?.slug}`, undefined, {
-      locale: router.locale,
-  });
+    setModalData(product.slug);
+    setModalView('PRODUCT_VIEW');
+    return openModal();
   }
 
   return (
@@ -72,7 +69,7 @@ const ProductCard: FC<ProductProps> = ({
         className
       )}
       onClick={handlePopupView}
-      role="button"
+      // role="button"
       title={name}
     >
       <div

@@ -19,8 +19,14 @@ import VariationPrice from '@components/product/product-variant-price';
 import { useTranslation } from 'next-i18next';
 import isMatch from 'lodash/isMatch';
 import { ROUTES } from '@lib/routes';
-import FavoriteButton from './favorite-button';
 import cn from 'classnames';
+import dynamic from 'next/dynamic';
+const FavoriteButton = dynamic(
+  () => import('@components/product/favorite-button'),
+  {
+    ssr: false,
+  }
+);
 
 const productGalleryCarouselResponsive = {
   '768': {
@@ -394,7 +400,7 @@ const ProductSingleDetails: React.FC<Props> = ({ product }: any) => {
               product.tags.length > 0 && (
                 <li className="productTags">
                   <span className="inline-block font-semibold text-heading ltr:pr-2 rtl:pl-2">
-                    Condition:
+                    Tags:
                   </span>
                   {product.tags.map((tag: any) => (
                     <Link

@@ -170,7 +170,7 @@ export default function CreateOrUpdateAddressForm() {
   };
 
   return (
-    <div className="min-h-screen p-5 bg-white sm:p-8 md:min-h-0 md:rounded-xl">
+    <div className="p-5 bg-white sm:p-8 max-w-lg sm:min-w-[450px]  md:rounded-xl">
       <h1 className="mb-4 text-lg font-semibold text-center text-heading sm:mb-6">
         {address ? t('text-update') : t('text-add-new')} {t('text-address')}
       </h1>

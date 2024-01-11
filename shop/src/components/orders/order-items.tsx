@@ -5,6 +5,8 @@ import { useIsRTL } from '@lib/locals';
 import { useMemo } from 'react';
 import { Image } from '@components/ui/image';
 import { productPlaceholder } from '@lib/placeholders';
+import Link from '@components/ui/link';
+import { ROUTES } from '@lib/routes';
 
 const OrderItemList = (_: any, record: any) => {
   const { price } = usePrice({
@@ -30,9 +32,13 @@ const OrderItemList = (_: any, record: any) => {
 
       <div className="flex flex-col overflow-hidden ltr:ml-4 rtl:mr-4">
         <div className="flex mb-2 text-body">
-          <span className="text-[15px] truncate inline-block overflow-hidden">
-            {name} x&nbsp;
-          </span>
+          <Link
+            href={`${ROUTES.PRODUCT}/${record?.slug}`}
+            className="text-[15px] truncate inline-block overflow-hidden hover:underline"
+          >
+            {name}
+          </Link>
+          &nbsp;x&nbsp;
           <span className="text-[15px] text-heading font-semibold truncate inline-block overflow-hidden">
             {record.unit}
           </span>

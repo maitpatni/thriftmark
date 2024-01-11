@@ -9,12 +9,16 @@ import { useTranslation } from 'next-i18next';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { customerValidationSchema } from './user-validation-schema';
 import { Permission } from '@/types';
+import StickyFooterPanel from '@/components/ui/sticky-footer-panel';
+import { useRouter } from 'next/router';
+import { Routes } from '@/config/routes';
+import { toast } from 'react-toastify';
 
 type FormValues = {
   name: string;
   email: string;
   password: string;
-  permission: Permission;
+  // permission: Permission;
 };
 
 const defaultValues = {
@@ -24,6 +28,7 @@ const defaultValues = {
 
 const CustomerCreateForm = () => {
   const { t } = useTranslation();
+  const router = useRouter();
   const { mutate: registerUser, isLoading: loading } = useRegisterMutation();
 
   const {
@@ -43,7 +48,7 @@ const CustomerCreateForm = () => {
         name,
         email,
         password,
-        permission: Permission.StoreOwner,
+        // permission: Permission.StoreOwner,
       },
       {
         onError: (error: any) => {
@@ -53,6 +58,11 @@ const CustomerCreateForm = () => {
               message: error?.response?.data[field][0],
             });
           });
+        },
+        onSuccess: (data) => {
+          if (data) {
+            router.push(Routes.user.list);
+          }
         },
       }
     );
@@ -64,7 +74,7 @@ const CustomerCreateForm = () => {
         <Description
           title={t('form:form-title-information')}
           details={t('form:customer-form-info-help-text')}
-          className="sm:pe-4 md:pe-5 w-full px-0 pb-5 sm:w-4/12 sm:py-8 md:w-1/3"
+          className="w-full px-0 pb-5 sm:w-4/12 sm:py-8 sm:pe-4 md:w-1/3 md:pe-5"
         />
 
         <Card className="w-full sm:w-8/12 md:w-2/3">
@@ -75,6 +85,7 @@ const CustomerCreateForm = () => {
             variant="outline"
             className="mb-4"
             error={t(errors.name?.message!)}
+            required
           />
           <Input
             label={t('form:input-label-email')}
@@ -83,6 +94,7 @@ const CustomerCreateForm = () => {
             variant="outline"
             className="mb-4"
             error={t(errors.email?.message!)}
+            required
           />
           <PasswordInput
             label={t('form:input-label-password')}
@@ -90,15 +102,17 @@ const CustomerCreateForm = () => {
             error={t(errors.password?.message!)}
             variant="outline"
             className="mb-4"
+            required
           />
         </Card>
       </div>
-
-      <div className="text-end mb-4">
-        <Button loading={loading} disabled={loading}>
-          {t('form:button-label-create-customer')}
-        </Button>
-      </div>
+      <StickyFooterPanel className="z-0">
+        <div className="mb-4 text-end">
+          <Button loading={loading} disabled={loading}>
+            {t('form:button-label-create-customer')}
+          </Button>
+        </div>
+      </StickyFooterPanel>
     </form>
   );
 };

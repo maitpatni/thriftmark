@@ -8,6 +8,9 @@ import isEmpty from 'lodash/isEmpty';
 import cn from 'classnames';
 import { productPlaceholder } from '@lib/placeholders';
 import ReadMore from '@components/ui/truncate';
+import Link from '@components/ui/link';
+import { useSettings } from '@framework/settings';
+import { ROUTES } from '@lib/routes';
 
 interface ShopSidebarProps {
   data: any;
@@ -16,6 +19,9 @@ interface ShopSidebarProps {
 
 const ShopSidebar: React.FC<ShopSidebarProps> = ({ data, className }) => {
   const { t } = useTranslation();
+
+  const { data: settingsData } = useSettings();
+  const isTermsEnabled = settingsData?.options?.enableTerms ?? false;
 
   return (
     <div className={cn('flex flex-col pt-10 lg:pt-14 px-6', className)}>
@@ -107,6 +113,57 @@ const ShopSidebar: React.FC<ShopSidebarProps> = ({ data, className }) => {
             </div>
           </div>
         )}
+
+        <div className="mb-7 flex items-center justify-between last:mb-0">
+          <span className="text-heading font-semibold text-sm mb-1.5">
+            Shop
+          </span>
+
+          <Link
+            href={ROUTES.SHOP_URL(data?.slug)}
+            className="flex-shrink-0 text-sm font-semibold transition-all text-heading hover:opacity-80"
+          >
+            Visit
+          </Link>
+        </div>
+
+        <div className="mb-7 flex items-center justify-between last:mb-0">
+          <span className="text-heading font-semibold text-sm mb-1.5">FAQ</span>
+
+          <Link
+            href={`${ROUTES.SHOP_URL(data?.slug)}/faq`}
+            className="flex-shrink-0 text-sm font-semibold transition-all text-heading hover:opacity-80"
+          >
+            Visit
+          </Link>
+        </div>
+        {isTermsEnabled && (
+          <div className="mb-7 flex items-center justify-between last:mb-0">
+            <span className="text-heading font-semibold text-sm mb-1.5">
+              Terms
+            </span>
+
+            <Link
+              href={`${ROUTES.SHOP_URL(data?.slug)}/terms`}
+              className="flex-shrink-0 text-sm font-semibold transition-all text-heading hover:opacity-80"
+            >
+              Visit
+            </Link>
+          </div>
+        )}
+
+        <div className="mb-7 flex items-center justify-between last:mb-0">
+          <span className="text-heading font-semibold text-sm mb-1.5">
+            Contact
+          </span>
+
+          <Link
+            href={`${ROUTES.SHOP_URL(data?.slug)}/contact-us`}
+            className="flex-shrink-0 text-sm font-semibold transition-all text-heading hover:opacity-80"
+          >
+            Visit
+          </Link>
+        </div>
       </div>
     </div>
   );

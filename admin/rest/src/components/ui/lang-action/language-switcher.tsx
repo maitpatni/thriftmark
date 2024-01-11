@@ -10,7 +10,7 @@ import {
   autoUpdate,
   useFloating,
   shift,
-} from '@floating-ui/react-dom-interactions';
+} from '@floating-ui/react';
 import ActionButtons from '@/components/common/action-buttons';
 import LanguageListbox from './lang-list-box';
 import { Config } from '@/config';
@@ -22,6 +22,9 @@ export type LanguageSwitcherProps = {
   deleteModalView?: string | any;
   routes: any;
   className?: string | undefined;
+  enablePreviewMode?: boolean;
+  isShop?: boolean;
+  shopSlug?: string;
 };
 
 const LanguageSwitcher = ({
@@ -30,27 +33,30 @@ const LanguageSwitcher = ({
   deleteModalView,
   routes,
   className = '',
+  enablePreviewMode,
+  isShop,
+  shopSlug,
 }: LanguageSwitcherProps) => {
   const router = useRouter();
   const { t } = useTranslation('common');
   const { locales, locale } = router;
 
-  let filterItem = [...languageMenu]?.filter((element) =>
-    locales?.includes(element?.id)
+  let filterItem = [...languageMenu]?.filter(
+    (element) => locales?.includes(element?.id),
   );
 
   let options = [...filterItem]?.filter(
     (filter) =>
       !record?.translated_languages?.find(
-        (translated: any) => translated === filter?.value
-      )
+        (translated: any) => translated === filter?.value,
+      ),
   );
 
   let filterTranslatedItem = [...languageMenu]
     ?.filter((element) => record?.translated_languages?.includes(element?.id))
     .filter((item: any) => !locale?.includes(item?.id));
 
-  const { x, y, reference, floating, strategy, update, refs } = useFloating({
+  const { x, y, strategy, update, refs } = useFloating({
     strategy: 'fixed',
     placement: 'bottom',
     middleware: [offset(20), flip(), shift()],
@@ -64,17 +70,25 @@ const LanguageSwitcher = ({
     return autoUpdate(refs.reference.current, refs.floating.current, update);
   }, [refs.reference, refs.floating, update]);
 
+  const preview = `${process.env.NEXT_PUBLIC_SHOP_URL}/products/preview/${slug}`;
+
   return (
-    <div className={`flex w-full items-center justify-end gap-5 ${className}`}>
+    <div className={`flex w-full items-center justify-end gap-3 ${className}`}>
       <ActionButtons
         id={record?.id}
-        editUrl={routes.editWithoutLang(slug)}
+        editUrl={
+          isShop
+            ? routes.editWithoutLang(slug, shopSlug)
+            : routes.editWithoutLang(slug)
+        }
+        previewUrl={preview}
         deleteModalView={deleteModalView}
+        enablePreviewMode={enablePreviewMode}
       />
       {Config.defaultLanguage === router.locale && (
         // <Popover className="relative inline-block">
         //   <Popover.Button
-        //     className="p-2 text-base opacity-80 transition duration-200 hover:text-heading"
+        //     className="p-2 text-base transition duration-200 opacity-80 hover:text-heading"
         //     ref={reference}
         //   >
         //     <ToggleIcon width={20} />
@@ -126,9 +140,7 @@ const LanguageSwitcher = ({
               id={record?.id}
               routes={routes}
             />
-          ) : (
-            ''
-          )}
+          ) : null}
           {filterTranslatedItem?.length ? (
             <LanguageListbox
               title={t('text-translated-title')}
@@ -138,9 +150,7 @@ const LanguageSwitcher = ({
               id={record?.id}
               routes={routes}
             />
-          ) : (
-            ''
-          )}
+          ) : null}
         </PopOver>
       )}
     </div>

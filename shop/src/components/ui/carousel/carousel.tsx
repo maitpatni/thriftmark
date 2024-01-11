@@ -1,13 +1,9 @@
 import React, { useRef } from 'react';
 import { Swiper } from 'swiper/react';
 import { useRouter } from 'next/router';
-import SwiperCore, {
-  Navigation,
-  Pagination,
-  Autoplay,
-  Scrollbar,
-} from 'swiper';
-import 'swiper/swiper-bundle.min.css';
+import SwiperCore from 'swiper';
+import { Navigation, Pagination, Scrollbar, Autoplay } from 'swiper/modules';
+import 'swiper/css';
 import { getDirection } from '@utils/get-direction';
 import CarouselNavigation from './carousel-navigation';
 

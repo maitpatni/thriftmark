@@ -160,21 +160,7 @@ if (!function_exists('gateway_path')) {
 
 
 
-    if (!function_exists("setConfig")) {
-        function setConfig($config)
-        {
-            try {
-                if (empty(env('APP_KEY'))) {
-                    Artisan::call('key:generate');
-                }
-                $json_data = json_encode($config, JSON_PRETTY_PRINT);
-                $encryptedData = Crypt::encrypt($json_data);
-                $file_path = storage_path('app/shop/shop.config.json');
-                file_put_contents($file_path, $encryptedData);
-            } catch (Exception $e) {
-            }
-        }
-    }
+
     if (!function_exists("getConfig")) {
         function getConfig(): array | bool
         {
@@ -196,68 +182,12 @@ if (!function_exists('gateway_path')) {
             }
         }
     }
-    if (!function_exists("getConfigFromApi")) {
 
-        function getConfigFromApi(string $code)
+    if (!function_exists("formatCurrency")) {
+        function formatCurrency(float $amount, string $currency = "USD", string $locale = "en_US")
         {
-            $url = "https://customer.redq.io/api/sale/verify";
-
-            $code = trim($code);
-
-            if (!preg_match("/^([a-f0-9]{8})-(([a-f0-9]{4})-){3}([a-f0-9]{12})$/i", $code)) {
-                return false;
-            }
-            $response = Http::post($url, [
-                "k" => $code,
-                "i" => 35029972,
-                "n" => "ChawkBazar Laravel - React, Next, REST API Ecommerce With Multivendor",
-                "v" => config('shop.version'),
-                "u" => url('/'),
-            ]);
-
-            $responseBody = $response->json(); // converted response to array
-
-            $is_validated = isset($responseBody['isValid']) ? $responseBody['isValid']      : false;
-            $domains      = isset($responseBody['domains']) ? $responseBody['domains']      : [];
-            $body         = !empty($responseBody) && is_array($responseBody) ? $responseBody : [];
-            return [
-                ...$body,
-                'license_key' => $code,
-                'trust'       => $is_validated,
-                'domains'     => $domains,
-                'status'      => $response->status()
-            ];
+            $formatter = new NumberFormatter($locale, NumberFormatter::CURRENCY);
+            return $formatter->formatCurrency($amount, $currency);
         }
-
-
-        // function getConfigFromApi(string $code)
-        // {
-        //     $url = "https://rnb.redq.io/wp-json/redqteam/v1/elv";
-
-        //     $code = trim($code);
-
-        //     if (!preg_match("/^([a-f0-9]{8})-(([a-f0-9]{4})-){3}([a-f0-9]{12})$/i", $code)) {
-        //         return false;
-        //     }
-        //     $response = Http::get($url, [
-        //         'item_id'       => config('shop.marvel_id'),
-        //         'purchase_code' => $code,
-        //         'site_url'      => url('/'),
-        //         'runtime'       => 'yes',
-        //     ]);
-
-        //     $responseBody = $response->json(); // converted response to array
-
-        //     $purchase_count = isset($responseBody['purchase_count']) ? $responseBody['purchase_count'] : null;
-        //     $response_license_key = isset($responseBody['license_key']) ? $responseBody['license_key'] : null;
-        //     $item = isset($responseBody['item']) ? $responseBody['item'] : null;
-        //     $is_validated = ($item == 'valid' || $purchase_count == 1 || $response_license_key == $code);
-        //     return [
-        //         'license_key' => $responseBody['license_key'] ?? $code,
-        //         'trust' => $is_validated,
-        //         'body'   => $responseBody,
-        //         'status' => $response->status()
-        //     ];
-        // }
     }
 }

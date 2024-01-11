@@ -1,37 +1,42 @@
-import React, { useState } from 'react';
-import { useRouter } from 'next/router';
-import isEmpty from 'lodash/isEmpty';
-import { ROUTES } from '@lib/routes';
-import { useUI } from '@contexts/ui.context';
-import Button from '@components/ui/button';
-import Image from 'next/image';
 import Counter from '@components/common/counter';
 import { ProductAttributes } from '@components/product/product-attributes';
-import { generateCartItem } from '@utils/generate-cart-item';
-import usePrice from '@lib/use-price';
-import { getVariations } from '@framework/utils/get-variations';
-import { useTranslation } from 'next-i18next';
-import { useProduct } from '@framework/products';
-import isEqual from 'lodash/isEqual';
-import Spinner from '@components/ui/loaders/spinner/spinner';
 import VariationPrice from '@components/product/product-variant-price';
-import { useCart } from '@store/quick-cart/cart.context';
-import { toast } from 'react-toastify';
-import isMatch from 'lodash/isMatch';
-import dynamic from 'next/dynamic';
+import Button from '@components/ui/button';
+import Spinner from '@components/ui/loaders/spinner/spinner';
+import { useUI } from '@contexts/ui.context';
 import { useUser } from '@framework/auth';
+import { useProduct } from '@framework/products';
+import { getVariations } from '@framework/utils/get-variations';
+import { ROUTES } from '@lib/routes';
+import usePrice from '@lib/use-price';
+import { useCart } from '@store/quick-cart/cart.context';
+import { generateCartItem } from '@utils/generate-cart-item';
+import isEmpty from 'lodash/isEmpty';
+import isEqual from 'lodash/isEqual';
+import isMatch from 'lodash/isMatch';
+import { useTranslation } from 'next-i18next';
+import dynamic from 'next/dynamic';
+import Image from 'next/image';
+import { useRouter } from 'next/router';
+import { useCallback, useState } from 'react';
+import { toast } from 'react-toastify';
 
 const FavoriteButton = dynamic(
   () => import('@components/product/favorite-button'),
-  { ssr: false }
+  { ssr: false },
 );
 
 export default function ProductPopup({ productSlug }: { productSlug: string }) {
   const { t } = useTranslation('common');
-  const { closeModal, openCart } = useUI();
+  const { closeModal, openSidebar } = useUI();
   const { data: product, isLoading: loading }: any = useProduct({
     slug: productSlug,
   });
+  const openCart = useCallback(() => {
+    return openSidebar({
+      view: 'DISPLAY_CART',
+    });
+  }, []);
   const router = useRouter();
   const { addItemToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
@@ -49,9 +54,9 @@ export default function ProductPopup({ productSlug }: { productSlug: string }) {
 
   const isSelected = !isEmpty(variations)
     ? !isEmpty(attributes) &&
-    Object.keys(variations).every((variation) =>
-      attributes.hasOwnProperty(variation)
-    )
+      Object.keys(variations).every((variation) =>
+        attributes.hasOwnProperty(variation),
+      )
     : true;
 
   let selectedVariation: any = {};
@@ -59,8 +64,8 @@ export default function ProductPopup({ productSlug }: { productSlug: string }) {
     selectedVariation = product?.variation_options?.find((o: any) =>
       isEqual(
         o.options.map((v: any) => v.value).sort(),
-        Object.values(attributes).sort()
-      )
+        Object.values(attributes).sort(),
+      ),
     );
   }
 
@@ -148,22 +153,18 @@ export default function ProductPopup({ productSlug }: { productSlug: string }) {
 
         <div className="flex flex-col w-full p-5 md:p-8">
           <div className="pb-5">
-            <div
-              className="mb-2 md:mb-2.5 -mt-1.5 flex w-full items-start justify-between space-x-8 rtl:space-x-reverse"
-              role="button"
-            >
+            <div className="mb-2 md:mb-2.5 -mt-1.5 flex w-full items-start justify-between space-x-8 rtl:space-x-reverse">
               <h2
-                className="text-lg font-semibold text-heading md:text-xl lg:text-2xl hover:text-black"
+                className="text-lg font-semibold text-heading md:text-xl lg:text-2xl hover:text-black cursor-pointer"
                 onClick={navigateToProductPage}
+                role="button"
               >
                 {product.name}
               </h2>
 
               {me && (
                 <div>
-                  <FavoriteButton
-                    productId={product?.id}
-                  />
+                  <FavoriteButton productId={product?.id} />
                 </div>
               )}
             </div>

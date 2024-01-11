@@ -21,16 +21,147 @@ type Type {
     updated_at: DateTime
 }
 
+input CompactTypeProductCardInput {
+    productCard: String
+}
+input CompactTypeSettingsInput {
+    settings: CompactTypeProductCardInput
+}
+
+input CompactProductInput {
+    id: String
+    slug: String
+    name: String
+    image: AttachmentInput
+    regular_price: Float
+    sale_price: Float
+    min_price: Float
+    max_price: Float
+    product_type: String
+    quantity: Int
+    is_external: Boolean
+    unit: String
+    price: Float
+    external_product_url: String
+    status: String
+    type: CompactTypeSettingsInput
+}
+
+input CompactBestSellingInput {
+    enable: Boolean
+    title: String
+}
+input CompactDemoBestSellingInput {
+    enable: Boolean
+    title: String
+}
+input CompactDemoPopularProductsInput {
+    enable: Boolean
+    title: String
+}
+input CompactDemoCategoryInput {
+    enable: Boolean
+    title: String
+}
+input CompactDemoHandpickedProductsInput {
+    enable: Boolean
+    title: String
+    enableSlider: Boolean
+    products: [CompactProductInput]
+}
+input CompactDemoNewArrivalInput {
+    enable: Boolean
+    title: String
+}
+input CompactDemoAuthorsInput {
+    enable: Boolean
+    title: String
+}
+input CompactDemoManufacturesInput {
+    enable: Boolean
+    title: String
+}
+
+type CompactTypeProductCard {
+    productCard: String
+}
+type CompactTypeSettings {
+    settings: CompactTypeProductCard
+}
+
+type CompactProduct {
+    id: String
+    slug: String
+    name: String
+    image: Attachment
+    regular_price: Float
+    sale_price: Float
+    min_price: Float
+    max_price: Float
+    product_type: String
+    quantity: Int
+    is_external: Boolean
+    unit: String
+    price: Float
+    external_product_url: String
+    status: String
+    type: CompactTypeSettings
+}
+type CompactDemoBestSelling {
+    enable: Boolean
+    title: String
+}
+type CompactDemoPopularProducts {
+    enable: Boolean
+    title: String
+}
+type CompactDemoCategory {
+    enable: Boolean
+    title: String
+}
+type CompactDemoHandpickedProducts {
+    enable: Boolean
+    title: String
+    enableSlider: Boolean
+    products: [CompactProduct]
+}
+type CompactDemoNewArrival {
+    enable: Boolean
+    title: String
+}
+type CompactDemoAuthors {
+    enable: Boolean
+    title: String
+}
+type CompactDemoManufactures {
+    enable: Boolean
+    title: String
+}
+
 type TypeSettings {
     isHome: Boolean
     layoutType: String
     productCard: String
+    bestSelling: CompactDemoBestSelling
+    popularProducts: CompactDemoPopularProducts
+    category: CompactDemoCategory
+    handpickedProducts: CompactDemoHandpickedProducts
+    newArrival: CompactDemoNewArrival
+    authors: CompactDemoAuthors
+    manufactures: CompactDemoManufactures
 }
 
 input TypeSettingsInput {
     isHome: Boolean
     layoutType: String
     productCard: String
+    bestSelling: CompactBestSellingInput
+    popularProducts: CompactDemoPopularProductsInput
+    category: CompactDemoCategoryInput
+    handpickedProducts: CompactDemoHandpickedProductsInput
+    newArrival: CompactDemoNewArrivalInput
+    authors: CompactDemoAuthorsInput
+    manufactures: CompactDemoManufacturesInput
 }
 
 type Banner {

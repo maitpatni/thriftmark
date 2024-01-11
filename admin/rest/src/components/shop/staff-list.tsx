@@ -7,6 +7,8 @@ import { SortOrder } from '@/types';
 import { useState } from 'react';
 import TitleWithSort from '@/components/ui/title-with-sort';
 import { User, MappedPaginatorInfo } from '@/types';
+import { NoDataFound } from '@/components/icons/no-data-found';
+import Badge from '@/components/ui/badge/badge';
 
 type IProps = {
   staffs: User[] | undefined;
@@ -77,8 +79,18 @@ const StaffList = ({
       dataIndex: 'is_active',
       key: 'is_active',
       align: 'center',
-      render: (is_active: boolean) =>
-        is_active ? t('common:text-active') : t('common:text-inactive'),
+      render: (is_active: boolean) => (
+        <Badge
+          textKey={
+            is_active ? t('common:text-active') : t('common:text-inactive')
+          }
+          color={
+            is_active
+              ? 'bg-accent/10 !text-accent'
+              : 'bg-status-failed/10 text-status-failed'
+          }
+        />
+      ),
     },
     {
       title: t('table:table-item-actions'),
@@ -97,7 +109,15 @@ const StaffList = ({
         <Table
           // @ts-ignore
           columns={columns}
-          emptyText={t('table:empty-table-data')}
+          emptyText={() => (
+            <div className="flex flex-col items-center py-7">
+              <NoDataFound className="w-52" />
+              <div className="mb-1 pt-6 text-base font-semibold text-heading">
+                {t('table:empty-table-data')}
+              </div>
+              <p className="text-[13px]">{t('table:empty-table-sorry-text')}</p>
+            </div>
+          )}
           data={staffs!}
           rowKey="id"
           scroll={{ x: 800 }}

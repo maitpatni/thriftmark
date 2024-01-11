@@ -18,8 +18,12 @@ export default class CustomDocument extends Document {
     return (
       <Html>
         <Head>
-          <link
+          {/* <link
             href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=optional"
+            rel="stylesheet"
+          /> */}
+          <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
             rel="stylesheet"
           />
         </Head>

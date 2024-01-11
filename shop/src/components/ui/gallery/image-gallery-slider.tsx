@@ -1,13 +1,9 @@
 import Container from '@components/ui/container';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Attachment } from '@type/index';
-import SwiperCore, {
-  Navigation,
-  Pagination,
-  Autoplay,
-  Scrollbar,
-} from 'swiper';
-import 'swiper/swiper-bundle.min.css';
+import SwiperCore from 'swiper';
+import { Navigation, Pagination, Scrollbar, Autoplay } from 'swiper/modules';
+import 'swiper/css';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
 SwiperCore.use([Navigation, Pagination, Autoplay, Scrollbar]);

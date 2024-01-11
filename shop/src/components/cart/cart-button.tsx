@@ -1,18 +1,21 @@
 import CartIcon from "@components/icons/cart-icon";
 import { useUI } from "@contexts/ui.context";
-import { useCart } from "@store/quick-cart/cart.context";
+import { useCart } from '@store/quick-cart/cart.context';
+import { useCallback } from 'react';
 
 const CartButton = () => {
-  const { openCart } = useUI();
   const { totalItems } = useCart();
-  function handleCartOpen() {
-    return openCart();
-  }
+  const { openSidebar } = useUI();
+  const handleMobileMenu = useCallback(() => {
+    return openSidebar({
+      view: 'DISPLAY_CART',
+    });
+  }, []);
 
   return (
     <button
       className="flex items-center justify-center flex-shrink-0 h-auto relative focus:outline-none transform"
-      onClick={handleCartOpen}
+      onClick={handleMobileMenu}
       aria-label="cart-button"
     >
       <CartIcon />

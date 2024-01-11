@@ -27,124 +27,39 @@ import {
   useUpdateAuthorMutation,
 } from '@/data/author';
 import { useSettingsQuery } from '@/data/settings';
-import { useModalAction } from '../ui/modal/modal.context';
+import { useModalAction } from '@/components/ui/modal/modal.context';
 
-import OpenAIButton from '../openAI/openAI.button';
+import OpenAIButton from '@/components/openAI/openAI.button';
 import { formatSlug } from '@/utils/use-slug';
-
-export const chatbotAutoSuggestion = ({ name }: { name: string }) => {
-  return [
-    {
-      id: 1,
-      title: `Explore the captivating imagination of a rising literary talent, ${name}.`,
-    },
-    {
-      id: 2,
-      title: `Immerse yourself in the thought-provoking world crafted by visionary author ${name}.`,
-    },
-    {
-      id: 3,
-      title: `Discover the compelling storytelling prowess of ${name} through their debut work.`,
-    },
-    {
-      id: 4,
-      title: `Experience the unique voice and perspective of ${name} in their literary creations.`,
-    },
-    {
-      id: 5,
-      title: `Dive into the pages of ${name}'s writing and embark on a literary journey like no other.`,
-    },
-    {
-      id: 6,
-      title: `Uncover the literary genius of ${name}, captivating readers with their brilliant narratives.`,
-    },
-    {
-      id: 7,
-      title: `Indulge in the lyrical prose and evocative storytelling of acclaimed author ${name}.`,
-    },
-    {
-      id: 8,
-      title: `Get ready to be enchanted by the imaginative narratives and vivid characters brought to life by ${name}.`,
-    },
-    {
-      id: 9,
-      title: `Be captivated by the powerful storytelling and insightful observations of emerging author ${name}.`,
-    },
-    {
-      id: 10,
-      title: `Enter a world of literary brilliance with ${name}, where imagination knows no bounds.`,
-    },
-  ];
-};
-
-export const chatbotAutoSuggestion1 = ({ name }: { name: string }) => {
-  return [
-    {
-      id: 1,
-      title: `Create a quote about the profound insights and emotional depth found in the writings of ${name}.`,
-    },
-    {
-      id: 2,
-      title: `Craft a quote that captures the essence of ${name}'s storytelling, where imagination knows no bounds.`,
-    },
-    {
-      id: 3,
-      title: `Develop a quote that highlights the unique perspective and thought-provoking narratives of ${name}.`,
-    },
-    {
-      id: 4,
-      title: `Write a quote that celebrates the literary brilliance and captivating wordsmithing of ${name}.`,
-    },
-    {
-      id: 5,
-      title: `Design a quote that pays tribute to the transformative power of ${name}'s words and ideas.`,
-    },
-    {
-      id: 6,
-      title: `Shape a quote that encapsulates the profound impact and enduring legacy of ${name}'s literary contributions.`,
-    },
-    {
-      id: 7,
-      title: `Construct a quote that reflects the artistry and poetic beauty found within ${name}'s written works.`,
-    },
-    {
-      id: 8,
-      title: `Build a quote that invites readers to embark on a journey of self-discovery through ${name}'s insightful prose.`,
-    },
-    {
-      id: 9,
-      title: `Create a quote that captures the raw emotions and poignant storytelling of ${name}'s literary creations.`,
-    },
-    {
-      id: 10,
-      title: `Craft a quote that invites readers to explore the rich tapestry of human experiences woven by ${name}.`,
-    },
-  ];
-};
-
-const socialIcon = [
-  {
-    value: 'FacebookIcon',
-    label: 'Facebook',
-  },
-  {
-    value: 'InstagramIcon',
-    label: 'Instagram',
-  },
-  {
-    value: 'TwitterIcon',
-    label: 'Twitter',
-  },
-  {
-    value: 'YouTubeIcon',
-    label: 'Youtube',
-  },
-];
+import StickyFooterPanel from '@/components/ui/sticky-footer-panel';
+import { socialIcon } from '@/settings/site.settings';
+import {
+  AuthorBioSuggestion,
+  AuthorQuoteSuggestion,
+} from '@/components/author/author-ai-prompt';
+// const socialIcon = [
+//   {
+//     value: 'FacebookIcon',
+//     label: 'Facebook',
+//   },
+//   {
+//     value: 'InstagramIcon',
+//     label: 'Instagram',
+//   },
+//   {
+//     value: 'TwitterIcon',
+//     label: 'Twitter',
+//   },
+//   {
+//     value: 'YouTubeIcon',
+//     label: 'Youtube',
+//   },
+// ];
 
 export const updatedIcons = socialIcon.map((item: any) => {
   item.label = (
     <div className="flex items-center text-body space-s-4">
-      <span className="flex h-4 w-4 items-center justify-center">
+      <span className="flex items-center justify-center w-4 h-4">
         {getIcon({
           iconList: socialIcons,
           iconName: item.value,
@@ -191,7 +106,7 @@ export default function CreateOrUpdateAuthorForm({ initialValues }: IProps) {
     {
       slug: shop as string,
     },
-    { enabled: !!router.query.shop }
+    { enabled: !!router.query.shop },
   );
   const shopId = shopData?.id!;
   const {
@@ -204,6 +119,7 @@ export default function CreateOrUpdateAuthorForm({ initialValues }: IProps) {
     formState: { errors },
   } = useForm<FormValues>({
     shouldUnregister: true,
+    //@ts-ignore
     resolver: yupResolver(authorValidationSchema),
     ...(initialValues && {
       defaultValues: {
@@ -230,30 +146,30 @@ export default function CreateOrUpdateAuthorForm({ initialValues }: IProps) {
   });
 
   const generateName = watch('name');
-  const autoSuggestionList = useMemo(() => {
-    return chatbotAutoSuggestion({ name: generateName ?? '' });
+  const authorBioSuggestionList = useMemo(() => {
+    return AuthorBioSuggestion({ name: generateName ?? '' });
   }, [generateName]);
 
-  const handleGenerateDescription = useCallback(() => {
+  const handleGenerateBioDescription = useCallback(() => {
     openModal('GENERATE_DESCRIPTION', {
       control,
       name: generateName,
       set_value: setValue,
       key: 'bio',
-      suggestion: autoSuggestionList as ItemProps[],
+      suggestion: authorBioSuggestionList as ItemProps[],
     });
   }, [generateName]);
 
-  const autoSuggestionList1 = useMemo(() => {
-    return chatbotAutoSuggestion1({ name: generateName ?? '' });
+  const authorQuoteSuggestionLists = useMemo(() => {
+    return AuthorQuoteSuggestion({ name: generateName ?? '' });
   }, [generateName]);
-  const handleGenerateDescription1 = useCallback(() => {
+  const handleGenerateQuoteDescription = useCallback(() => {
     openModal('GENERATE_DESCRIPTION', {
       control,
       name: generateName,
       set_value: setValue,
       key: 'quote',
-      suggestion: autoSuggestionList1 as ItemProps[],
+      suggestion: authorQuoteSuggestionLists as ItemProps[],
     });
   }, [generateName]);
 
@@ -317,9 +233,11 @@ export default function CreateOrUpdateAuthorForm({ initialValues }: IProps) {
     }
   };
 
+  console.log('errors.name?.message!', errors.name?.message!);
+
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="my-5 flex flex-wrap border-b border-dashed border-border-base pb-8 sm:my-8">
+      <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
         <Description
           title={t('form:input-label-image')}
           details={t('form:author-image-helper-text')}
@@ -330,7 +248,7 @@ export default function CreateOrUpdateAuthorForm({ initialValues }: IProps) {
           <FileInput name="image" control={control} multiple={false} />
         </Card>
       </div>
-      <div className="my-5 flex flex-wrap border-b border-dashed border-border-base pb-8 sm:my-8">
+      <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
         <Description
           title={t('form:input-label-cover-image')}
           details={t('form:author-cover-image-helper-text')}
@@ -342,7 +260,7 @@ export default function CreateOrUpdateAuthorForm({ initialValues }: IProps) {
         </Card>
       </div>
 
-      <div className="my-5 flex flex-wrap sm:my-8">
+      <div className="flex flex-wrap my-5 sm:my-8">
         <Description
           title={t('form:input-label-description')}
           details={`${
@@ -365,14 +283,14 @@ export default function CreateOrUpdateAuthorForm({ initialValues }: IProps) {
           {isSlugEditable ? (
             <div className="relative mb-5">
               <Input
-                label={`${t('Slug')}`}
+                label={t('form:input-label-slug')}
                 {...register('slug')}
                 error={t(errors.slug?.message!)}
                 variant="outline"
                 disabled={isSlugDisable}
               />
               <button
-                className="absolute top-[27px] right-px z-10 flex h-[46px] w-11 items-center justify-center rounded-tr rounded-br border-l border-solid border-border-base bg-white px-2 text-body transition duration-200 hover:text-heading focus:outline-none"
+                className="absolute top-[27px] right-px z-0 flex h-[46px] w-11 items-center justify-center rounded-tr rounded-br border-l border-solid border-border-base bg-white px-2 text-body transition duration-200 hover:text-heading focus:outline-none"
                 type="button"
                 title={t('common:text-edit')}
                 onClick={() => setIsSlugDisable(false)}
@@ -382,7 +300,7 @@ export default function CreateOrUpdateAuthorForm({ initialValues }: IProps) {
             </div>
           ) : (
             <Input
-              label={`${t('Slug')}`}
+              label={t('form:input-label-slug')}
               {...register('slug')}
               value={slugAutoSuggest}
               variant="outline"
@@ -402,8 +320,8 @@ export default function CreateOrUpdateAuthorForm({ initialValues }: IProps) {
           <div className="relative">
             {options?.useAi && (
               <OpenAIButton
-                title="Generate Description With AI"
-                onClick={handleGenerateDescription}
+                title={t('form:button-label-description-ai')}
+                onClick={handleGenerateBioDescription}
               />
             )}
             <TextArea
@@ -417,8 +335,8 @@ export default function CreateOrUpdateAuthorForm({ initialValues }: IProps) {
           <div className="relative">
             {options?.useAi && (
               <OpenAIButton
-                title="Generate Description With AI"
-                onClick={handleGenerateDescription1}
+                title={t('form:button-label-description-ai')}
+                onClick={handleGenerateQuoteDescription}
               />
             )}
             <TextArea
@@ -429,8 +347,8 @@ export default function CreateOrUpdateAuthorForm({ initialValues }: IProps) {
             />
           </div>
 
-          <div className="mb-5 flex flex-col sm:flex-row">
-            <div className="mb-5 w-full p-0 sm:mb-0 sm:w-1/2 sm:pe-2">
+          <div className="flex flex-col mb-5 sm:flex-row">
+            <div className="w-full p-0 mb-5 sm:mb-0 sm:w-1/2 sm:pe-2">
               <Label>{t('form:input-label-author-born')}</Label>
               <Controller
                 control={control}
@@ -477,7 +395,7 @@ export default function CreateOrUpdateAuthorForm({ initialValues }: IProps) {
             {fields.map(
               (item: ShopSocialInput & { id: string }, index: number) => (
                 <div
-                  className="border-b border-dashed border-border-200 py-5 first:mt-5 first:border-t last:border-b-0 md:py-8 md:first:mt-10"
+                  className="py-5 border-b border-dashed border-border-200 first:mt-5 first:border-t last:border-b-0 md:py-8 md:first:mt-10"
                   key={item.id}
                 >
                   <div className="grid grid-cols-1 gap-5 sm:grid-cols-5">
@@ -516,7 +434,7 @@ export default function CreateOrUpdateAuthorForm({ initialValues }: IProps) {
                     </button>
                   </div>
                 </div>
-              )
+              ),
             )}
           </div>
 
@@ -529,24 +447,30 @@ export default function CreateOrUpdateAuthorForm({ initialValues }: IProps) {
           </Button>
         </Card>
       </div>
-      <div className="mb-4 text-end">
-        {initialValues && (
-          <Button
-            variant="outline"
-            onClick={router.back}
-            className="me-4"
-            type="button"
-          >
-            {t('form:button-label-back')}
-          </Button>
-        )}
+      <StickyFooterPanel className="z-0">
+        <div className="text-end">
+          {initialValues && (
+            <Button
+              variant="outline"
+              onClick={router.back}
+              className="text-sm me-4 md:text-base"
+              type="button"
+            >
+              {t('form:button-label-back')}
+            </Button>
+          )}
 
-        <Button loading={updating || creating}>
-          {initialValues
-            ? t('form:button-label-update-author')
-            : t('form:button-label-add-author')}
-        </Button>
-      </div>
+          <Button
+            loading={creating || updating}
+            disabled={creating || updating}
+            className="text-sm md:text-base"
+          >
+            {initialValues
+              ? t('form:button-label-update-author')
+              : t('form:button-label-add-author')}
+          </Button>
+        </div>
+      </StickyFooterPanel>
     </form>
   );
 }

@@ -21,6 +21,8 @@ import StoreNoticeList from '@/components/store-notice/store-notice-list';
 import { Config } from '@/config';
 import { Routes } from '@/config/routes';
 import { useMeQuery } from '@/data/user';
+import PageHeading from '@/components/common/page-heading';
+
 export default function StoreNotices() {
   const router = useRouter();
   const { permissions } = getAuthCredentials();
@@ -37,14 +39,19 @@ export default function StoreNotices() {
   } = useRouter();
   const { data: shopData } = useShopQuery({ slug: shop as string });
   const shopId = shopData?.id!;
-  const { storeNotices, paginatorInfo, loading, error } = useStoreNoticesQuery({
-    limit: 15,
-    shop_id: shopId,
-    notice: searchTerm,
-    page,
-    orderBy,
-    sortedBy,
-  });
+  const { storeNotices, paginatorInfo, loading, error } = useStoreNoticesQuery(
+    {
+      limit: 15,
+      shops: shop as string,
+      notice: searchTerm,
+      page,
+      orderBy,
+      sortedBy,
+    },
+    {
+      enabled: Boolean(shopId),
+    }
+  );
 
   if (loading) return <Loader text={t('common:text-loading')} />;
   if (error) return <ErrorMessage message={error.message} />;
@@ -69,9 +76,7 @@ export default function StoreNotices() {
     <>
       <Card className="mb-8 flex flex-col items-center md:flex-row">
         <div className="mb-4 md:mb-0 md:w-1/4">
-          <h1 className="text-xl font-semibold text-heading">
-            {t('form:input-label-store-notices')}
-          </h1>
+          <PageHeading title={t('form:input-label-store-notices')} />
         </div>
 
         <div className="flex w-full flex-col items-center space-y-4 ms-auto md:w-2/3 md:flex-row md:space-y-0 xl:w-3/4 2xl:w-1/2">

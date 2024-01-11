@@ -4,6 +4,7 @@ define('APP_NOTICE_DOMAIN', config('shop.app_notice_domain'));
 define('DEFAULT_LANGUAGE', config('shop.default_language'));
 define('TRANSLATION_ENABLED', config('shop.translation_enabled'));
 define('DEFAULT_CURRENCY', config('shop.default_currency'));
+define('DEFAULT_CURRENCY_FORMATION', 'en-US');
 define('ACTIVE_PAYMENT_GATEWAY', config('shop.active_payment_gateway'));
 define('NOT_FOUND', APP_NOTICE_DOMAIN . 'ERROR.NOT_FOUND');
 define('COUPON_NOT_FOUND', APP_NOTICE_DOMAIN . 'ERROR.COUPON_NOT_FOUND');

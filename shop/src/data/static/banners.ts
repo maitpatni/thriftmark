@@ -1121,40 +1121,6 @@ export const homeElegantHeroSlider = [
       },
     },
   },
-{
-    id: 2,
-    title: 'We picked every item with care you must try',
-    slug: 'winter-collection',
-    image: {
-      mobile: {
-        url: '/assets/images/hero/banner-mobile-8.jpg',
-        width: 690,
-        height: 480,
-      },
-      desktop: {
-        url: '/assets/images/hero/banner-8.jpg',
-        width: 1920,
-        height: 900,
-      },
-    },
-  },
-  {
-    id: 3,
-    title: 'We picked every item with care you must try',
-    slug: 'winter-collection',
-    image: {
-      mobile: {
-        url: '/assets/images/hero/banner-mobile-9.jpg',
-        width: 690,
-        height: 480,
-      },
-      desktop: {
-        url: '/assets/images/hero/banner-9.jpg',
-        width: 1920,
-        height: 900,
-      },
-    },
-  },
 ];
 
 export const elegantBannerDataThree = [

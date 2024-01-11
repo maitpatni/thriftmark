@@ -66,3 +66,7 @@ export let languageMenu =[
     iconMobile: <ESFlagRound />
   },
 ]
+
+export function contentWrapperCSS(dir: string) {
+  return dir === 'ltr' ? { left: 0 } : { right: 0 };
+}

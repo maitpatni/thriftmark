@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Bell } from '@/components/icons/bell';
 import { Dot } from '@/components/icons/dot';
 import NotificationCard from '@/components/ui/notification-card';
+import { useTranslation } from 'react-i18next';
 
 type ItemType = {
   source?: string;
@@ -16,6 +17,7 @@ interface MenuType {
 }
 
 const NotificationMenu: React.FC<MenuType> = ({ data }) => {
+  const { t } = useTranslation();
   const [isOpen, setOpen] = useState(false);
 
   // helper function to close the menu
@@ -46,7 +48,7 @@ const NotificationMenu: React.FC<MenuType> = ({ data }) => {
       >
         <Bell className="h-5 w-5" />
 
-        <div className="end-0 absolute -top-1 flex text-green-500">
+        <div className="absolute -top-1 flex text-green-500 end-0">
           <Dot />
         </div>
       </button>
@@ -68,7 +70,7 @@ const NotificationMenu: React.FC<MenuType> = ({ data }) => {
             >
               <div className="flex items-center justify-between border-b border-border-200 px-4 py-3">
                 <span className="text-lg font-semibold text-heading">
-                  Notification
+                  {t('text-notification')}
                 </span>
 
                 <button className="text-sm font-semibold text-red-500 transition duration-200 hover:text-red-600 focus:outline-none focus:ring-1">
@@ -87,7 +89,7 @@ const NotificationMenu: React.FC<MenuType> = ({ data }) => {
               ) : (
                 <div className="flex items-center justify-center border-b border-border-200 bg-light">
                   <p className="py-5 text-sm text-body">
-                    You dont have any notifications.
+                    You do not have any notifications.
                   </p>
                 </div>
               )}
@@ -96,7 +98,7 @@ const NotificationMenu: React.FC<MenuType> = ({ data }) => {
                 href="#"
                 className="flex h-11 items-center justify-center bg-light px-4 text-sm font-semibold text-green-500 transition duration-200 ease-in-out hover:text-green-600"
               >
-                See all notifications
+                {t('text-see-all-notifications')}
               </a>
             </motion.div>
           )}

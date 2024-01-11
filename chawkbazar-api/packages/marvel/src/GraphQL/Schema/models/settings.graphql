@@ -61,6 +61,23 @@ type PushNotification {
 type All {
     all: PushNotification
 }
+type Maintenance {
+    title: String
+    image: Attachment
+    description: String
+    start: String
+    until: String
+    buttonTitleOne: String
+    newsLetterTitle: String
+    buttonTitleTwo: String
+    contactUsTitle: String
+    aboutUsTitle: String
+    newsLetterDescription: String
+    aboutUsDescription: String
+    isOverlayColor: Boolean
+    overlayColor: String
+    overlayColorRange: String
+}
 type SettingsOptions {
     siteTitle: String
     siteSubtitle: String
@@ -104,6 +121,8 @@ type SettingsOptions {
     copyrightText: String
     externalText: String
     externalLink: String
+    isUnderMaintenance: Boolean!
+    maintenance: Maintenance!
 }
 
 type EventSettings {
@@ -144,9 +163,9 @@ input PaymentGatewaysInput {
 }
 
 type Settings {
-    id: ID
-    language: String
-    options: SettingsOptions
+    id: ID!
+    language: String!
+    options: SettingsOptions!
 }
 
 input DeliveryTimeInput {
@@ -222,6 +241,23 @@ input PushNotificationInput {
 input AllInput {
     all: PushNotificationInput
 }
+input MaintenanceInput {
+    title: String
+    image: AttachmentInput
+    description: String
+    start: String
+    until: String
+    buttonTitleOne: String
+    newsLetterTitle: String
+    buttonTitleTwo: String
+    contactUsTitle: String
+    aboutUsTitle: String
+    newsLetterDescription: String
+    aboutUsDescription: String
+    isOverlayColor: Boolean
+    overlayColor: String
+    overlayColorRange: String
+}
 
 input SettingsOptionsInput {
     siteTitle: String
@@ -265,6 +301,8 @@ input SettingsOptionsInput {
     copyrightText: String
     externalText: String
     externalLink: String
+    isUnderMaintenance: Boolean
+    maintenance: MaintenanceInput
 }
 
 input SettingsInput {

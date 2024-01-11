@@ -20,21 +20,20 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 class InstallCommand extends Command
 {
     private array $appData;
+    protected MarvelVerification $verification;
     protected $signature = 'marvel:install';
 
     protected $description = 'Installing Marvel Dependencies';
-
     public function handle()
     {
+        $this->verification = new MarvelVerification();
         $shouldGetLicenseKeyFromUser = $this->shouldGetLicenseKey();
         if ($shouldGetLicenseKeyFromUser) {
             $this->getLicenseKey();
             $description = $this->appData['description'] ?? '';
-            $this->components->info("Thank you for using " . APP_NOTICE_DOMAIN. ". $description");
+            $this->components->info("Thank you for using " . APP_NOTICE_DOMAIN . ". $description");
         } else {
-            $config = getConfig();
-            $this->appData['last_checking_time'] = $config['last_checking_time'] ?? Carbon::now();
-            $this->appData['trust'] = $config['trust'] ?? true;
+            $this->appData = $this->verification->jsonSerialize();
         }
 
         $this->info('Installing Marvel Dependencies...');
@@ -150,39 +149,22 @@ class InstallCommand extends Command
 
     private function licenseKeyValidator(string $licenseKey): bool
     {
-
-        try {
-            $apiData = getConfigFromApi($licenseKey);
-            $isValidated = $apiData["trust"];
-            $this->appData = [
-                ...$apiData,
-                'license_key'        => $apiData['license_key'],
-                'trust'       => $apiData['trust'],
-                'last_checking_time' => Carbon::now(),
-            ];
-
-            setConfig($this->appData);
-            if (!$isValidated) {
-                return false;
-            }
-            return true;
-        } catch (Exception $e) {
-            return false;
-        }
+        $verification = $this->verification->verify($licenseKey);
+        $this->appData = $verification->jsonSerialize();
+        return $verification->getTrust();
     }
 
 
 
     private function shouldGetLicenseKey()
     {
-        $isFileExists = getConfig();
-
+        $trust = empty($this->verification->getTrust());
         $env = config("app.env");
         if ($env == "production") {
             return true;
-        } elseif ($env == "local" && empty($isFileExists['trust'])) {
+        } elseif ($env == "local" && $trust) {
             return true;
-        } elseif ($env == "development" && empty($isFileExists['trust'])) {
+        } elseif ($env == "development" && $trust) {
             return true;
         }
         return false;

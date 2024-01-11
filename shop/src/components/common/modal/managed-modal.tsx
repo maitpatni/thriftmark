@@ -48,6 +48,10 @@ const WishListModal = dynamic(
   () => import('@components/my-account/wishlist-modal')
 );
 const GalleryModal = dynamic(() => import('@components/ui/gallery'));
+const NewsLetterModal = dynamic(
+  () => import('@components/maintenance/news-letter'),
+  { ssr: false },
+);
 
 const ManagedModal: React.FC = () => {
   const { displayModal, closeModal, modalView, modalData } = useUI();
@@ -97,6 +101,7 @@ const ManagedModal: React.FC = () => {
         <CreateOrUpdateGuestAddressForm />
       )}
       {modalView === 'WISHLIST_MODAL' && <WishListModal data={modalData} />}
+      {modalView === 'NEWSLETTER_MODAL' && <NewsLetterModal />}
     </Modal>
   );
 };

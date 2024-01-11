@@ -10,6 +10,8 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useShopQuery } from '@/data/shop';
 import { useAddStaffMutation } from '@/data/staff';
+import { passwordRules } from '@/utils/constants';
+import StickyFooterPanel from '@/components/ui/sticky-footer-panel';
 
 type FormValues = {
   name: string;
@@ -22,7 +24,13 @@ const staffFormSchema = yup.object().shape({
     .string()
     .email('form:error-email-format')
     .required('form:error-email-required'),
-  password: yup.string().required('form:error-password-required'),
+  password: yup
+    .string()
+    .required('form:error-password-required')
+    .matches(passwordRules, {
+      message:
+        'Please create a stronger password. hint: Min 8 characters, 1 Upper case letter, 1 Lower case letter, 1 Numeric digit.',
+    }),
 });
 const AddStaffForm = () => {
   const router = useRouter();
@@ -72,7 +80,7 @@ const AddStaffForm = () => {
         <Description
           title={t('form:form-title-information')}
           details={t('form:form-description-staff-info')}
-          className="sm:pe-4 md:pe-5 w-full px-0 pb-5 sm:w-4/12 sm:py-8 md:w-1/3"
+          className="w-full px-0 pb-5 sm:w-4/12 sm:py-8 sm:pe-4 md:w-1/3 md:pe-5"
         />
 
         <Card className="w-full sm:w-8/12 md:w-2/3">
@@ -83,6 +91,7 @@ const AddStaffForm = () => {
             variant="outline"
             className="mb-4"
             error={t(errors.name?.message!)}
+            required
           />
           <Input
             label={t('form:input-label-email')}
@@ -91,6 +100,7 @@ const AddStaffForm = () => {
             variant="outline"
             className="mb-4"
             error={t(errors.email?.message!)}
+            required
           />
           <PasswordInput
             label={t('form:input-label-password')}
@@ -98,15 +108,22 @@ const AddStaffForm = () => {
             error={t(errors.password?.message!)}
             variant="outline"
             className="mb-4"
+            required
           />
         </Card>
       </div>
 
-      <div className="text-end mb-4">
-        <Button loading={loading} disabled={loading}>
-          {t('form:button-label-add-staff')}
-        </Button>
-      </div>
+      <StickyFooterPanel>
+        <div className="text-end">
+          <Button
+            loading={loading}
+            disabled={loading}
+            className="text-sm md:text-base"
+          >
+            {t('form:button-label-add-staff')}
+          </Button>
+        </div>
+      </StickyFooterPanel>
     </form>
   );
 };

@@ -1,18 +1,19 @@
 import Card from '@/components/common/card';
-import Layout from '@/components/layouts/admin';
+import PageHeading from '@/components/common/page-heading';
 import Search from '@/components/common/search';
 import CouponList from '@/components/coupon/coupon-list';
-import LinkButton from '@/components/ui/link-button';
-import { useState } from 'react';
+import Layout from '@/components/layouts/admin';
 import ErrorMessage from '@/components/ui/error-message';
+import LinkButton from '@/components/ui/link-button';
 import Loader from '@/components/ui/loader/loader';
-import { useTranslation } from 'next-i18next';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { Config } from '@/config';
+import { useCouponsQuery } from '@/data/coupon';
 import { SortOrder } from '@/types';
 import { adminOnly } from '@/utils/auth-utils';
-import { useCouponsQuery } from '@/data/coupon';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
-import { Config } from '@/config';
+import { useState } from 'react';
 
 export default function Coupons() {
   const { t } = useTranslation();
@@ -44,14 +45,12 @@ export default function Coupons() {
 
   return (
     <>
-      <Card className="mb-8 flex flex-col items-center xl:flex-row">
+      <Card className="mb-8 flex flex-col items-center md:flex-row">
         <div className="mb-4 md:mb-0 md:w-1/4">
-          <h1 className="text-xl font-semibold text-heading">
-            {t('form:input-label-coupons')}
-          </h1>
+          <PageHeading title={t('form:input-label-coupons')} />
         </div>
 
-        <div className="flex w-full flex-col items-center space-y-4 ms-auto md:flex-row md:space-y-0 xl:w-1/2">
+        <div className="flex w-full flex-col items-center space-y-4 ms-auto md:w-3/4 md:flex-row md:space-y-0 xl:w-1/2">
           <Search
             onSearch={handleSearch}
             placeholderText={t('form:input-placeholder-search-code')}

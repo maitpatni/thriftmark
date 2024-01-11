@@ -7,13 +7,13 @@
     <title>Order Invoice</title>
     <style >
         body {
-            font-family: Arial, sans-serif;
+            font-family: Arial, DejaVu Sans, sans-serif;
         }
     </style>
     @if($language === "bd")
     <style >
         body {
-            font-family: Arial, sans-serif, bangla;
+            font-family: Arial, DejaVu Sans, sans-serif, bangla;
         }
     </style>
     @endif

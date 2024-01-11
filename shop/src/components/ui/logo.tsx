@@ -18,8 +18,8 @@ const Logo: React.FC<React.AnchorHTMLAttributes<{}>> = ({
       {...props}
     >
       <Image
-        src={'/assets/images/thriftmark-logo-color.png'}
-        alt={siteTitle || 'ThriftMark'}
+        src={logo?.original ?? siteSettings.logo.url}
+        alt={siteTitle || 'ChawkBazar Logo'}
         height={siteSettings.logo.height}
         width={siteSettings.logo.width}
         loading="eager"

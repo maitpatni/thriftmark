@@ -346,5 +346,12 @@
   "text-cash-on-delivery": "Contrareembolso",
   "text-payment-order": "Haga clic en Realizar pedido para realizar el pedido y el pago.",
   "text-read-more": "Leer más",
-  "text-less": "Menos"
+  "text-less": "Menos",
+  "text-title-days": "días",
+  "text-title-hours": "horas",
+  "text-title-minutes": "minutos",
+  "text-title-seconds": "segundos",
+  "text-title-change-language": "Cambiar idioma",
+  "text-title-language": "Idioma",
+  "text-maintenance-mode-title": "El modo de mantenimiento comienza en"
 }

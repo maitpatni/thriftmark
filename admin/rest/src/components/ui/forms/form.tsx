@@ -5,7 +5,7 @@ import type {
   UseFormProps,
   Path,
 } from 'react-hook-form';
-import type { SchemaOf } from 'yup';
+import type { Schema } from 'yup';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useEffect } from 'react';
@@ -17,7 +17,7 @@ type FormProps<TFormValues extends FieldValues> = {
   onSubmit: SubmitHandler<TFormValues>;
   children: (methods: UseFormReturn<TFormValues>) => React.ReactNode;
   useFormProps?: UseFormProps<TFormValues>;
-  validationSchema?: SchemaOf<TFormValues>;
+  validationSchema?: Schema<TFormValues> | any;
   fieldErrors?: ServerErrors<Partial<TFormValues>> | null;
   formError?: string | string[] | null;
 };

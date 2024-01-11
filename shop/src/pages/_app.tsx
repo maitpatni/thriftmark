@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { AnimatePresence } from 'framer-motion';
 import { ManagedUIContext } from '@contexts/ui.context';
 import ManagedModal from '@components/common/modal/managed-modal';
-import ManagedDrawer from '@components/common/drawer/managed-drawer';
+import ManagedDrawer from '@components/ui/drawer/managed-drawer';
 import React, { useEffect, useState } from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { Hydrate } from 'react-query/hydration';
@@ -13,10 +13,10 @@ import { appWithTranslation } from 'next-i18next';
 import DefaultSeo from '@components/common/default-seo';
 
 // Load Open Sans and satisfy typeface font
-// import '@fontsource/open-sans';
-// import '@fontsource/open-sans/600.css';
-// import '@fontsource/open-sans/700.css';
-// import '@fontsource/satisfy';
+import '@fontsource/open-sans';
+import '@fontsource/open-sans/600.css';
+import '@fontsource/open-sans/700.css';
+import '@fontsource/satisfy';
 import '@fontsource/italiana';
 import '@fontsource/tenor-sans';
 // external
@@ -34,9 +34,9 @@ import { SettingsProvider } from '@contexts/settings.context';
 import { useSettings } from '@framework/settings';
 import type { NextPage } from 'next';
 import PrivateRoute from '@lib/private-route';
-import SocialLoginProvider from '../providers/social-login-provider';
+import SocialLoginProvider from '@providers/social-login-provider';
 import { SessionProvider } from 'next-auth/react';
-
+import Maintenance from '@components/maintenance/layout';
 function handleExitComplete() {
   if (typeof window !== 'undefined') {
     window.scrollTo({ top: 0 });
@@ -53,7 +53,7 @@ type AppPropsWithLayout = AppProps & {
 };
 
 export const AppSettings: React.FC<{ children?: React.ReactNode }> = (
-  props
+  props,
 ) => {
   const { data, isLoading: loading, error } = useSettings();
   if (loading) return <PageLoader />;
@@ -90,13 +90,15 @@ function CustomApp({
             <AppSettings>
               <ManagedUIContext>
                 <DefaultSeo />
-                {Boolean(authProps) ? (
-                  <PrivateRoute>
-                    {getLayout(<Component {...pageProps} />)}
-                  </PrivateRoute>
-                ) : (
-                  getLayout(<Component {...pageProps} />)
-                )}
+                <Maintenance>
+                  {Boolean(authProps) ? (
+                    <PrivateRoute>
+                      {getLayout(<Component {...pageProps} />)}
+                    </PrivateRoute>
+                  ) : (
+                    getLayout(<Component {...pageProps} />)
+                  )}
+                </Maintenance>
                 <ToastContainer autoClose={2000} theme="colored" />
                 <SocialLoginProvider />
                 <ManagedModal />

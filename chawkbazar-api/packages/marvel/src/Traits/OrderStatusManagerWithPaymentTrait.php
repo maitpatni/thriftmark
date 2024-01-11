@@ -87,77 +87,32 @@ trait OrderStatusManagerWithPaymentTrait
      */
     public function orderStatusManagementOnPayment($order, $order_status, $payment_status)
     {
-        if ($payment_status === PaymentStatus::PENDING) {
-            # code...
-            # send notification to user about order is pending.
-        } elseif ($payment_status === PaymentStatus::PROCESSING) {
-            # code...
-            # send notification to user about order is processing.
-        } elseif ($payment_status === PaymentStatus::SUCCESS) {
 
-            event(new PaymentSuccess($order));
+        switch ($payment_status) {
+            case PaymentStatus::SUCCESS:
+                event(new PaymentSuccess($order));
+                break;
+            case PaymentStatus::FAILED:
+                event(new PaymentFailed($order));
+                break;
+            case PaymentStatus::REVERSAL:
+                event(new PaymentFailed($order));
+                break;
+            case PaymentStatus::PENDING:
+                # code...
+                # send notification to user about order is pending.
+                break;
+            case PaymentStatus::PROCESSING:
+                # code...
+                # send notification to user about order is processing.
+                break;
 
-            switch ($order_status) {
-                case 'order-processing':
-                    # code...
-                    # send notification to site-admin about order is at processing level & payment is success.
-                    break;
-
-                case 'order-at-local-facility':
-                    # code...
-                    # send notification to user about order is at local facility.
-                    break;
-
-                case 'order-out-for-delivery':
-                    # code...
-                    # send notification to user about order is out for delivery.
-                    break;
-
-                case 'order-completed':
-                    event(new OrderDelivered($order));
-                    # send notification to user about order is delivered.
-                    break;
-
-                case 'order-cancelled':
-                    $this->orderStatusManagementOnCancelled($order);
-                    event(new OrderCancelled($order));
-                    break;
-                default:
-                    event(new OrderStatusChanged($order));
-            }
-        } elseif ($payment_status === PaymentStatus::AWAITING_FOR_APPROVAL) {
-            switch ($order_status) {
-
-                case 'order-pending':
-                    # code...
-                    # send notification to user about order is pending & payment is waiting for approval.
-                    break;
-            }
-        } elseif ($payment_status === PaymentStatus::FAILED) {
-
-            event(new PaymentFailed($order));
-
-            switch ($order_status) {
-                case 'order-failed':
-                    # code...
-                    # send notification to site-admin about order is failed due to payment failed.
-                    # then admin will set order status to cancelled manually on order page.
-                    break;
-
-                case 'order-cancelled':
-                    $this->orderStatusManagementOnCancelled($order);
-                    event(new OrderCancelled($order));
-                    break;
-            }
-        } elseif ($payment_status === PaymentStatus::REVERSAL) {
-            # code...
-            switch ($order_status) {
-                case 'order-cancelled':
-                    $this->orderStatusManagementOnCancelled($order);
-                    event(new OrderCancelled($order));
-                    break;
-            }
+            case PaymentStatus::AWAITING_FOR_APPROVAL:
+                # code...
+                # send notification to user about order is pending & payment is waiting for approval.
+                break;
         }
+        $this->fireEventOnOrderStatus($order, $order_status);
     }
 
     /**
@@ -185,6 +140,36 @@ trait OrderStatusManagerWithPaymentTrait
             case OrderStatus::FAILED:
                 # code...
                 break;
+            case OrderStatus::PROCESSING:
+                # do nothing
+                # this event already has been fired from OrderRepository
+                break;
+            default:
+                event(new OrderStatusChanged($order));
+                break;
+        }
+    }
+
+
+    public function fireEventOnOrderStatus($order, $currentStatus)
+    {
+        switch ($currentStatus) {
+            case OrderStatus::CANCELLED:
+                # code...
+                $this->orderStatusManagementOnCancelled($order);
+                event(new OrderCancelled($order));
+                break;
+
+            case OrderStatus::REFUNDED:
+                $this->orderStatusManagementOnCancelled($order);
+                event(new OrderCancelled($order));
+                break;
+
+            case OrderStatus::FAILED:
+                $this->orderStatusManagementOnCancelled($order);
+                event(new OrderCancelled($order));
+                break;
+
             default:
                 event(new OrderStatusChanged($order));
                 break;

@@ -14,10 +14,11 @@ export interface Props extends InputHTMLAttributes<HTMLInputElement> {
   shadow?: boolean;
   variant?: 'normal' | 'solid' | 'outline';
   error: string | undefined;
+  required?: boolean;
 }
 
 const classes = {
-  root: 'px-4 h-12 flex items-center w-full rounded appearance-none transition duration-300 ease-in-out text-heading text-sm focus:outline-none focus:ring-0',
+  root: 'ltr:pl-4 rtl:pr-4 ltr:pr-12 rtl:pl-12 h-12 flex items-center w-full rounded appearance-none transition duration-300 ease-in-out text-heading text-sm focus:outline-none focus:ring-0',
   normal:
     'bg-gray-100 border border-border-base focus:shadow focus:bg-light focus:border-accent',
   solid:
@@ -39,6 +40,7 @@ const PasswordInput = React.forwardRef<HTMLInputElement, Props>(
       shadow = false,
       type = 'text',
       forgotPageLink = '',
+      required,
       ...rest
     },
     ref
@@ -64,6 +66,7 @@ const PasswordInput = React.forwardRef<HTMLInputElement, Props>(
             className="text-sm font-semibold leading-none text-body-dark"
           >
             {label}
+            {required ? <span className="ml-0.5 text-red-500">*</span> : ''}
           </label>
 
           {forgotPageLink && forgotPassHelpText && (
@@ -90,7 +93,7 @@ const PasswordInput = React.forwardRef<HTMLInputElement, Props>(
           />
           <label
             htmlFor={name}
-            className="end-4 absolute top-5 -mt-2 text-body"
+            className="absolute top-5 -mt-2 text-body end-4"
             onClick={() => setShow((prev) => !prev)}
           >
             {show ? (
@@ -101,7 +104,7 @@ const PasswordInput = React.forwardRef<HTMLInputElement, Props>(
           </label>
         </div>
         {error && (
-          <p className="text-start my-2 text-xs text-red-500">{error}</p>
+          <p className="my-2 text-xs text-red-500 text-start">{error}</p>
         )}
       </div>
     );

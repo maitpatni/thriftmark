@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Marvel\Database\Models\Address;
 use Marvel\Database\Repositories\SettingsRepository;
+use Marvel\Events\Maintenance;
 use Marvel\Exceptions\MarvelException;
 use Illuminate\Support\Facades\Cache;
 use Marvel\Http\Requests\SettingsRequest;
@@ -69,10 +70,13 @@ class SettingsController extends CoreController
             if (Cache::has('cached_settings_' . $language)) {
                 Cache::forget('cached_settings_' . $language);
             }
-            return tap($data)->update($request->only(['options']));
+            $settings =  tap($data)->update($request->only(['options']));
+        } else {
+            // Cache::flush();
+            $settings =  $this->repository->create(['options' => $request['options'], 'language' => $language]);
         }
-        // Cache::flush();
-        return $this->repository->create(['options' => $request['options'], 'language' => $request->language ?? DEFAULT_LANGUAGE]);
+        event(new Maintenance($language));
+        return $settings;
     }
 
     /**

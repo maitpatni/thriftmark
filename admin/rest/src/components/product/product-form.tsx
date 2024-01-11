@@ -9,33 +9,34 @@ import Radio from '@/components/ui/radio/radio';
 import { useRouter } from 'next/router';
 import { yupResolver } from '@hookform/resolvers/yup';
 import FileInput from '@/components/ui/file-input';
-import { productValidationSchema } from './product-validation-schema';
-import ProductVariableForm from './product-variable-form';
-import ProductSimpleForm from './product-simple-form';
-import ProductGroupInput from './product-group-input';
-import ProductCategoryInput from './product-category-input';
-import ProductTypeInput from './product-type-input';
+import { productValidationSchema } from '@/components/product/product-validation-schema';
+import ProductVariableForm from '@/components/product/product-variable-form';
+import ProductSimpleForm from '@/components/product/product-simple-form';
+import ProductGroupInput from '@/components/product/product-group-input';
+import ProductCategoryInput from '@/components/product/product-category-input';
+import ProductTypeInput from '@/components/product/product-type-input';
 import { ProductType, Product, ProductStatus } from '@/types';
 import { useTranslation } from 'next-i18next';
 import { useShopQuery } from '@/data/shop';
-import ProductTagInput from './product-tag-input';
+import cn from 'classnames';
+import ProductTagInput from '@/components/product/product-tag-input';
 import { Config } from '@/config';
 import Alert from '@/components/ui/alert';
 import { useMemo, useState } from 'react';
-import ProductAuthorInput from './product-author-input';
-import ProductManufacturerInput from './product-manufacturer-input';
+import ProductAuthorInput from '@/components/product/product-author-input';
+import ProductManufacturerInput from '@/components/product/product-manufacturer-input';
 import { EditIcon } from '@/components/icons/edit';
 import {
   getProductDefaultValues,
   getProductInputValues,
   ProductFormValues,
-} from './form-utils';
+} from '@/components/product/form-utils';
 import { getErrorMessage } from '@/utils/form-error';
 import {
   useCreateProductMutation,
   useUpdateProductMutation,
 } from '@/data/product';
-import { split, join, isEmpty } from 'lodash';
+import { isEmpty } from 'lodash';
 import { adminOnly, getAuthCredentials, hasAccess } from '@/utils/auth-utils';
 import { useSettingsQuery } from '@/data/settings';
 import Tooltip from '@/components/ui/tooltip';
@@ -43,52 +44,14 @@ import { useModalAction } from '@/components/ui/modal/modal.context';
 import { useCallback } from 'react';
 import OpenAIButton from '@/components/openAI/openAI.button';
 import { ItemProps } from '@/types';
+import { EyeIcon } from '@/components/icons/category/eyes-icon';
+import { LongArrowPrev } from '@/components/icons/long-arrow-prev';
+import Link from 'next/link';
 import { formatSlug } from '@/utils/use-slug';
-
-export const chatbotAutoSuggestion = ({ name }: { name: string }) => {
-  return [
-    {
-      id: 1,
-      title: `Write a product description about ${name} in 100 words or less that highlights the key benefits of the product.`,
-    },
-    {
-      id: 2,
-      title: `Create a product description about ${name} using HTML tags and include a product ID.`,
-    },
-    {
-      id: 3,
-      title: `Write a product description about ${name} using sensory language to appeal to the reader's senses.`,
-    },
-    {
-      id: 4,
-      title: `Create a product description about ${name} that includes customer reviews and ratings.`,
-    },
-    {
-      id: 5,
-      title: `Write a product description about ${name} using storytelling techniques to create an emotional connection with the reader.`,
-    },
-    {
-      id: 6,
-      title: `Write a product description about ${name} that compares and contrasts the product with similar products on the market.`,
-    },
-    {
-      id: 7,
-      title: `Create a product description about ${name} that highlights the product's sustainability and eco-friendliness.`,
-    },
-    {
-      id: 8,
-      title: `Write a product description about ${name} that includes a list of frequently asked questions and their answers.`,
-    },
-    {
-      id: 9,
-      title: `Create a product description about ${name} that includes a video demonstration of the product in use.`,
-    },
-    {
-      id: 10,
-      title: `Write a product description about ${name} that includes a call-to-action and encourages the reader to make a purchase.`,
-    },
-  ];
-};
+import ProductFlashSaleBox from '@/components/product/product-flash-sale-box';
+import { UpdateIcon } from '@/components/icons/update';
+import StickyFooterPanel from '@/components/ui/sticky-footer-panel';
+import { ProductDescriptionSuggestion } from '@/components/product/product-ai-prompt';
 
 type ProductFormProps = {
   initialValues?: Product | null;
@@ -98,7 +61,7 @@ export default function CreateOrUpdateProductForm({
   initialValues,
 }: ProductFormProps) {
   const router = useRouter();
-  const { locale } = router;
+  const { query, locale } = router;
   const {
     // @ts-ignore
     settings: { options },
@@ -128,14 +91,17 @@ export default function CreateOrUpdateProductForm({
     { slug: router.query.shop as string },
     {
       enabled: !!router.query.shop,
-    }
+    },
   );
   const shopId = shopData?.id!;
   const isNewTranslation = router?.query?.action === 'translate';
+  const showPreviewButton =
+    router?.query?.action === 'edit' && Boolean(initialValues?.slug);
   const isSlugEditable =
     router?.query?.action === 'edit' &&
     router?.locale === Config.defaultLanguage;
   const methods = useForm<ProductFormValues>({
+    //@ts-ignore
     resolver: yupResolver(productValidationSchema),
     shouldUnregister: true,
     // @ts-ignore
@@ -202,8 +168,8 @@ export default function CreateOrUpdateProductForm({
   });
   const productName = watch('name');
 
-  const autoSuggestionList = useMemo(() => {
-    return chatbotAutoSuggestion({ name: productName ?? '' });
+  const productDescriptionSuggestionLists = useMemo(() => {
+    return ProductDescriptionSuggestion({ name: productName ?? '' });
   }, [productName]);
 
   const handleGenerateDescription = useCallback(() => {
@@ -212,7 +178,7 @@ export default function CreateOrUpdateProductForm({
       name: productName,
       set_value: setValue,
       key: 'description',
-      suggestion: autoSuggestionList as ItemProps[],
+      suggestion: productDescriptionSuggestionLists as ItemProps[],
     });
   }, [productName]);
 
@@ -304,6 +270,16 @@ export default function CreateOrUpdateProductForm({
     </span>
   );
 
+  const {
+    fields: variationsFiled,
+    append: variationsAppend,
+    remove: variationsRemove,
+  } = useFieldArray({
+    shouldUnregister: true,
+    control,
+    name: 'variations',
+  });
+
   return (
     <>
       {errorMessage ? (
@@ -317,7 +293,7 @@ export default function CreateOrUpdateProductForm({
       ) : null}
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
-          <div className="my-5 flex flex-wrap border-b border-dashed border-border-base pb-8 sm:my-8">
+          <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
             <Description
               title={t('form:featured-image-title')}
               details={featuredImageInformation}
@@ -334,7 +310,7 @@ export default function CreateOrUpdateProductForm({
             </Card>
           </div>
 
-          <div className="my-5 flex flex-wrap border-b border-dashed border-border-base pb-8 sm:my-8">
+          <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
             <Description
               title={t('form:gallery-title')}
               details={galleryImageInformation}
@@ -346,7 +322,7 @@ export default function CreateOrUpdateProductForm({
             </Card>
           </div>
 
-          <div className="my-5 flex flex-wrap border-b border-dashed border-border-base pb-8 sm:my-8">
+          <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
             <Description
               title={t('form:video-title')}
               details={t('form:video-help-text')}
@@ -356,13 +332,13 @@ export default function CreateOrUpdateProductForm({
             <Card className="w-full sm:w-8/12 md:w-2/3">
               {/* Video url picker */}
               <div>
-                {fields.map((item: any, index: number) => (
+                {fields?.map((item: any, index: number) => (
                   <div
-                    className="border-b border-dashed border-border-200 py-5 first:pt-0 last:border-b-0 md:py-8 md:first:pt-0"
+                    className="py-5 border-b border-dashed border-border-200 first:pt-0 last:border-b-0 md:py-8 md:first:pt-0"
                     key={index}
                   >
                     {' '}
-                    <div className="mb-3 flex gap-1 text-sm font-semibold leading-none text-body-dark">
+                    <div className="flex gap-1 mb-3 text-sm font-semibold leading-none text-body-dark">
                       {`${t('form:input-label-video-embed')} ${index + 1}`}
                       <Tooltip content={t('common:text-video-tooltip')} />
                     </div>
@@ -401,7 +377,7 @@ export default function CreateOrUpdateProductForm({
             </Card>
           </div>
 
-          <div className="my-5 flex flex-wrap border-b border-dashed border-border-base pb-8 sm:my-8">
+          <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
             <Description
               title={t('form:type-and-category')}
               details={t('form:type-and-category-help-text')}
@@ -421,7 +397,7 @@ export default function CreateOrUpdateProductForm({
             </Card>
           </div>
 
-          <div className="my-5 flex flex-wrap sm:my-8">
+          <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
             <Description
               title={t('form:item-description')}
               details={`${
@@ -444,14 +420,14 @@ export default function CreateOrUpdateProductForm({
               {isSlugEditable ? (
                 <div className="relative mb-5">
                   <Input
-                    label={`${t('Slug')}`}
+                    label={t('form:input-label-slug')}
                     {...register('slug')}
                     error={t(errors.slug?.message!)}
                     variant="outline"
                     disabled={isSlugDisable}
                   />
                   <button
-                    className="absolute top-[27px] right-px z-10 flex h-[46px] w-11 items-center justify-center rounded-tr rounded-br border-l border-solid border-border-base bg-white px-2 text-body transition duration-200 hover:text-heading focus:outline-none"
+                    className="absolute top-[27px] right-px z-0 flex h-[46px] w-11 items-center justify-center rounded-tr rounded-br border-l border-solid border-border-base bg-white px-2 text-body transition duration-200 hover:text-heading focus:outline-none"
                     type="button"
                     title={t('common:text-edit')}
                     onClick={() => setIsSlugDisable(false)}
@@ -461,7 +437,7 @@ export default function CreateOrUpdateProductForm({
                 </div>
               ) : (
                 <Input
-                  label={`${t('Slug')}`}
+                  label={t('form:input-label-slug')}
                   {...register('slug')}
                   value={slugAutoSuggest}
                   variant="outline"
@@ -479,7 +455,7 @@ export default function CreateOrUpdateProductForm({
               <div className="relative">
                 {options?.useAi && (
                   <OpenAIButton
-                    title="Generate Description With AI"
+                    title={t('form:button-label-description-ai')}
                     onClick={handleGenerateDescription}
                   />
                 )}
@@ -520,8 +496,39 @@ export default function CreateOrUpdateProductForm({
               </div>
             </Card>
           </div>
+          {/* TODO: Uncomment this when flash will release for Chawkbazar */}
+          {/* {initialValues?.in_flash_sale ? (
+            <>
+              <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
+                <Description
+                  title="Promotional"
+                  details="Product selected for this campaign."
+                  className="w-full px-0 pb-5 sm:w-4/12 sm:py-8 sm:pe-4 md:w-1/3 md:pe-5"
+                />
+                <Card className="w-full sm:w-8/12 md:w-2/3">
+                  <ProductFlashSaleBox
+                    initialValues={initialValues}
+                    shop={shopData}
+                  />
+                </Card>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
+                <Description
+                  title="Promotional"
+                  details="Select product promotional settings form here"
+                  className="w-full px-0 pb-5 sm:w-4/12 sm:py-8 sm:pe-4 md:w-1/3 md:pe-5"
+                />
+                <Card className="w-full sm:w-8/12 md:w-2/3">
+                  <Alert message={'Product is not selected in any campaign.'} />
+                </Card>
+              </div>
+            </>
+          )} */}
 
-          <div className="my-5 flex flex-wrap border-b border-dashed border-border-base pb-8 sm:my-8">
+          <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
             <Description
               title={t('form:form-title-product-type')}
               details={t('form:form-description-product-type')}
@@ -542,26 +549,97 @@ export default function CreateOrUpdateProductForm({
               shopId={shopId}
               initialValues={initialValues}
               settings={options}
+              name="variations"
+              fields={variationsFiled}
+              // @ts-ignore
+              append={variationsAppend}
+              remove={variationsRemove}
             />
           )}
-
-          <div className="mb-4 text-end">
-            {initialValues && (
-              <Button
-                variant="outline"
-                onClick={router.back}
-                className="me-4"
-                type="button"
-              >
-                {t('form:button-label-back')}
-              </Button>
-            )}
-            <Button loading={updating || creating}>
-              {initialValues
-                ? t('form:button-label-update-product')
-                : t('form:button-label-add-product')}
-            </Button>
-          </div>
+          <StickyFooterPanel className="z-0">
+            <div
+              className={cn(
+                'flex items-center',
+                initialValues ? 'justify-between' : 'justify-end',
+              )}
+            >
+              {initialValues && (
+                <Button
+                  variant="custom"
+                  onClick={router.back}
+                  className="!px-0 text-sm !text-body me-4 hover:!text-accent focus:ring-0 md:text-base"
+                  type="button"
+                  size="medium"
+                >
+                  <LongArrowPrev className="w-4 h-5 me-2" />
+                  {t('form:button-label-back')}
+                </Button>
+              )}
+              <div className="flex items-center">
+                {showPreviewButton && (
+                  <Link
+                    href={`${process.env.NEXT_PUBLIC_SHOP_URL}/products/preview/${query.productSlug}`}
+                    target="_blank"
+                    className="inline-flex h-12 flex-shrink-0 items-center justify-center rounded border !border-accent bg-transparent px-5 py-0 text-sm font-semibold leading-none !text-accent outline-none transition duration-300 ease-in-out me-4 hover:border-accent hover:bg-accent hover:!text-white focus:shadow focus:outline-none focus:ring-1 focus:ring-accent-700 md:text-base"
+                  >
+                    <EyeIcon className="w-4 h-4 me-2" />
+                    {t('form:button-label-preview-product-on-shop')}
+                  </Link>
+                )}
+                <Button
+                  loading={updating || creating}
+                  disabled={updating || creating}
+                  size="medium"
+                  className="text-sm md:text-base"
+                >
+                  {initialValues ? (
+                    <>
+                      <UpdateIcon className="w-5 h-5 shrink-0 ltr:mr-2 rtl:pl-2" />
+                      <span className="sm:hidden">
+                        {t('form:button-label-update')}
+                      </span>
+                      <span className="hidden sm:block">
+                        {t('form:button-label-update-product')}
+                      </span>
+                    </>
+                  ) : (
+                    t('form:button-label-add-product')
+                  )}
+                </Button>
+              </div>
+            </div>
+          </StickyFooterPanel>
+          {/* <div className="fixed inset-x-0 left-auto bottom-0 w-full bg-white py-5 px-8 lg:w-[calc(100%-288px)]">
+            <div className="flex items-center justify-between">
+              {initialValues && (
+                <Button
+                  variant="custom"
+                  onClick={router.back}
+                  className="!px-0 !text-body me-4 focus:ring-0"
+                  type="button"
+                  size="medium"
+                >
+                  <LongArrowPrev className="w-5 h-5 me-2" />
+                  {t('form:button-label-back')}
+                </Button>
+              )}
+              <div className="flex items-center">
+                <Link
+                  href={`${process.env.NEXT_PUBLIC_SHOP_URL}/products/preview/${query.productSlug}`}
+                  target="_blank"
+                  className="inline-flex h-12 flex-shrink-0 items-center justify-center rounded border !border-accent bg-transparent px-5 py-0 font-semibold leading-none !text-accent outline-none transition duration-300 ease-in-out me-4 hover:border-accent hover:bg-accent hover:!text-white focus:shadow focus:outline-none focus:ring-1 focus:ring-accent-700"
+                >
+                  <EyeIcon className="w-4 h-4 me-2" />
+                  {t('form:button-label-preview-product-on-shop')}
+                </Link>
+                <Button loading={updating || creating} size="medium">
+                  {initialValues
+                    ? t('form:button-label-update-product')
+                    : t('form:button-label-add-product')}
+                </Button>
+              </div>
+            </div>
+          </div> */}
         </form>
       </FormProvider>
     </>

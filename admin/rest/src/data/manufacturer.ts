@@ -79,6 +79,20 @@ export const useUpdateManufacturerMutation = () => {
   });
 };
 
+export const useUpdateManufacturerMutationInList = () => {
+  const { t } = useTranslation();
+  const queryClient = useQueryClient();
+  return useMutation(manufacturerClient.update, {
+    onSuccess: async () => {
+      toast.success(t('common:successfully-updated'));
+    },
+    // Always refetch after error or success:
+    onSettled: () => {
+      queryClient.invalidateQueries(API_ENDPOINTS.MANUFACTURERS);
+    },
+  });
+};
+
 export const useManufacturerQuery = ({ slug, language }: GetParams) => {
   const { data, error, isLoading } = useQuery<Manufacturer, Error>(
     [API_ENDPOINTS.MANUFACTURERS, { slug, language }],

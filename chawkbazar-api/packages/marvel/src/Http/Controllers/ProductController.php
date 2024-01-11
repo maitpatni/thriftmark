@@ -14,12 +14,17 @@ use Marvel\Database\Models\Wishlist;
 use Marvel\Database\Models\Variation;
 use Marvel\Exceptions\MarvelException;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Cache;
+use Marvel\Database\Models\Author;
+use Marvel\Database\Models\Category;
+use Marvel\Database\Models\Manufacturer;
 use Marvel\Http\Requests\ProductCreateRequest;
 use Marvel\Http\Requests\ProductUpdateRequest;
 use Marvel\Database\Repositories\ProductRepository;
 use Marvel\Database\Repositories\SettingsRepository;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Marvel\Database\Models\Settings;
+use Marvel\Database\Models\Tag;
 use Marvel\Exceptions\MarvelNotFoundException;
 use \OpenAI;
 use Marvel\Enums\Permission;
@@ -277,7 +282,10 @@ class ProductController extends CoreController
             'Pragma'              => 'public'
         ];
 
-        $list = $this->repository->where('shop_id', $shop_id)->get()->toArray();
+        $list = $this->repository->with([
+            'categories',
+            'tags',
+        ])->where('shop_id', $shop_id)->get()->toArray();
 
         if (!count($list)) {
             return response()->stream(function () {
@@ -291,7 +299,7 @@ class ProductController extends CoreController
             $FH = fopen('php://output', 'w');
             foreach ($list as $key => $row) {
                 if ($key === 0) {
-                    $exclude = ['id','sold','blocked_dates','slug', 'deleted_at', 'created_at', 'updated_at', 'shipping_class_id', 'author_id', 'manufacturer_id', 'ratings', 'total_reviews', 'my_review', 'in_wishlist', 'rating_count', 'translated_languages','sold'];
+                    $exclude = ['id', 'slug', 'deleted_at', 'created_at', 'updated_at', 'shipping_class_id', 'ratings', 'total_reviews', 'my_review', 'in_wishlist', 'rating_count', 'translated_languages', 'sold', 'blocked_dates'];
                     $row = array_diff($row, $exclude);
                 }
                 unset($row['id']);
@@ -300,8 +308,6 @@ class ProductController extends CoreController
                 unset($row['updated_at']);
                 unset($row['created_at']);
                 unset($row['slug']);
-                unset($row['author_id']);
-                unset($row['manufacturer_id']);
                 unset($row['ratings']);
                 unset($row['total_reviews']);
                 unset($row['my_review']);
@@ -310,7 +316,7 @@ class ProductController extends CoreController
                 unset($row['translated_languages']);
                 unset($row['sold']);
                 unset($row['blocked_dates']);
-                
+
                 if (isset($row['image'])) {
                     $row['image'] = json_encode($row['image']);
                 }
@@ -322,6 +328,14 @@ class ProductController extends CoreController
                 }
                 if (isset($row['video'])) {
                     $row['video'] = json_encode($row['video']);
+                }
+                if (isset($row['categories'])) {
+                    $categories = collect($row['categories'])->pluck('id')->toArray();
+                    $row['categories'] = json_encode($categories);
+                }
+                if (isset($row['tags'])) {
+                    $tagIds = collect($row['tags'])->pluck('pivot.tag_id')->toArray();
+                    $row['tags'] = json_encode($tagIds);
                 }
                 fputcsv($FH, $row);
             }
@@ -395,7 +409,7 @@ class ProductController extends CoreController
      * importProducts
      *
      * @param  Request $request
-     * @return void
+     * @return bool
      */
     public function importProducts(Request $request)
     {
@@ -428,10 +442,28 @@ class ProductController extends CoreController
                 $product['image'] = json_decode($product['image'], true);
                 $product['gallery'] = json_decode($product['gallery'], true);
                 $product['video'] = json_decode($product['video'], true);
+                $categoriesId = json_decode($product['categories'], true);
+                $tagsId = json_decode($product['tags'], true);
                 try {
                     $type = Type::findOrFail($product['type_id']);
+                    $authorCacheKey = $product['author_id'] . '_author_id';
+                    $manufacturerCacheKey = $product['manufacturer_id'] . '_manufacturer_id';
+                    $product['author_id'] = Cache::remember($authorCacheKey, 30, fn () => Author::find($product['author_id'])?->id);
+                    $product['manufacturer_id'] = Cache::remember($manufacturerCacheKey, 30, fn () => Manufacturer::find($product['manufacturer_id'])?->id);
+                    $dataArray = $this->repository->getProductDataArray();
+                    $productArray = array_intersect_key($product, array_flip($dataArray));
                     if (isset($type->id)) {
-                        Product::firstOrCreate($product);
+                        $newProduct = Product::FirstOrCreate($productArray);
+                        $categoryCacheKey = $product['categories'] . '_categories';
+                        $tagCacheKey = $product['tags'] . '_tags';
+                        $categories = Cache::remember($categoryCacheKey, 30, fn () => Category::whereIn('id', $categoriesId)->get());
+                        $tags = Cache::remember($tagCacheKey, 30, fn () => Tag::whereIn('id', $tagsId)->get());
+                        if (!empty($categories)) {
+                            $newProduct->categories()->attach($categories);
+                        }
+                        if (!empty($tags)) {
+                            $newProduct->tags()->attach($tags);
+                        }
                     }
                 } catch (Exception $e) {
                     //
@@ -447,7 +479,7 @@ class ProductController extends CoreController
      * importVariationOptions
      *
      * @param  Request $request
-     * @return void
+     * @return bool
      */
     public function importVariationOptions(Request $request)
     {

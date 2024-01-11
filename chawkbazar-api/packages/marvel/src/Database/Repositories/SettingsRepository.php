@@ -5,6 +5,7 @@ namespace Marvel\Database\Repositories;
 
 use Carbon\Carbon;
 use Exception;
+use Marvel\Console\MarvelVerification;
 use Marvel\Database\Models\Settings;
 
 class SettingsRepository extends BaseRepository
@@ -19,40 +20,28 @@ class SettingsRepository extends BaseRepository
 
     public function getApplicationSettings(): array
     {
-        $config = getConfig();
-
-        $appData = $this->getAppSettingsData($config['license_key']);
-
+        $appData = $this->getAppSettingsData();
         return [
             'app_settings' => $appData,
         ];
     }
 
-    private function getAppSettingsData(string $licenseKey): array
+    private function getAppSettingsData(): array
     {
+        $config = new MarvelVerification();
+        $apiData = $config->jsonSerialize();
         try {
-            $config = getConfig();
-            $apiData = $config;
-            $last_checking_time = $config['last_checking_time'] ?? Carbon::now();
+            $licenseKey = $config->getPrivateKey();
+            $last_checking_time = $config->getLastCheckingTime() ?? Carbon::now();
             $lastCheckingTimeDifferenceFromNow = Carbon::parse($last_checking_time)->diffInMinutes(Carbon::now());
-            
             if ($lastCheckingTimeDifferenceFromNow > 20) {
-                $apiData = getConfigFromApi($licenseKey);
-            };
-            $isValidated = $apiData["trust"] ?? true;
-
-            $appData = [
-                ...$apiData,
-                'last_checking_time' => Carbon::now(),
-                'license_key' => $apiData['license_key'],
-                'trust' => $apiData['trust'],
-            ];
-            setConfig($appData);
-            return [
-                'last_checking_time' => Carbon::now(),
-                'trust' => $isValidated,
-            ];
+                $apiData = $config->verify($licenseKey)->jsonSerialize();
+            }
         } catch (Exception $e) {
         }
+        return [
+            'last_checking_time' => Carbon::now(),
+            'trust' => $apiData['trust'] ?? false,
+        ];
     }
 }

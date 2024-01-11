@@ -17,3 +17,73 @@ export const EditIcon: React.FC<React.SVGAttributes<{}>> = (props) => (
     </g>
   </svg>
 );
+
+
+export const EditFillIcon: React.FC<React.SVGAttributes<{}>> = (props) => {
+  return (
+    <svg
+      width="1em"
+      height="1em"
+      viewBox="0 0 14 14"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <path
+        d="M4.671 7.87l4.546-4.546 1.459 1.459-4.547 4.546h0a2.563 2.563 0 01-1.08.645s0 0 0 0l-1.456.433.434-1.455c.121-.409.343-.78.644-1.081h0zm-1.189 2.57s0 0 0 0h0zm8.112-9.065a1.031 1.031 0 01.729 1.76l-.321.322-1.459-1.459.322-.32a1.03 1.03 0 01.729-.303z"
+        fill="currentColor"
+        stroke="currentColor"
+      />
+      <path
+        d="M3.063 3.063a1.75 1.75 0 00-1.75 1.75v6.125a1.75 1.75 0 001.75 1.75h6.124a1.75 1.75 0 001.75-1.75V7.874a.438.438 0 00-.874 0v3.063a.875.875 0 01-.876.874H3.064a.875.875 0 01-.876-.874V4.811a.875.875 0 01.876-.875h3.062a.437.437 0 100-.874H3.062z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+};
+
+export const EditGhostIcon: React.FC<React.SVGAttributes<{}>> = (props) => {
+  return (
+    <svg
+      width="1em"
+      height="1em"
+      viewBox="0 0 16 16"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <path
+        opacity={0.2}
+        d="M13.854 5.646L12 7.5 8.5 4l1.854-1.854a.5.5 0 01.707 0l2.793 2.792a.5.5 0 010 .708z"
+        fill="currentColor"
+      />
+      <path
+        d="M14.207 4.586l-2.793-2.793a1 1 0 00-1.414 0L2.293 9.5a.991.991 0 00-.293.707V13a1 1 0 001 1h2.793a.992.992 0 00.707-.293l5.23-5.229.217.869-2.3 2.3a.5.5 0 00.707.707l2.5-2.5a.5.5 0 00.132-.475l-.432-1.726L14.207 6a.999.999 0 000-1.414zM3 13v-1.793L4.793 13H3zm3-.207L3.207 10 8.5 4.707 11.293 7.5 6 12.793zm6-6L9.208 4l1.5-1.5L13.5 5.293l-1.5 1.5z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+};
+
+export const ComposeEditIcon: React.FC<React.SVGAttributes<{}>> = (props) => {
+  return (
+    <svg
+      width="1em"
+      height="1em"
+      viewBox="0 0 16 16"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <path
+        opacity={0.2}
+        d="M13.854 5.646L12 7.5 8.5 4l1.854-1.854a.5.5 0 01.707 0l2.793 2.792a.5.5 0 010 .708z"
+        fill="currentColor"
+      />
+      <path
+        d="M14.207 4.586l-2.793-2.793a1 1 0 00-1.414 0L2.293 9.5a.991.991 0 00-.293.707V13a1 1 0 001 1h10.5a.5.5 0 000-1H7.208l7-7a.999.999 0 000-1.414zM3 10.206l5.5-5.5L11.293 7.5l-5.5 5.5H3v-2.793zm9-3.413L9.208 4l1.5-1.5L13.5 5.293l-1.5 1.5z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+};

@@ -6,6 +6,7 @@ import { useTranslation } from 'next-i18next';
 import { useIsRTL } from '@/utils/locals';
 import { useState } from 'react';
 import TitleWithSort from '@/components/ui/title-with-sort';
+import { NoDataFound } from '@/components/icons/no-data-found';
 
 export type IProps = {
   shippings: Shipping[] | undefined;
@@ -41,11 +42,22 @@ const ShippingList = ({ shippings, onSort, onOrder }: IProps) => {
 
   const columns = [
     {
-      title: t('table:table-item-id'),
+      title: (
+        <TitleWithSort
+          title={t('table:table-item-id')}
+          ascending={
+            sortingObj.sort === SortOrder.Asc && sortingObj.column === 'id'
+          }
+          isActive={sortingObj.column === 'id'}
+        />
+      ),
+      className: 'cursor-pointer',
       dataIndex: 'id',
       key: 'id',
-      align: 'center',
-      width: 62,
+      align: alignLeft,
+      width: 150,
+      onHeaderCell: () => onHeaderClick('id'),
+      render: (id: number) => `#${t('table:table-item-id')}: ${id}`,
     },
     {
       title: (
@@ -95,6 +107,9 @@ const ShippingList = ({ shippings, onSort, onOrder }: IProps) => {
       key: 'type',
       align: 'center',
       onHeaderCell: () => onHeaderClick('type'),
+      render: (value: boolean) => (
+        <span className="capitalize">{value?.toString()}</span>
+      ),
     },
     {
       title: t('table:table-item-actions'),
@@ -117,7 +132,15 @@ const ShippingList = ({ shippings, onSort, onOrder }: IProps) => {
       <Table
         //@ts-ignore
         columns={columns}
-        emptyText={t('table:empty-table-data')}
+        emptyText={() => (
+          <div className="flex flex-col items-center py-7">
+            <NoDataFound className="w-52" />
+            <div className="mb-1 pt-6 text-base font-semibold text-heading">
+              {t('table:empty-table-data')}
+            </div>
+            <p className="text-[13px]">{t('table:empty-table-sorry-text')}</p>
+          </div>
+        )}
         data={shippings}
         rowKey="id"
         scroll={{ x: 900 }}

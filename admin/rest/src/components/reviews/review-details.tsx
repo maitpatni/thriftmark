@@ -18,6 +18,7 @@ import { CheckedIcon } from '@/components/icons/checked';
 import { LikeIcon } from '@/components/icons/like-icon';
 import { DislikeIcon } from '@/components/icons/dislike-icon';
 import isEmpty from 'lodash/isEmpty';
+import { NoDataFound } from '@/components/icons/no-data-found';
 
 type IProps = {
   review: Review | undefined | null;
@@ -211,7 +212,7 @@ const ReviewDetailsView = ({ review }: IProps) => {
         <div className="mb-3 flex items-center text-xs text-gray-500">
           {t('common:text-by')}{' '}
           <span className="font-semibold capitalize text-heading ltr:ml-1 rtl:mr-1">
-            {user?.name}
+            {user?.name ? user?.name : t('common:text-guest')}
           </span>
           {user?.is_active && (
             <CheckedIcon className="h-[13px] w-[13px] text-gray-700 ltr:ml-1 rtl:mr-1" />
@@ -257,7 +258,15 @@ const ReviewDetailsView = ({ review }: IProps) => {
       <Table
         //@ts-ignore
         columns={columns}
-        emptyText={t('table:empty-table-data')}
+        emptyText={() => (
+          <div className="flex flex-col items-center py-7">
+            <NoDataFound className="w-52" />
+            <div className="mb-1 pt-6 text-base font-semibold text-heading">
+              {t('table:empty-table-data')}
+            </div>
+            <p className="text-[13px]">{t('table:empty-table-sorry-text')}</p>
+          </div>
+        )}
         data={abusive_reports}
         rowKey="id"
         scroll={{ x: 700 }}

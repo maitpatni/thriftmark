@@ -254,7 +254,7 @@ class ShopController extends CoreController
 
     public function myShops(Request $request)
     {
-        $user = $request->user;
+        $user = $request->user();
         return $this->repository->where('owner_id', '=', $user->id)->get();
     }
 

@@ -8,6 +8,7 @@ import FileInput from '@/components/ui/file-input';
 import Checkbox from '@/components/ui/checkbox/checkbox';
 import { Config } from '@/config';
 import { useRouter } from 'next/router';
+import Alert from '@/components/ui/alert';
 
 type IProps = {
   initialValues: any;
@@ -36,7 +37,7 @@ export default function ProductSimpleForm({ initialValues }: IProps) {
             ? t('form:item-description-edit')
             : t('form:item-description-add')
         } ${t('form:form-description-simple-product-info')}`}
-        className="sm:pe-4 md:pe-5 w-full px-0 pb-5 sm:w-4/12 sm:py-8 md:w-1/3"
+        className="w-full px-0 pb-5 sm:w-4/12 sm:py-8 sm:pe-4 md:w-1/3 md:pe-5"
       />
 
       <Card className="w-full sm:w-8/12 md:w-2/3">
@@ -79,6 +80,7 @@ export default function ProductSimpleForm({ initialValues }: IProps) {
           error={t(errors.sku?.message!)}
           variant="outline"
           className="mb-5"
+          inputClassName="uppercase"
           disabled={isTranslateProduct}
         />
 
@@ -129,12 +131,24 @@ export default function ProductSimpleForm({ initialValues }: IProps) {
               acceptFile={true}
               defaultValue={{}}
             />
+            <Alert
+              message={t('form:info-about-digital-product')}
+              variant="info"
+              closeable={false}
+              className="mt-5 mb-5"
+            />
             <input type="hidden" {...register(`digital_file`)} />
-            {errors.digital_file_input && (
-              <p className="my-2 text-xs text-start text-red-500">
-                {t(errors.digital_file_input?.message!)}
-              </p>
-            )}
+            {
+              // @ts-ignore
+              errors.digital_file_input && (
+                <p className="my-2 text-xs text-red-500 text-start">
+                  {
+                    // @ts-ignore
+                    t('form:error-digital-file-is-required')
+                  }
+                </p>
+              )
+            }
           </>
         ) : null}
         {is_external ? (

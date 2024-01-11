@@ -44,4 +44,9 @@ export const API_ENDPOINTS = {
   USERS_WISHLIST_TOGGLE: '/wishlists/toggle',
   WISHLIST: '/wishlists',
   IN_WISHLIST: '/wishlists/in_wishlist',
+  TERMS_AND_CONDITIONS: 'terms-and-conditions',
+  FAQS: '/faqs',
+  ORDERS_DOWNLOADS: '/downloads',
+  GENERATE_DOWNLOADABLE_PRODUCT_LINK: '/downloads/digital_file',
+  USERS_UPDATE_EMAIL: '/update-email',
 };

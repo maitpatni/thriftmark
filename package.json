@@ -1,6 +1,6 @@
 {
   "name": "chawkbazar",
-  "version": "5.6.0",
+  "version": "6.2.0",
   "private": true,
   "author": "RedQ",
   "workspaces": [
@@ -27,7 +27,7 @@
     "*.{js,ts,tsx,md,css}": [
       "prettier --trailing-comma es5 --write"
     ]
-  },
+},
   "dependencies": {
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",

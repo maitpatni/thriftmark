@@ -21,7 +21,7 @@ const Coupon = ({ subtotal }: { subtotal: number }) => {
   if (!hasCoupon && !coupon) {
     return (
       <p
-        role="button"
+        // role="button"
         className="text-[13px] font-bold text-heading transition duration-200 hover:text-accent"
         onClick={() => setHasCoupon(true)}
       >

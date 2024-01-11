@@ -17,6 +17,7 @@ import { useWindowSize } from '@/utils/use-window-size';
 import { RESPONSIVE_WIDTH } from '@/utils/constants';
 import ErrorMessage from '@/components/ui/error-message';
 import { useMessageSeen } from '@/data/conversations';
+import { Conversations, Shop } from '@/types';
 
 interface Props {
   className?: string;
@@ -69,8 +70,9 @@ const UserMessageIndex = ({ className, ...rest }: Props) => {
 
   messages = [...messages].reverse();
   const classes = {
-    common: 'inline-block rounded-[13.5px] px-4 py-2 shadow-chat break-all',
-    default: 'bg-white text-left',
+    common:
+      'inline-block rounded-[8px] px-4 py-2 break-all leading-[150%] text-sm',
+    default: 'bg-[#FAFAFA] text-left text-base-dark',
     reverse: 'bg-accent text-white',
   };
   if (!isEmpty(query?.id) && messageError)
@@ -90,8 +92,8 @@ const UserMessageIndex = ({ className, ...rest }: Props) => {
     <>
       <div
         className={cn(
-          'flex h-full flex-1 bg-[#F3F4F6] pb-7',
-          width >= RESPONSIVE_WIDTH ? '2xl:max-w-[calc(100% - 26rem)]' : '',
+          'flex h-full max-h-[calc(100%-51px)] flex-1 items-stretch bg-[#F3F4F6]',
+          width >= RESPONSIVE_WIDTH ? '2xl:max-w-[calc(100%-26rem)]' : '',
           className
         )}
         {...rest}
@@ -100,7 +102,9 @@ const UserMessageIndex = ({ className, ...rest }: Props) => {
           <>
             {!loading || !messageLoading ? (
               <div
-                className={cn('flex h-full w-full flex-col')}
+                className={cn(
+                  'flex h-full w-full flex-col overflow-hidden rounded-xl bg-white p-6'
+                )}
                 onFocus={() => {
                   // @ts-ignore
                   seenMessage(Boolean(data?.unseen));
@@ -127,7 +131,7 @@ const UserMessageIndex = ({ className, ...rest }: Props) => {
                           limit={LIMIT / 2}
                         />
                       ) : (
-                        <div className="hidden">No search left</div>
+                        <div className="hidden">{t('text-no-search')}</div>
                       )}
                     </div>
                   ) : (
@@ -135,11 +139,14 @@ const UserMessageIndex = ({ className, ...rest }: Props) => {
                   )}
                 </UserMessageView>
 
-                <div className="relative mx-6">
+                <div className="relative mt-auto">
                   {/* @ts-ignore */}
                   {Boolean(data?.shop?.is_active) ? (
                     <>
-                      <CreateMessageForm />
+                      <CreateMessageForm
+                        // @ts-ignore
+                        shop={data as Conversations}
+                      />
                     </>
                   ) : (
                     <>

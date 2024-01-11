@@ -346,5 +346,12 @@
   "text-cash-on-delivery": "货到付款",
   "text-payment-order": "请点击Place order进行下单和付款",
   "text-read-more": "了解更多",
-  "text-less": "减少"
+  "text-less": "减少",
+  "text-title-days": "天",
+  "text-title-hours": "小时",
+  "text-title-minutes": "分钟",
+  "text-title-seconds": "秒",
+  "text-title-change-language": "改变语言",
+  "text-title-language": "语言",
+  "text-maintenance-mode-title": "维护模式开始于"
 }

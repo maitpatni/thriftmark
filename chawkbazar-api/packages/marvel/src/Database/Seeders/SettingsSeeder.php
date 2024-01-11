@@ -41,10 +41,10 @@ class SettingsSeeder extends Seeder
                     'file_name' => 'logo-final2x.png'
                 ],
                 "collapseLogo" => [
-                    'thumbnail' => 'https://pickbazarlaravel.s3.ap-southeast-1.amazonaws.com/2283/conversions/Pickbazar-thumbnail.jpg',
-                    'original' => 'https://pickbazarlaravel.s3.ap-southeast-1.amazonaws.com/2283/Pickbazar.png',
-                    'id' => 2286,
-                    'file_name' => 'Pickbazar.png'
+                    'thumbnail' => 'https://chawkbazarlaravel.s3.ap-southeast-1.amazonaws.com/345/conversions/favicon-black-thumbnail.jpg',
+                    'original' => 'https://chawkbazarlaravel.s3.ap-southeast-1.amazonaws.com/345/favicon-black.png',
+                    'id' => 345,
+                    'file_name' => 'favicon-black.png'
                 ],
                 "useOtp" => false,
                 "currency" => "USD",
@@ -136,7 +136,7 @@ class SettingsSeeder extends Seeder
                 "externalText" =>  "REDQ",
                 "externalLink" =>  "https://redq.io",
                 ...$this->getSmsEmailEvents(),
-
+                ...$this->maintenanceSettings(),
             ]),
             "language" => DEFAULT_LANGUAGE ?? "en",
             "created_at" => Carbon::now(),
@@ -198,6 +198,34 @@ class SettingsSeeder extends Seeder
                     "message" => false,
                     "storeNotice" => false
                 ],
+            ],
+        ];
+    }
+    private function maintenanceSettings(): array
+    {
+        return [
+            "isUnderMaintenance" => false,
+            "maintenance" => [
+                "title"                 => "Site is under Maintenance",
+                "buttonTitleOne"        => "Notify Me",
+                "newsLetterTitle"       => "Subscribe Newsletter",
+                "buttonTitleTwo"        => "Contact Us",
+                "contactUsTitle"        => "Contact Us",
+                "aboutUsTitle"          => "About Us",
+                "isOverlayColor"        => false,
+                "overlayColor"          => null,
+                "overlayColorRange"     => null,
+                "description"           => "We are currently undergoing essential maintenance to elevate your browsing experience. Our team is working diligently to implement improvements that will bring you an even more seamless and enjoyable interaction with our site. During this period, you may experience temporary inconveniences. We appreciate your patience and understanding. Thank you for being a part of our community, and we look forward to unveiling the enhanced features and content soon.",
+                "newsLetterDescription" => "Stay in the loop! Subscribe to our newsletter for exclusive deals and the latest trends delivered straight to your inbox. Elevate your shopping experience with insider access.",
+                "aboutUsDescription"    => "Welcome to Chawkbazar, your go-to destination for curated excellence. Discover a fusion of style, quality, and affordability in every click. Join our community and elevate your shopping experience with us!",
+                "image" => [
+                    'id'        => 346,
+                    'file_name' => "background.png",
+                    'original'  => "https://chawkbazarlaravel.s3.ap-southeast-1.amazonaws.com/346/background.png",
+                    'thumbnail' => "https://chawkbazarlaravel.s3.ap-southeast-1.amazonaws.com/346/conversions/background-thumbnail.jpg",
+                ],
+                "start"       => Carbon::now(),
+                "until"       => Carbon::now()->addDays(1),
             ],
         ];
     }

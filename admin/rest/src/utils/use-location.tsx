@@ -16,9 +16,10 @@ interface Component {
 
 export const fullAddressAtom = atom((get) => {
   const location = get(locationAtom);
-  return location ? `${location.street_address}, ${location.city}, ${location.state}, ${location.zip}, ${location.country}` : '';
+  return location
+    ? `${location.street_address}, ${location.city}, ${location.state}, ${location.zip}, ${location.country}`
+    : '';
 });
-
 
 function getLocation(placeOrResult: any) {
   // Declare the location variable with the Location interface
@@ -49,27 +50,30 @@ function getLocation(placeOrResult: any) {
       // Assign the component value to the location property
       location[componentMap[componentType]] ??= long_name;
       // If the component type is postal_code_suffix, append it to the zip
-      componentType === 'postal_code_suffix' ?
-        location['zip'] = `${location?.zip}-${long_name}` :
-        null;
+      componentType === 'postal_code_suffix'
+        ? (location['zip'] = `${location?.zip}-${long_name}`)
+        : null;
       // If the component type is administrative_area_level_1, use the short name
-      componentType === 'administrative_area_level_1' ?
-        location['state'] = short_name :
-        null;
+      componentType === 'administrative_area_level_1'
+        ? (location['state'] = short_name)
+        : null;
     }
   }
-  console.log('location', location)
   // Return the location object
   return location;
 }
 
-interface UseLocationProps { 
+interface UseLocationProps {
   onChange?: any;
   onChangeCurrentLocation?: any;
   setInputValue?: any;
 }
 
-export default function useLocation({ onChange, onChangeCurrentLocation, setInputValue }: UseLocationProps) {
+export default function useLocation({
+  onChange,
+  onChangeCurrentLocation,
+  setInputValue,
+}: UseLocationProps) {
   const { t } = useTranslation();
   const [autocomplete, setAutocomplete] = useState<any>(null);
   const { isLoaded, loadError } = useJsApiLoader({
@@ -112,18 +116,18 @@ export default function useLocation({ onChange, onChangeCurrentLocation, setInpu
           const latlng = { lat: latitude, lng: longitude };
 
           geocoder.geocode({ location: latlng }, (results, status) => {
-            if (status === "OK" && results?.[0]) {
+            if (status === 'OK' && results?.[0]) {
               const location = getLocation(results?.[0]);
-              onChangeCurrentLocation?.(location)
+              onChangeCurrentLocation?.(location);
             }
           });
         },
         (error) => {
-          console.error("Error getting current location:", error);
+          console.error('Error getting current location:', error);
         }
       );
     } else {
-      console.error("Geolocation is not supported by this browser.");
+      console.error('Geolocation is not supported by this browser.');
     }
   };
 

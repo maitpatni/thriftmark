@@ -18,12 +18,15 @@ export const refundClient = {
     type,
     name,
     shop_id,
+    refund_reason,
     ...params
   }: Partial<OrderQueryOptions>) => {
     return HttpClient.get<OrderPaginator>(API_ENDPOINTS.REFUNDS, {
       searchJoin: 'and',
+      shop_id,
+      with: 'order;customer;refund_policy',
       ...params,
-      search: HttpClient.formatSearchParams({ type, name, shop_id }),
+      search: HttpClient.formatSearchParams({ type, name, shop_id, refund_reason }),
     });
   },
 };

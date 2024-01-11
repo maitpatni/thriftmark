@@ -14,6 +14,10 @@ import {
   QueryOptionsType,
   UserPaginator,
   UserQueryOptions,
+  VendorQueryOptionsType,
+  KeyInput,
+  LicensedDomainPaginator,
+  LicenseAdditionalData,
 } from '@/types';
 import { API_ENDPOINTS } from './api-endpoints';
 import { HttpClient } from './http-client';
@@ -61,6 +65,10 @@ export const userClient = {
   addWalletPoints: (variables: WalletPointsInput) => {
     return HttpClient.post<any>(API_ENDPOINTS.ADD_WALLET_POINTS, variables);
   },
+  addLicenseKey: (variables: KeyInput) => {
+    return HttpClient.post<any>(API_ENDPOINTS.ADD_LICENSE_KEY_VERIFY, variables);
+  },
+
   fetchUsers: ({ name, ...params }: Partial<UserQueryOptions>) => {
     return HttpClient.get<UserPaginator>(API_ENDPOINTS.USERS, {
       searchJoin: 'and',
@@ -72,6 +80,7 @@ export const userClient = {
   fetchAdmins: ({ ...params }: Partial<UserQueryOptions>) => {
     return HttpClient.get<UserPaginator>(API_ENDPOINTS.ADMIN_LIST, {
       searchJoin: 'and',
+      with: 'wallet;permissions;profile',
       ...params,
     });
   },
@@ -83,5 +92,36 @@ export const userClient = {
   },
   updateEmail: ({ email }: { email: string }) => {
     return HttpClient.post<any>(API_ENDPOINTS.UPDATE_EMAIL, { email });
-  }
+  },
+  fetchVendors: ({ is_active, ...params }: Partial<UserQueryOptions>) => {
+    return HttpClient.get<UserPaginator>(API_ENDPOINTS.VENDORS_LIST, {
+      searchJoin: 'and',
+      with: 'wallet;permissions;profile',
+      is_active,
+      ...params,
+    });
+  },
+  fetchCustomers: ({ ...params }: Partial<UserQueryOptions>) => {
+    return HttpClient.get<UserPaginator>(API_ENDPOINTS.CUSTOMERS, {
+      searchJoin: 'and',
+      with: 'wallet',
+      ...params,
+    });
+  },
+  getMyStaffs: ({ is_active, shop_id, name, ...params }: Partial<UserQueryOptions & { shop_id: string }>) => {
+    return HttpClient.get<UserPaginator>(API_ENDPOINTS.MY_STAFFS, {
+      searchJoin: 'and',
+      shop_id,
+      ...params,
+      search: HttpClient.formatSearchParams({ name, is_active })
+    });
+  },
+  getAllStaffs: ({ is_active, name, ...params }: Partial<UserQueryOptions>) => {
+    return HttpClient.get<UserPaginator>(API_ENDPOINTS.ALL_STAFFS, {
+      searchJoin: 'and',
+      ...params,
+      search: HttpClient.formatSearchParams({ name, is_active }),
+    });
+  },
+  
 };

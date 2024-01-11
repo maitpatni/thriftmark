@@ -430,7 +430,7 @@ Route::group(['middleware' => ['permission:' . Permission::SUPER_ADMIN, 'auth:sa
     Route::apiResource('questions', QuestionController::class, [
         'only' => ['destroy'],
     ]);
-    Route::apiResource('feedbacks', QuestionController::class, [
+    Route::apiResource('feedbacks', FeedbackController::class, [
         'only' => ['update', 'destroy'],
     ]);
     Route::apiResource('abusive_reports', AbusiveReportController::class, [

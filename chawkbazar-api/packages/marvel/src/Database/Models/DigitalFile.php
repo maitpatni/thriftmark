@@ -10,7 +10,7 @@ class DigitalFile extends Model
     protected $table = 'digital_files';
 
     public $guarded = [];
-
+    
     protected $hidden = [
         'url'
     ];

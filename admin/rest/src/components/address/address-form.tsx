@@ -132,7 +132,7 @@ const AddressForm: React.FC<any> = ({ onSubmit }) => {
                         setValue('address.zip', location?.zip);
                         setValue(
                           'address.street_address',
-                          location?.street_address
+                          location?.street_address,
                         );
                       }}
                       data={getValues('location')!}

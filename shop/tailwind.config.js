@@ -30,6 +30,7 @@ module.exports = {
         google: '#4285F4',
         googleHover: '#307bf9',
         success: '#23B848',
+        'border-200': withOpacity('--color-border-200'),
         gray: {
           50: '#FBFBFB',
           100: '#F1F1F1',
@@ -42,6 +43,14 @@ module.exports = {
           600: '#3A3A3A',
           700: '#292929',
           800: '#707070',
+        },
+        status: {
+          pending: withOpacity('--color-pending'),
+          processing: withOpacity('--color-processing'),
+          complete: withOpacity('--color-complete'),
+          canceled: withOpacity('--color-canceled'),
+          failed: withOpacity('--color-failed'),
+          'out-for-delivery': withOpacity('--color-out-for-delivery'),
         },
       },
       fontSize: {
@@ -96,8 +105,10 @@ module.exports = {
       cardAction:
         '0 0 0 1px #8898aa1a, 0 15px 35px #31315d1a, 0 5px 15px #00000014',
       variationButton: '0px 1px 2px 0px rgba(0, 0, 0, 0.12)',
+      700: 'rgba(0, 0, 0, 0.08) 0px 2px 16px',
     },
     fontFamily: {
+      body: ["'Open Sans', sans-serif"],
       body: ["'Tenor Sans', sans-serif"],
       heading: ["'Italiana', sans-serif"],
       satisfy: ["'Satisfy', cursive"],

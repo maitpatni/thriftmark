@@ -49,7 +49,10 @@ const ProductCard = ({ item }: Props) => {
     <div className="cart-type-neon h-full overflow-hidden rounded border border-border-200 bg-light shadow-sm transition-all duration-200 hover:shadow-md">
       {/* <h3>{name}</h3> */}
 
-      <div className="relative flex h-48 w-auto items-center justify-center sm:h-64">
+      <div
+        className="relative flex h-48 w-auto cursor-pointer items-center justify-center sm:h-64"
+        onClick={handleVariableProduct}
+      >
         <span className="sr-only">{t('text-product-image')}</span>
         <Image
           src={image?.original ?? productPlaceholder}
@@ -112,8 +115,8 @@ const ProductCard = ({ item }: Props) => {
         )}
 
         {Number(quantity) <= 0 && (
-          <div className="rounded bg-red-500 px-2 py-1 text-xs text-light">
-            {t('text-out-stock')}
+          <div className="rounded bg-red-500 px-3 py-2.5 text-xs text-light">
+            {t('text-out-of-stock')}
           </div>
         )}
       </header>

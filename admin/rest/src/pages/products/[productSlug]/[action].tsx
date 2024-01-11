@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
 import { Config } from '@/config';
+import Link from '@/components/ui/link';
 
 export default function UpdateProductPage() {
   const { query, locale } = useRouter();
@@ -26,9 +27,12 @@ export default function UpdateProductPage() {
   if (error) return <ErrorMessage message={error?.message as string} />;
   return (
     <>
-      <div className="flex border-b border-dashed border-border-base py-5 sm:py-8">
-        <h1 className="text-lg font-semibold text-heading">Edit Product</h1>
+      <div className="flex items-center gap-5 border-b border-dashed border-border-base py-5 sm:py-8">
+        <h4 className="text-lg font-semibold text-heading">
+          {t('form:form-title-edit-product')}
+        </h4>
       </div>
+
       <CreateOrUpdateProductForm initialValues={product} />
     </>
   );

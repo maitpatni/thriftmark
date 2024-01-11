@@ -5,6 +5,7 @@ import { API_ENDPOINTS } from './client/api-endpoints';
 import { settingsClient } from './client/settings';
 import { useSettings } from '@/contexts/settings.context';
 import { Settings } from '@/types';
+import { getMaintenanceDetails, setMaintenanceDetails } from '@/utils/maintenance-utils';
 
 export const useUpdateSettingsMutation = () => {
   const { t } = useTranslation();
@@ -17,6 +18,10 @@ export const useUpdateSettingsMutation = () => {
     },
     onSuccess: (data) => {
       updateSettings(data?.options);
+      setMaintenanceDetails(
+        data?.options?.maintenance?.isUnderMaintenance,
+        data?.options?.maintenance
+      );
       toast.success(t('common:successfully-updated'));
     },
     // Always refetch after error or success:
@@ -33,7 +38,7 @@ export const useSettingsQuery = ({ language }: { language: string }) => {
   );
 
   return {
-    settings: data ?? {},
+    settings: data,
     error,
     loading: isLoading,
   };

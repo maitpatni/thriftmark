@@ -90,6 +90,10 @@ class ProductRepository extends BaseRepository
         'shop_id',
         'sold_quantity'
     ];
+    public function getProductDataArray(): array
+    {
+        return $this->dataArray;
+    }
 
     public function boot()
     {

@@ -11,13 +11,13 @@ const MyCards: React.FC = () => {
 
   return (
     <>
-      {!isLoading ? (
+      {isLoading ? (
+        <Spinner showText={false} className="!h-full" />
+      ) : (
         <>
           <CardViewHeader />
           <CardsView payments={cards} />
         </>
-      ) : (
-        ''
       )}
     </>
   );

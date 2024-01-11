@@ -31,4 +31,7 @@ export const orderClient = {
       input
     );
   },
+  orderSeen({ id }: { id: string }) {
+    return HttpClient.post<any>(`${API_ENDPOINTS.ORDER_SEEN}/${id}`, id);
+  },
 };

@@ -76,7 +76,7 @@ class AttachmentController extends CoreController
     public function show($id)
     {
         try {
-            $this->repository->findOrFail($id);
+            return $this->repository->findOrFail($id);
         } catch (MarvelException $e) {
             throw new MarvelException(NOT_FOUND);
         }

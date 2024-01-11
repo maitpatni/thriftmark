@@ -7,6 +7,7 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useCategoryQuery } from '@/data/category';
 import { Config } from '@/config';
+import { adminOnly } from '@/utils/auth-utils';
 
 export default function UpdateCategoriesPage() {
   const { query, locale } = useRouter();
@@ -26,7 +27,7 @@ export default function UpdateCategoriesPage() {
 
   return (
     <>
-      <div className="flex border-b border-dashed border-border-base py-5 sm:py-8">
+      <div className="flex border-b border-dashed border-border-base pb-5 md:pb-7">
         <h1 className="text-lg font-semibold text-heading">
           {t('form:form-title-edit-category')}
         </h1>
@@ -36,7 +37,9 @@ export default function UpdateCategoriesPage() {
     </>
   );
 }
-
+UpdateCategoriesPage.authenticate = {
+  permissions: adminOnly,
+};
 UpdateCategoriesPage.Layout = Layout;
 
 export const getServerSideProps = async ({ locale }: any) => ({

@@ -2,16 +2,16 @@ import NextLink, { LinkProps as NextLinkProps } from 'next/link';
 import cn from 'classnames';
 
 const classes = {
-  root: 'inline-flex items-center justify-center flex-shrink-0 font-semibold leading-none rounded outline-none transition duration-300 ease-in-out focus:outline-none focus:shadow',
+  root: 'inline-flex items-center justify-center flex-shrink-0 font-medium leading-none rounded-full outline-none transition duration-300 ease-in-out focus:outline-none focus:shadow',
   normal:
-    'bg-accent text-light border border-transparent hover:bg-accent-hover',
+    'text-white bg-accent border border-solid border-accent hover:bg-accent-hover hover:text-white hover:border-transparent',
   outline:
     'border border-border-400 bg-transparent hover:text-light hover:bg-accent hover:border-accent',
   disabled:
     'border border-border-base bg-gray-300 border-border-400 text-body cursor-not-allowed',
   disabledOutline: 'border border-border-base text-muted cursor-not-allowed',
   small: 'px-3 py-0 h-9 text-sm h-10',
-  medium: 'px-5 py-0 h-12',
+  medium: 'px-5 py-0 h-12 text-[15px] lg:text-base',
   big: 'px-10 py-0 h-14',
 };
 

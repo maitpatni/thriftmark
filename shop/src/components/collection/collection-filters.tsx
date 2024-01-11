@@ -1,16 +1,16 @@
-import React from 'react';
-import { useTranslation } from 'next-i18next';
 import ActiveLink from '@components/ui/active-link';
-import { ROUTES } from '@lib/routes';
-import { useTags } from '@framework/tags';
-import { useUI } from '@contexts/ui.context';
-import { useRouter } from 'next/router';
-import classNames from 'classnames';
 import Spinner from '@components/ui/loaders/spinner/spinner';
+import { useUI } from '@contexts/ui.context';
+import { useTags } from '@framework/tags';
+import { ROUTES } from '@lib/routes';
+import classNames from 'classnames';
+import { useTranslation } from 'next-i18next';
+import { useRouter } from 'next/router';
+import React from 'react';
 
 export const CollectionFilters: React.FC = () => {
   const { t } = useTranslation('common');
-  const { closeFilter } = useUI();
+  const { closeSidebar } = useUI();
   const { data, isLoading: loading } = useTags({});
   const {
     query: { tags },
@@ -35,13 +35,13 @@ export const CollectionFilters: React.FC = () => {
             <li
               key={item.id}
               className="text-sm lg:text-[15px] cursor-pointer"
-              onClick={closeFilter}
+              onClick={closeSidebar}
             >
               <ActiveLink
                 href={`${ROUTES.COLLECTIONS}/${item.slug}`}
                 className={classNames(
                   'block transition duration-300 ease-in-out text-heading hover:font-semibold py-0.5',
-                  tags === item?.slug && 'font-semibold'
+                  tags === item?.slug && 'font-semibold',
                 )}
               >
                 {item.name}

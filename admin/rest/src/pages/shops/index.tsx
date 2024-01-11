@@ -10,6 +10,7 @@ import Search from '@/components/common/search';
 import { adminOnly } from '@/utils/auth-utils';
 import { useShopsQuery } from '@/data/shop';
 import { SortOrder } from '@/types';
+import PageHeading from '@/components/common/page-heading';
 
 export default function AllShopPage() {
   const { t } = useTranslation();
@@ -39,9 +40,7 @@ export default function AllShopPage() {
     <>
       <Card className="mb-8 flex flex-col items-center justify-between md:flex-row">
         <div className="mb-4 md:mb-0 md:w-1/4">
-          <h1 className="text-lg font-semibold text-heading">
-            {t('common:sidebar-nav-item-shops')}
-          </h1>
+          <PageHeading title={t('common:sidebar-nav-item-shops')} />
         </div>
 
         <div className="flex w-full flex-col items-center ms-auto md:w-1/2 md:flex-row">

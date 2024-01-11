@@ -8,7 +8,7 @@ export default function CreateManufacturerPage() {
   const { t } = useTranslation();
   return (
     <>
-      <div className="flex border-b border-dashed border-border-base py-5 sm:py-8">
+      <div className="flex border-b border-dashed border-border-base pb-5 md:pb-7">
         <h1 className="text-lg font-semibold text-heading">
           {t('form:form-title-create-manufacturer')}
         </h1>

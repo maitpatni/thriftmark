@@ -62,7 +62,7 @@ export const CheckAvailabilityAction: React.FC<{
           onError: (error: any) => {
             setError(error?.message);
           },
-        }
+        },
       );
     } else {
       setError('error-add-both-address');
@@ -73,11 +73,13 @@ export const CheckAvailabilityAction: React.FC<{
     <>
       <Button
         loading={loading}
-        className="w-full mt-5"
+        className="mt-5 w-full"
         onClick={handleVerifyCheckout}
-        disabled={isEmpty}
+        disabled={isEmpty || loading}
         {...props}
-      />
+      >
+        <></>
+      </Button>
       {errorMessage && (
         <div className="mt-3">
           <ValidationError message={t(errorMessage)} />

@@ -6,6 +6,7 @@ import usePrice from '@/utils/use-price';
 import Badge from '@/components/ui/badge/badge';
 import { Router, useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
+import { NoDataFound } from '@/components/icons/no-data-found';
 import {
   Product,
   MappedPaginatorInfo,
@@ -41,6 +42,9 @@ const ProductList = ({
 }: IProps) => {
   // const { data, paginatorInfo } = products! ?? {};
   const router = useRouter();
+  const {
+    query: { shop },
+  } = router;
   const { t } = useTranslation();
   const { alignLeft, alignRight } = useIsRTL();
 
@@ -66,27 +70,17 @@ const ProductList = ({
 
   let columns = [
     {
-      title: t('table:table-item-image'),
-      dataIndex: 'image',
-      key: 'image',
+      title: t('table:table-item-id'),
+      dataIndex: 'id',
+      key: 'id',
       align: alignLeft,
-      width: 74,
-      render: (image: any, { name }: { name: string }) => (
-        <div className="relative flex h-[42px] w-[42px] items-center">
-          <Image
-            src={image?.thumbnail ?? siteSettings.product.placeholder}
-            alt={name}
-            fill
-            sizes="(max-width: 768px) 100vw"
-            className="overflow-hidden rounded object-fill"
-          />
-        </div>
-      ),
+      width: 130,
+      render: (id: number) => `#${t('table:table-item-id')}: ${id}`,
     },
     {
       title: (
         <TitleWithSort
-          title={t('table:table-item-title')}
+          title={t('table:table-item-product')}
           ascending={
             sortingObj.sort === SortOrder.Asc && sortingObj.column === 'name'
           }
@@ -97,42 +91,64 @@ const ProductList = ({
       dataIndex: 'name',
       key: 'name',
       align: alignLeft,
-      width: 300,
+      width: 280,
       ellipsis: true,
       onHeaderCell: () => onHeaderClick('name'),
+      render: (name: string, { image, type }: { image: any; type: any }) => (
+        <div className="flex items-center">
+          <div className="relative aspect-square h-10 w-10 shrink-0 overflow-hidden rounded border border-border-200/80 bg-gray-100 me-2.5">
+            <Image
+              src={image?.thumbnail ?? siteSettings.product.placeholder}
+              alt={name}
+              fill
+              priority={true}
+              sizes="(max-width: 768px) 100vw"
+            />
+          </div>
+          <div className="flex flex-col">
+            <span className="truncate font-medium">{name}</span>
+            <span className="truncate whitespace-nowrap pt-1 pb-0.5 text-[13px] text-body/80">
+              {type?.name}
+            </span>
+          </div>
+        </div>
+      ),
     },
     {
-      title: t('table:table-item-group'),
-      dataIndex: 'type',
-      key: 'type',
-      width: 120,
-      align: 'center',
-      ellipsis: true,
-      render: (type: any) => (
-        <span className="truncate whitespace-nowrap">{type?.name}</span>
+      title: t('table:table-item-product-type'),
+      dataIndex: 'product_type',
+      key: 'product_type',
+      width: 150,
+      align: alignLeft,
+      render: (product_type: string) => (
+        <span className="truncate whitespace-nowrap capitalize">
+          {product_type}
+        </span>
       ),
     },
     {
       title: t('table:table-item-shop'),
       dataIndex: 'shop',
       key: 'shop',
-      width: 120,
-      align: 'center',
+      width: 170,
+      align: alignLeft,
       ellipsis: true,
       render: (shop: Shop) => (
-        <span className="truncate whitespace-nowrap">{shop?.name}</span>
+        <div className="flex items-center font-medium">
+          <div className="relative aspect-square h-9 w-9 shrink-0 overflow-hidden rounded-full border border-border-200/80 bg-gray-100 me-2">
+            <Image
+              src={shop?.logo?.thumbnail ?? siteSettings.product.placeholder}
+              alt={shop?.name ?? 'Shop Name'}
+              fill
+              priority={true}
+              sizes="(max-width: 768px) 100vw"
+            />
+          </div>
+          <span className="truncate">{shop?.name}</span>
+        </div>
       ),
     },
-    {
-      title: 'Product Type',
-      dataIndex: 'product_type',
-      key: 'product_type',
-      width: 120,
-      align: 'center',
-      render: (product_type: string) => (
-        <span className="truncate whitespace-nowrap">{product_type}</span>
-      ),
-    },
+
     {
       title: (
         <TitleWithSort
@@ -188,14 +204,15 @@ const ProductList = ({
       dataIndex: 'quantity',
       key: 'quantity',
       align: 'center',
-      width: 150,
+      width: 170,
       onHeaderCell: () => onHeaderClick('quantity'),
       render: (quantity: number) => {
         if (quantity < 1) {
           return (
             <Badge
               text={t('common:text-out-of-stock')}
-              color="bg-red-500 text-white"
+              color="bg-status-failed/10 text-status-failed"
+              className="capitalize"
             />
           );
         }
@@ -207,28 +224,30 @@ const ProductList = ({
       dataIndex: 'status',
       key: 'status',
       align: 'left',
-      width: 180,
+      width: 200,
       render: (status: string, record: any) => (
         <div
           className={`flex justify-start ${
             record?.quantity > 0 && record?.quantity < 10
-              ? 'flex-col items-baseline space-y-3 3xl:flex-row 3xl:space-x-3 3xl:space-y-0 rtl:3xl:space-x-reverse'
-              : 'items-center space-x-3 rtl:space-x-reverse'
+              ? 'flex-col items-baseline space-y-2 3xl:flex-row 3xl:space-x-2 3xl:space-y-0 rtl:3xl:space-x-reverse'
+              : 'items-center space-x-2 rtl:space-x-reverse'
           }`}
         >
           <Badge
             text={status}
             color={
               status.toLocaleLowerCase() === 'draft'
-                ? 'bg-yellow-400'
-                : 'bg-accent'
+                ? 'bg-yellow-400/10 text-yellow-500'
+                : 'bg-accent bg-opacity-10 !text-accent'
             }
+            className="capitalize"
           />
           {record?.quantity > 0 && record?.quantity < 10 && (
             <Badge
               text={t('common:text-low-quantity')}
-              color="bg-red-600"
+              color="bg-status-failed/10 text-status-failed"
               animate={true}
+              className="capitalize"
             />
           )}
         </div>
@@ -246,6 +265,9 @@ const ProductList = ({
           record={record}
           deleteModalView="DELETE_PRODUCT"
           routes={Routes?.product}
+          enablePreviewMode={true}
+          isShop={Boolean(shop)}
+          shopSlug={(shop as string) ?? ''}
         />
       ),
     },
@@ -261,7 +283,15 @@ const ProductList = ({
         <Table
           /* @ts-ignore */
           columns={columns}
-          emptyText={t('table:empty-table-data')}
+          emptyText={() => (
+            <div className="flex flex-col items-center py-7">
+              <NoDataFound className="w-52" />
+              <div className="mb-1 pt-6 text-base font-semibold text-heading">
+                {t('table:empty-table-data')}
+              </div>
+              <p className="text-[13px]">{t('table:empty-table-sorry-text')}</p>
+            </div>
+          )}
           data={products}
           rowKey="id"
           scroll={{ x: 900 }}

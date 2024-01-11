@@ -25,53 +25,9 @@ import { ItemProps } from '@/types';
 import { useModalAction } from '../ui/modal/modal.context';
 import { EditIcon } from '@/components/icons/edit';
 import { Config } from '@/config';
-import { join, split } from 'lodash';
 import { formatSlug } from '@/utils/use-slug';
-
-export const chatbotAutoSuggestion = ({ name }: { name: string }) => {
-  return [
-    {
-      id: 1,
-      title: `Discover the magic of ${name} as we curate the finest products for you.`,
-    },
-    {
-      id: 2,
-      title: `Elevate your shopping experience with our carefully selected ${name} collection.`,
-    },
-    {
-      id: 3,
-      title: `Explore a world of possibilities with our diverse range of ${name} products.`,
-    },
-    {
-      id: 4,
-      title: `Experience excellence with our handpicked selection of ${name} items.`,
-    },
-    {
-      id: 5,
-      title: `Find your perfect match among our premium ${name} products.`,
-    },
-    {
-      id: 6,
-      title: `Simplify your search and find what you need with our intuitive ${name} category.`,
-    },
-    {
-      id: 7,
-      title: `Embrace style and functionality with our exclusive ${name} product line.`,
-    },
-    {
-      id: 8,
-      title: `Enhance your lifestyle with our innovative ${name} offerings.`,
-    },
-    {
-      id: 9,
-      title: `Unlock new dimensions of ${name} with our exceptional product assortment.`,
-    },
-    {
-      id: 10,
-      title: `Immerse yourself in the world of ${name} and discover unique treasures.`,
-    },
-  ];
-};
+import StickyFooterPanel from '@/components/ui/sticky-footer-panel';
+import { TagDetailSuggestions } from '@/components/tag/tag-ai-prompt';
 
 function SelectTypes({
   control,
@@ -107,7 +63,7 @@ function SelectTypes({
 export const updatedIcons = tagIcons.map((item: any) => {
   item.label = (
     <div className="flex items-center space-s-5">
-      <span className="flex h-5 w-5 items-center justify-center">
+      <span className="flex items-center justify-center w-5 h-5">
         {getIcon({
           iconList: categoriesIcon,
           iconName: item.value,
@@ -164,7 +120,7 @@ export default function CreateOrUpdateTagForm({ initialValues }: IProps) {
           ...initialValues,
           icon: initialValues?.icon
             ? tagIcons.find(
-                (singleIcon) => singleIcon.value === initialValues?.icon!
+                (singleIcon) => singleIcon.value === initialValues?.icon!,
               )
             : '',
           ...(isNewTranslation && {
@@ -172,7 +128,7 @@ export default function CreateOrUpdateTagForm({ initialValues }: IProps) {
           }),
         }
       : defaultValues,
-
+    //@ts-ignore
     resolver: yupResolver(tagValidationSchema),
   });
 
@@ -186,8 +142,8 @@ export default function CreateOrUpdateTagForm({ initialValues }: IProps) {
   });
 
   const generateName = watch('name');
-  const autoSuggestionList = useMemo(() => {
-    return chatbotAutoSuggestion({ name: generateName ?? '' });
+  const tagDetailSuggestionLists = useMemo(() => {
+    return TagDetailSuggestions({ name: generateName ?? '' });
   }, [generateName]);
 
   const handleGenerateDescription = useCallback(() => {
@@ -196,7 +152,7 @@ export default function CreateOrUpdateTagForm({ initialValues }: IProps) {
       name: generateName,
       set_value: setValue,
       key: 'details',
-      suggestion: autoSuggestionList as ItemProps[],
+      suggestion: tagDetailSuggestionLists as ItemProps[],
     });
   }, [generateName]);
 
@@ -240,7 +196,7 @@ export default function CreateOrUpdateTagForm({ initialValues }: IProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="my-5 flex flex-wrap border-b border-dashed border-gray-300 pb-8 sm:my-8">
+      <div className="flex flex-wrap pb-8 my-5 border-b border-gray-300 border-dashed sm:my-8">
         <Description
           title={t('form:input-label-image')}
           details={t('form:tag-image-helper-text')}
@@ -252,7 +208,7 @@ export default function CreateOrUpdateTagForm({ initialValues }: IProps) {
         </Card>
       </div>
 
-      <div className="my-5 flex flex-wrap sm:my-8">
+      <div className="flex flex-wrap my-5 sm:my-8">
         <Description
           title={t('form:input-label-description')}
           details={`${
@@ -275,14 +231,14 @@ export default function CreateOrUpdateTagForm({ initialValues }: IProps) {
           {isSlugEditable ? (
             <div className="relative mb-5">
               <Input
-                label={`${t('Slug')}`}
+                label={t('form:input-label-slug')}
                 {...register('slug')}
                 error={t(errors.slug?.message!)}
                 variant="outline"
                 disabled={isSlugDisable}
               />
               <button
-                className="absolute top-[27px] right-px z-10 flex h-[46px] w-11 items-center justify-center rounded-tr rounded-br border-l border-solid border-border-base bg-white px-2 text-body transition duration-200 hover:text-heading focus:outline-none"
+                className="absolute top-[27px] right-px z-0 flex h-[46px] w-11 items-center justify-center rounded-tr rounded-br border-l border-solid border-border-base bg-white px-2 text-body transition duration-200 hover:text-heading focus:outline-none"
                 type="button"
                 title={t('common:text-edit')}
                 onClick={() => setIsSlugDisable(false)}
@@ -292,7 +248,7 @@ export default function CreateOrUpdateTagForm({ initialValues }: IProps) {
             </div>
           ) : (
             <Input
-              label={`${t('Slug')}`}
+              label={t('form:input-label-slug')}
               {...register('slug')}
               value={slugAutoSuggest}
               variant="outline"
@@ -304,7 +260,7 @@ export default function CreateOrUpdateTagForm({ initialValues }: IProps) {
           <div className="relative">
             {options?.useAi && (
               <OpenAIButton
-                title="Generate Description With AI"
+                title={t('form:button-label-description-ai')}
                 onClick={handleGenerateDescription}
               />
             )}
@@ -329,24 +285,30 @@ export default function CreateOrUpdateTagForm({ initialValues }: IProps) {
           {/* <SelectTypes control={control} errors={errors} /> */}
         </Card>
       </div>
-      <div className="mb-4 text-end">
-        {initialValues && (
-          <Button
-            variant="outline"
-            onClick={router.back}
-            className="me-4"
-            type="button"
-          >
-            {t('form:button-label-back')}
-          </Button>
-        )}
+      <StickyFooterPanel className="z-0">
+        <div className="text-end">
+          {initialValues && (
+            <Button
+              variant="outline"
+              onClick={router.back}
+              className="text-sm me-4 md:text-base"
+              type="button"
+            >
+              {t('form:button-label-back')}
+            </Button>
+          )}
 
-        <Button loading={creating || updating}>
-          {initialValues
-            ? t('form:button-label-update-tag')
-            : t('form:button-label-add-tag')}
-        </Button>
-      </div>
+          <Button
+            loading={creating || updating}
+            disabled={creating || updating}
+            className="text-sm md:text-base"
+          >
+            {initialValues
+              ? t('form:button-label-update-tag')
+              : t('form:button-label-add-tag')}
+          </Button>
+        </div>
+      </StickyFooterPanel>
     </form>
   );
 }

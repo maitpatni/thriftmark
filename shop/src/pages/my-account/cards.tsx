@@ -20,8 +20,9 @@ const FeatureNotAvailable = () => {
 const MyCardsPage = () => {
   let { data, isLoading } = useSettings();
   const isStripeGatewayAvailable = isStripeAvailable(data?.options);
-
-  if (!isStripeGatewayAvailable) {
+  const isPaymentEnable = data?.options.useEnableGateway ?? true;
+  
+  if (!isStripeGatewayAvailable || !isPaymentEnable) {
     return (
       <AccountLayout>
         <FeatureNotAvailable />

@@ -20,7 +20,7 @@ VALUES (
     ),
     (
         3,
-        NULL,
+        '{\"id\": 326, \"original\": \"https://chawkbazarlaravel.s3.ap-southeast-1.amazonaws.com/326/man.png\", \"thumbnail\": \"https://chawkbazarlaravel.s3.ap-southeast-1.amazonaws.com/326/conversions/man-thumbnail.jpg\"}',
         '',
         NULL,
         '19365141641631',

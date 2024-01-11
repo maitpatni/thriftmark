@@ -1,19 +1,19 @@
-import { useState } from 'react';
 import Card from '@/components/common/card';
+import Search from '@/components/common/search';
 import Layout from '@/components/layouts/admin';
 import ShippingList from '@/components/shipping/shipping-list';
-import Search from '@/components/common/search';
+import { useState } from 'react';
 
-import LinkButton from '@/components/ui/link-button';
+import PageHeading from '@/components/common/page-heading';
 import ErrorMessage from '@/components/ui/error-message';
+import LinkButton from '@/components/ui/link-button';
 import Loader from '@/components/ui/loader/loader';
-import { useShippingClassesQuery } from '@/data/shipping';
-import { useTranslation } from 'next-i18next';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { Routes } from '@/config/routes';
+import { useShippingClassesQuery } from '@/data/shipping';
 import { SortOrder } from '@/types';
 import { adminOnly } from '@/utils/auth-utils';
-
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 export default function ShippingsPage() {
   const { t } = useTranslation();
   const [searchTerm, setSearch] = useState('');
@@ -33,11 +33,9 @@ export default function ShippingsPage() {
 
   return (
     <>
-      <Card className="mb-8 flex flex-col items-center xl:flex-row">
+      <Card className="mb-8 flex flex-col items-center md:flex-row">
         <div className="mb-4 md:mb-0 md:w-1/4">
-          <h1 className="text-xl font-semibold text-heading">
-            {t('form:input-label-shippings')}
-          </h1>
+          <PageHeading title={t('form:input-label-shippings')} />
         </div>
 
         <div className="flex w-full flex-col items-center space-y-4 ms-auto md:flex-row md:space-y-0 xl:w-1/2">

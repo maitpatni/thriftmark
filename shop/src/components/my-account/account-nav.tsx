@@ -28,7 +28,7 @@ export default function AccountNav({ options }: { options: Option[] }) {
           const enableMyCardRoute = isStripeAvailable(data?.options);
           if (
             item?.slug === ROUTES?.ACCOUNT_CARDS &&
-            enableMyCardRoute === false
+            !enableMyCardRoute
           ) {
             return null;
           }
@@ -36,11 +36,6 @@ export default function AccountNav({ options }: { options: Option[] }) {
             <Link
               key={item?.slug}
               href={item?.slug}
-              // className={
-              //   mainPath === menuPath
-              //     ? 'bg-gray-100 font-semibold flex items-center cursor-pointer text-sm lg:text-base text-heading py-3.5 px-4 lg:px-5 rounded mb-2 '
-              //     : 'flex items-center cursor-pointer text-sm lg:text-base text-heading font-normal py-3.5 px-4 lg:px-5 rounded mb-2'
-              // }
               className={classNames(
                 'text-base font-normal flex items-center py-[0.8125rem] rounded-lg px-4 gap-3',
                 menuPath === mainPath
@@ -53,8 +48,6 @@ export default function AccountNav({ options }: { options: Option[] }) {
             </Link>
           );
         })}
-      </div>
-      <div className="border-t border-[#E6E6E6] border-solid pt-[3.125rem]">
         <Link
           href={`${ROUTES?.LOGOUT}`}
           className="text-base font-normal flex items-center py-[0.8125rem] rounded-lg px-4 gap-3 text-heading"
@@ -63,6 +56,15 @@ export default function AccountNav({ options }: { options: Option[] }) {
           <span className="leading-none">{t('text-logout')}</span>
         </Link>
       </div>
+      {/* <div className="border-t border-[#E6E6E6] border-solid pt-[3.125rem]">
+        <Link
+          href={`${ROUTES?.LOGOUT}`}
+          className="text-base font-normal flex items-center py-[0.8125rem] rounded-lg px-4 gap-3 text-heading"
+        >
+          <LogoutIcon className="text-lg md:text-xl" />
+          <span className="leading-none">{t('text-logout')}</span>
+        </Link>
+      </div> */}
     </nav>
   );
 }

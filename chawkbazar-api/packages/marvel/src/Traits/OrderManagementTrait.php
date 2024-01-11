@@ -25,10 +25,15 @@ trait OrderManagementTrait
 
         if ($prev_order_status !== $new_order_status) {
             $payment_gateway_type = isset($order->payment_gateway) ? $order->payment_gateway : PaymentGatewayType::CASH_ON_DELIVERY;
-            if ( !in_array($payment_gateway_type, [PaymentGatewayType::CASH, PaymentGatewayType::CASH_ON_DELIVERY]) ) {
-                if ($order->payment_status === PaymentStatus::SUCCESS)
+            $usedPaymentGateway = !in_array($payment_gateway_type, [PaymentGatewayType::CASH, PaymentGatewayType::CASH_ON_DELIVERY]);
+            $isPaymentSuccess = $order->payment_status === PaymentStatus::SUCCESS;
+            if ($usedPaymentGateway) {
+                if ($isPaymentSuccess) {
                     $this->manageVendorBalance($order, $new_order_status, $prev_order_status);
-                $this->orderStatusManagementOnPayment($order, $new_order_status, $order->payment_status);
+                    $this->orderStatusManagementOnPayment($order, $new_order_status, '');
+                } else {
+                    $this->orderStatusManagementOnPayment($order, $new_order_status, $order->payment_status);
+                }
             } else {
                 $this->manageVendorBalance($order, $new_order_status, $prev_order_status);
                 $this->orderStatusManagementOnCOD($order, $prev_order_status, $new_order_status);

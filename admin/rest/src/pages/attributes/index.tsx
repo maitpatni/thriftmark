@@ -11,6 +11,7 @@ import { adminOnly } from '@/utils/auth-utils';
 
 import { useRouter } from 'next/router';
 import { useAttributesQuery } from '@/data/attributes';
+import PageHeading from '@/components/common/page-heading';
 
 export default function AttributePage() {
   const { t } = useTranslation();
@@ -28,11 +29,9 @@ export default function AttributePage() {
   if (error) return <ErrorMessage message={error.message} />;
   return (
     <>
-      <Card className="mb-8 flex flex-col items-center justify-between md:flex-row">
-        <div className="mb-4 md:mb-0 md:w-1/4">
-          <h1 className="text-xl font-semibold text-heading">
-            {t('common:sidebar-nav-item-attributes')}
-          </h1>
+      <Card className="mb-8 flex flex-row items-center justify-between">
+        <div className="md:w-1/4">
+          <PageHeading title={t('common:sidebar-nav-item-attributes')} />
         </div>
       </Card>
       <AttributeList

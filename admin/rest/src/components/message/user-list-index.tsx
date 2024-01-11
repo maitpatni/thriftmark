@@ -8,6 +8,8 @@ import { useWindowSize } from '@/utils/use-window-size';
 import { RESPONSIVE_WIDTH } from '@/utils/constants';
 import { useState } from 'react';
 import { adminOnly, getAuthCredentials, hasAccess } from '@/utils/auth-utils';
+import { ComposeEditIcon } from '@/components/icons/edit';
+
 interface Props {
   className?: string;
 }
@@ -27,10 +29,10 @@ const UserListIndex = ({ className, ...rest }: Props) => {
       <div
         className={cn(
           width >= RESPONSIVE_WIDTH
-            ? 'max-w-[4rem] border-r border-solid border-r-[#E5E7EB] sm:max-w-xs 2xl:max-w-[26rem] '
+            ? 'max-w-[4rem] sm:max-w-xs 2xl:max-w-[21.875rem]'
             : '',
-          'flex h-full flex-1 flex-col',
-          adminPermission ? 'pb-6' : '',
+          'flex h-full max-h-[calc(100%-51px)] flex-1 flex-col overflow-hidden rounded-lg bg-white',
+          // adminPermission ? 'pb-6' : '',
           className
         )}
         {...rest}
@@ -40,16 +42,25 @@ const UserListIndex = ({ className, ...rest }: Props) => {
           onChange={(event: any) => setText(event?.target?.value)}
           value={text}
           clear={() => setText('')}
+          className="shrink-0"
         />
 
         {/* conversation list view */}
-        <UserListView filterText={text} permission={adminPermission} />
+        <div className="h-full overflow-y-auto">
+          <UserListView filterText={text} permission={adminPermission} />
+        </div>
 
         {adminPermission ? (
-          <div className="mx-6 block">
-            <Button onClick={handleComposeClick} className="w-full">
+          <div className="block">
+            <span
+              onClick={handleComposeClick}
+              className="flex w-full cursor-pointer items-center justify-center gap-2 p-5 text-center text-base font-medium text-[#30947F]"
+            >
+              <span className="flex h-9 w-9 rounded-full bg-[#E0EFEC]">
+                <ComposeEditIcon className="m-auto" />
+              </span>
               {t('text-compose')}
-            </Button>
+            </span>
           </div>
         ) : (
           ''

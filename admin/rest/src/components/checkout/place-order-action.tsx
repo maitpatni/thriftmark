@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { Routes } from '@/config/routes';
 import ValidationError from '@/components/ui/validation-error';
 import Button from '@/components/ui/button';
 import isEmpty from 'lodash/isEmpty';
@@ -14,10 +13,12 @@ import {
 } from '@/contexts/quick-cart/cart.utils';
 import { useCreateOrderMutation } from '@/data/order';
 import { PaymentGateway } from '@/types';
+import { useTranslation } from 'react-i18next';
 
 export const PlaceOrderAction: React.FC<{
   children?: React.ReactNode;
 }> = (props) => {
+  const { t } = useTranslation();
   const { locale, ...router } = useRouter();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { createOrder, isLoading: loading } = useCreateOrderMutation();
@@ -111,20 +112,19 @@ export const PlaceOrderAction: React.FC<{
     delivery_time,
     available_items,
   ].every((item) => !isEmpty(item));
-  return (
-    <>
-      <Button
+  return <>
+    <Button
         loading={loading}
-        className="w-full mt-5"
+        className="mt-5 w-full"
         onClick={handlePlaceOrder}
-        disabled={!isAllRequiredFieldSelected}
-        {...props}
-      />
-      {errorMessage && (
-        <div className="mt-3">
-          <ValidationError message={errorMessage} />
-        </div>
-      )}
-    </>
-  );
+        disabled={!isAllRequiredFieldSelected || loading}
+        {...props}>
+          <></>
+        </Button>
+    {errorMessage && (
+      <div className="mt-3">
+        <ValidationError message={errorMessage} />
+      </div>
+    )}
+  </>;
 };

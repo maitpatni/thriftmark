@@ -13,6 +13,7 @@ import timezone from 'dayjs/plugin/timezone';
 import { useIsRTL } from '@/utils/locals';
 import usePrice from '@/utils/use-price';
 import { Routes } from '@/config/routes';
+import { NoDataFound } from '@/components/icons/no-data-found';
 
 dayjs.extend(relativeTime);
 dayjs.extend(utc);
@@ -28,6 +29,9 @@ export type IProps = {
 const RefundList = ({ refunds, onSort, onOrder, onPagination }: IProps) => {
   const { t } = useTranslation();
   const router = useRouter();
+  const {
+    query: { shop },
+  } = router;
   const { alignLeft } = useIsRTL();
 
   const [sortingObj, setSortingObj] = useState<{
@@ -55,19 +59,33 @@ const RefundList = ({ refunds, onSort, onOrder, onPagination }: IProps) => {
 
   const columns = [
     {
-      title: t('table:table-item-id'),
+      title: (
+        <TitleWithSort
+          title={t('table:table-item-id')}
+          ascending={
+            sortingObj.sort === SortOrder.Asc && sortingObj.column === 'id'
+          }
+          isActive={sortingObj.column === 'id'}
+        />
+      ),
+      className: 'cursor-pointer',
       dataIndex: 'id',
       key: 'id',
-      align: 'center',
-      width: 62,
+      align: alignLeft,
+      width: 120,
+      onHeaderCell: () => onHeaderClick('id'),
+      render: (id: number) => `#${t('table:table-item-id')}: ${id}`,
     },
     {
       title: t('common:text-reason'),
-      dataIndex: 'title',
-      key: 'title',
+      dataIndex: 'refund_reason_name',
+      key: 'refund_reason_name',
       align: alignLeft,
       ellipsis: true,
       width: 220,
+      render: (refund_reason_name: any, record: any) => (
+        <span className="whitespace-nowrap">{record?.refund_reason?.name}</span>
+      ),
     },
     {
       title: t('table:table-item-customer-email'),
@@ -177,7 +195,7 @@ const RefundList = ({ refunds, onSort, onOrder, onPagination }: IProps) => {
         return (
           <ActionButtons
             id={id}
-            detailsUrl={`${Routes.refund.list}/${id}`}
+            detailsUrl={`${router.asPath}/${id}`}
             customLocale={refund?.order?.language}
           />
         );
@@ -191,7 +209,15 @@ const RefundList = ({ refunds, onSort, onOrder, onPagination }: IProps) => {
         <Table
           //@ts-ignore
           columns={columns}
-          emptyText={t('table:empty-table-data')}
+          emptyText={() => (
+            <div className="flex flex-col items-center py-7">
+              <NoDataFound className="w-52" />
+              <div className="mb-1 pt-6 text-base font-semibold text-heading">
+                {t('table:empty-table-data')}
+              </div>
+              <p className="text-[13px]">{t('table:empty-table-sorry-text')}</p>
+            </div>
+          )}
           data={refunds?.data}
           rowKey="id"
           scroll={{ x: 900 }}

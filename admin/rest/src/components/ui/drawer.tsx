@@ -1,5 +1,4 @@
 import { FC, useEffect, useRef } from 'react';
-import Portal from '@reach/portal';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   disableBodyScroll,
@@ -11,6 +10,7 @@ import { fadeInRight } from '@/utils/motion/fade-in-right';
 import { fadeInLeft } from '@/utils/motion/fade-in-left';
 import { fadeInOut } from '@/utils/motion/fade-in-out';
 import { useRouter } from 'next/router';
+import { Dialog } from '@headlessui/react';
 
 interface SidebarProps {
   children: any;
@@ -45,9 +45,9 @@ const Drawer: FC<SidebarProps> = ({
   }, [open]);
 
   return (
-    <Portal>
-      <AnimatePresence>
-        {open && (
+    <AnimatePresence>
+      {open && (
+        <Dialog static as={motion.div} open={open} onClose={onClose}>
           <motion.aside
             ref={ref}
             key="drawer"
@@ -67,7 +67,7 @@ const Drawer: FC<SidebarProps> = ({
                 onClick={onClose}
                 className={cn(
                   'absolute inset-0 bg-dark bg-opacity-40',
-                  useBlurBackdrop && 'use-blur-backdrop'
+                  useBlurBackdrop && 'use-blur-backdrop',
                 )}
               />
               <div
@@ -75,20 +75,20 @@ const Drawer: FC<SidebarProps> = ({
                   'absolute inset-y-0 flex max-w-full outline-none',
                   variant === 'right'
                     ? 'ltr:right-0 rtl:left-auto'
-                    : 'ltr:left-0 rtl:right-auto'
+                    : 'ltr:left-0 rtl:right-auto',
                 )}
               >
-                <div className="h-full w-screen max-w-md">
-                  <div className="flex h-full flex-col bg-light text-body shadow-xl">
+                <div className="w-screen h-full max-w-md">
+                  <div className="flex flex-col h-full shadow-xl bg-light text-body">
                     {children}
                   </div>
                 </div>
               </div>
             </div>
           </motion.aside>
-        )}
-      </AnimatePresence>
-    </Portal>
+        </Dialog>
+      )}
+    </AnimatePresence>
   );
 };
 

@@ -346,5 +346,12 @@
   "text-cash-on-delivery": "الدفع عند الاستلام",
   "text-payment-order": "يرجى النقر فوق تقديم الطلب لإجراء الطلب والدفع",
   "text-read-more": "قراءة المزيد",
-  "text-less": "أقل"
+  "text-less": "أقل",
+  "text-title-days": "أيام",
+  "text-title-hours": "ساعات",
+  "text-title-minutes": "دقائق",
+  "text-title-seconds": "ثواني",
+  "text-title-change-language": "تغيير اللغة",
+  "text-title-language": "لغة",
+  "text-maintenance-mode-title": "يبدأ وضع الصيانة في"
 }

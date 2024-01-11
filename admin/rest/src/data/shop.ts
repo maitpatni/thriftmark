@@ -99,3 +99,21 @@ export const useShopsQuery = (options: Partial<ShopQueryOptions>) => {
     loading: isLoading,
   };
 };
+
+export const useInActiveShopsQuery = (options: Partial<ShopQueryOptions>) => {
+  const { data, error, isLoading } = useQuery<ShopPaginator, Error>(
+    [API_ENDPOINTS.NEW_OR_INACTIVE_SHOPS, options],
+    ({ queryKey, pageParam }) =>
+      shopClient.newOrInActiveShops(Object.assign({}, queryKey[1], pageParam)),
+    {
+      keepPreviousData: true,
+    }
+  );
+
+  return {
+    shops: data?.data ?? [],
+    paginatorInfo: mapPaginatorData(data),
+    error,
+    loading: isLoading,
+  };
+};

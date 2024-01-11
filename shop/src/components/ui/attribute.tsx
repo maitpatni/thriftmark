@@ -26,7 +26,7 @@ function Attribute({
     case 'color':
       return (
         <div
-          role="button"
+          // role="button"
           onClick={onClick}
           className={cn(
             'flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border-2 border-transparent p-0.5',
@@ -44,7 +44,7 @@ function Attribute({
     default:
       return (
         <div
-          role="button"
+          // role="button"
           onClick={onClick}
           className={cn(
             'cursor-pointer whitespace-nowrap rounded border-border-200 bg-gray-50 px-4 py-3 text-sm text-heading transition-colors',

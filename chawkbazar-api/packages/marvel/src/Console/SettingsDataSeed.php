@@ -13,21 +13,21 @@ use Marvel\Database\Models\Settings;
 class SettingsDataImporter extends Command
 {
     private array $appData;
+    protected MarvelVerification $verification;
     protected $signature = 'marvel:settings_seed';
 
     protected $description = 'Import Settings Data';
 
     public function handle()
     {
+        $this->verification = new MarvelVerification();
         $shouldGetLicenseKeyFromUser = $this->shouldGetLicenseKey();
         if ($shouldGetLicenseKeyFromUser) {
             $this->getLicenseKey();
-            $customerName = $this->appData['body']['customer'] ?? '';
-            $this->components->info("Thank you {$customerName} for using " . APP_NOTICE_DOMAIN);
+            $description = $this->appData['description'] ?? '';
+            $this->components->info("Thank you for using " . APP_NOTICE_DOMAIN . ". $description");
         } else {
-            $config = getConfig();
-            $this->appData['last_checking_time'] = $config['last_checking_time'] ?? Carbon::now();
-            $this->appData['trust'] = $config['trust'] ?? true;
+            $this->appData = $this->verification->jsonSerialize();
         }
         if (DB::table('settings')->where('id', 1)->exists()) {
 
@@ -43,7 +43,7 @@ class SettingsDataImporter extends Command
                     '--class' => '\\Marvel\\Database\\Seeders\\SettingsSeeder'
                 ]);
 
-                $this->modifySettingsData();
+                $this->verification->modifySettingsData();
                 $this->info('Settings were imported successfully');
             } else {
                 $this->info('Previous settings was kept. Thanks!');
@@ -53,15 +53,16 @@ class SettingsDataImporter extends Command
 
     private function getLicenseKey($count = 0)
     {
+        $message = 'Please Enter a valid License Key! Please visit us at https://redq.io for a valid license key.';
         if ($count < 1) {
-            $licenseKey = $this->ask('Please Enter Your License Key...');
-        } else {
-            $licenseKey = $this->ask('Please Enter a valid License Key...');
+            $message = 'Please Enter Your License Key.';
         }
+        $licenseKey = $this->ask($message);
         $isValid = $this->licenseKeyValidator($licenseKey);
         if (!$isValid) {
             ++$count;
-            $this->components->error("Invalid Licensing Key");
+            $description = $this->appData['description'] ?? '';
+            $this->components->error("Invalid Licensing Key. $description");
             $this->getLicenseKey($count);
         }
         return $isValid;
@@ -69,58 +70,23 @@ class SettingsDataImporter extends Command
 
     private function licenseKeyValidator(string $licenseKey): bool
     {
-
-        try {
-            $apiData = getConfigFromApi($licenseKey);
-            $isValidated = $apiData["trust"];
-
-            $this->appData = [
-                ...$apiData,
-                'license_key'        => $apiData['license_key'],
-                'trust'       => $apiData['trust'],
-                'last_checking_time' => Carbon::now(),
-            ];
-
-            setConfig($this->appData);
-            if (!$isValidated) {
-                return false;
-            }
-            return true;
-        } catch (Exception $e) {
-            return false;
-        }
+        $verification = $this->verification->verify($licenseKey);
+        $this->appData = $verification->jsonSerialize();
+        return $verification->getTrust();
     }
 
 
 
     private function shouldGetLicenseKey()
     {
-        $isFileExists = getConfig();
-
         $env = config("app.env");
         if ($env == "production") {
             return true;
-        } elseif ($env == "local" && empty($isFileExists['trust'])) {
+        } elseif ($env == "local" && empty($this->verification->getTrust())) {
             return true;
-        } elseif ($env == "development" && empty($isFileExists['trust'])) {
+        } elseif ($env == "development" && empty($this->verification->getTrust())) {
             return true;
         }
         return false;
-    }
-
-    private function modifySettingsData(): void
-    {
-
-        Cache::flush();
-        $settings = Settings::getData();
-        $settings->update([
-            'options' => [
-                ...$settings->options,
-                'app_settings' => [
-                    'last_checking_time' => $this->appData['last_checking_time'],
-                    'trust'       => $this->appData['trust'],
-                ]
-            ]
-        ]);
     }
 }

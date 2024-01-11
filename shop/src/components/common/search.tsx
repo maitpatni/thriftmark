@@ -70,15 +70,15 @@ export default function Search() {
   return (
     <div ref={ref}>
       <div
-        className={cn("overlay", {
+        className={cn('overlay', {
           open: displaySearch,
         })}
-        role="button"
+        // role="button"
         onClick={closeSearch}
       />
       <div
         className={cn(
-          "drawer-search relative hidden top-0 z-30 opacity-0 invisible transition duration-300 ease-in-out left-1/2 px-4 w-full md:w-[730px] lg:w-[930px]",
+          'drawer-search relative hidden top-0 z-30 opacity-0 invisible transition duration-300 ease-in-out left-1/2 px-4 w-full md:w-[730px] lg:w-[930px]',
           {
             open: displaySearch,
           }
@@ -133,7 +133,7 @@ export default function Search() {
                               onClick={handleOnLoadMore}
                               className="w-full block text-sm md:text-base text-center px-4 py-3 lg:py-3.5 bg-gray-200 text-heading text-opacity-80 transition hover:text-opacity-100"
                             >
-                              {t("text-load-more-products")}
+                              {t('text-load-more-products')}
                             </Button>
                           </div>
                         )}
@@ -143,7 +143,7 @@ export default function Search() {
                         <div className=" flex items-center justify-center max-w-[520px]">
                           <Image
                             src={noResult}
-                            alt={t("text-no-result-found")}
+                            alt={t('text-no-result-found')}
                             className="object-contain"
                           />
                         </div>

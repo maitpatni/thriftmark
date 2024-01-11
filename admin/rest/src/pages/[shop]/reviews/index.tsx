@@ -18,6 +18,7 @@ import { useShopQuery } from '@/data/shop';
 import { useRouter } from 'next/router';
 import { Routes } from '@/config/routes';
 import { useMeQuery } from '@/data/user';
+import PageHeading from '@/components/common/page-heading';
 
 export default function Reviews() {
   const router = useRouter();
@@ -64,9 +65,7 @@ export default function Reviews() {
     <>
       <Card className="mb-8 flex flex-col">
         <div className="flex w-full flex-col items-center md:flex-row">
-          <h1 className="text-xl font-semibold text-heading">
-            {t('form:input-label-reviews')}
-          </h1>
+          <PageHeading title={t('form:input-label-reviews')} />
         </div>
       </Card>
       <ReviewList

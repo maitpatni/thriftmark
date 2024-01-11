@@ -8,7 +8,6 @@ import Button from '@/components/ui/button';
 import { useGenerateDescriptionMutation } from '@/data/product';
 import type { GenerateDescriptionInput } from '@/types';
 import { useCopyToClipboard } from 'react-use';
-import { toast } from 'react-toastify';
 import { useWatch, useForm } from 'react-hook-form';
 import { isEmpty } from 'lodash';
 import Select from '@/components/ui/select/select';
@@ -54,12 +53,9 @@ const GenerateDescription = () => {
     name: 'prompt',
   });
 
-  const onTypeFilter = useCallback(
-    (item: ItemProps) => {
-      setValue('prompt', item?.title);
-    },
-    []
-  );
+  const onTypeFilter = useCallback((item: ItemProps) => {
+    setValue('prompt', item?.title);
+  }, []);
 
   const syncPromptContent = useCallback(
     (data: string) => {
@@ -83,9 +79,7 @@ const GenerateDescription = () => {
               options={suggestion}
               getOptionLabel={(option: any) => option?.title}
               getOptionValue={(option: any) => option?.title}
-              placeholder={
-                'Please Select Some auto generated Prompt suggestion'
-              }
+              placeholder={t('form:input-placeholder-prompt-suggestion')}
               onChange={onTypeFilter as any}
               className="shadow-promptSuggestion"
               styles={selectStylesModern}
@@ -96,7 +90,7 @@ const GenerateDescription = () => {
           )}
           <div className="">
             <TextArea
-              label="Prompt"
+              label={t('form:input-label-prompt')}
               {...register('prompt')}
               error={t(errors.prompt?.message!)}
               variant="outline"
@@ -108,7 +102,9 @@ const GenerateDescription = () => {
                 loading={isLoading}
                 disabled={isLoading || isEmpty(prompt)}
               >
-                {isEmpty(data?.result) ? 'Generate With AI' : 'Regenerate With AI'}
+                {isEmpty(data?.result)
+                  ? t('form:button-label-generate-ai')
+                  : t('form:button-label-regenerate-ai')}
               </Button>
             </div>
           </div>
@@ -119,7 +115,7 @@ const GenerateDescription = () => {
           <TextArea
             name="Generated Description"
             inputClassName="h-72"
-            label="Output"
+            label={t('form:input-label-output')}
             value={data?.result}
             disabled={true}
           />
@@ -142,7 +138,7 @@ const GenerateDescription = () => {
                 copyToClipboard(data);
                 toast.success(t('Copied to clipboard'));
               }}
-              className="absolute right-5 top-10 text-accent-500 transition hover:text-accent-400 group-hover:opacity-100 md:opacity-0"
+              className="absolute transition right-5 top-10 text-accent-500 hover:text-accent-400 group-hover:opacity-100 md:opacity-0"
             >
               <ClipboardIcon />
             </button>
@@ -153,7 +149,7 @@ const GenerateDescription = () => {
             disabled={isEmpty(data?.result) || isLoading}
             onClick={() => syncPromptContent(data?.result)}
           >
-            Sync Content
+            {t('form:button-label-sync-content')}
           </Button>
         </div>
       </div>

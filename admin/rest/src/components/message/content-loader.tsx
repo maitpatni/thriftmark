@@ -61,7 +61,7 @@ const MessageCardLoader = ({
           >
             {checkOddAdnEven(i) ? (
               <div className="w-10">
-                <Avatar src={siteSettings?.avatar?.placeholder} alt="avatar" />
+                <Avatar src={siteSettings?.avatar?.placeholder} name="avatar" />
               </div>
             ) : (
               ''
@@ -69,7 +69,7 @@ const MessageCardLoader = ({
             <div
               className={cn(
                 classes?.common,
-                checkOddAdnEven(i) ? classes?.default : classes?.reverse
+                checkOddAdnEven(i) ? classes?.default : classes?.reverse,
               )}
             >
               <div className="p-2">

@@ -17,13 +17,12 @@ import Router, { useRouter } from 'next/router';
 import { useState } from "react";
 import { useMutation, useQuery } from 'react-query';
 import { toast } from 'react-toastify';
+import { setAuthCredentials } from '@lib/auth-utils';
 
 import { AUTH_TOKEN } from '@lib/constants';
 import { ROUTES } from '@lib/routes';
 import Cookies from 'js-cookie';
-import {
-  useQueryClient,
-} from 'react-query';
+import { useQueryClient } from 'react-query';
 
 export function useChangePassword() {
   const { t } = useTranslation('common');
@@ -38,7 +37,7 @@ export function useChangePassword() {
         });
         return;
       }
-      toast.success(t("password-update-success"));
+      toast.success(t('password-update-success'));
     },
     onError: (error) => {
       const {
@@ -96,21 +95,21 @@ export function useResendVerificationEmail() {
   return { mutate, isLoading };
 }
 
-
 export function useLogin() {
   const { t } = useTranslation('common');
   const [_, setAuthorized] = useAtom(authorizationAtom);
   const { closeModal } = useUI();
-  const { setToken } = useToken();
+  const { setToken, setAuthCredentials } = useToken();
   let [serverError, setServerError] = useState<string | null>(null);
 
   const { mutate, isLoading } = useMutation(client.auth.login, {
     onSuccess: (data: any) => {
       if (!data.token) {
-        setServerError(t("forms:error-credential-wrong"));
+        setServerError(t('forms:error-credential-wrong'));
         return;
       }
       setToken(data.token);
+      setAuthCredentials(data.token, data.permissions);
       setAuthorized(true);
       closeModal();
     },
@@ -124,7 +123,7 @@ export function useLogin() {
 
 export function useLogout() {
   const queryClient = useQueryClient();
-  const { setToken } = useToken();
+  const { setToken, removeAuthCredentials } = useToken();
   const [_, setAuthorized] = useAtom(authorizationAtom);
   const [_r, resetCheckout] = useAtom(clearCheckoutAtom);
   const { pathname, ...router } = useRouter();
@@ -133,6 +132,7 @@ export function useLogout() {
     onSuccess: (data) => {
       if (data) {
         setToken('');
+        removeAuthCredentials();
         setAuthorized(false);
         router.push("/");
         //@ts-ignore
@@ -421,3 +421,45 @@ export function useSubscribe() {
 
   return { mutate, isLoading, formError, setFormError };
 }
+
+export const useUpdateEmail = () => {
+  const queryClient = useQueryClient();
+  const { t } = useTranslation();
+  return useMutation(client.user.updateEmail, {
+    onSuccess: (data) => {
+      if (data) {
+        toast.success(t('successfully-email-updated'));
+      }
+    },
+    onError: (error) => {
+      const {
+        response: { data },
+      }: any = error ?? {};
+
+      toast.error(data?.message);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries(API_ENDPOINTS.CUSTOMER);
+    },
+  });
+};
+
+export const useUpdateUser = () => {
+  const { t } = useTranslation();
+  const queryClient = useQueryClient();
+  const { closeModal } = useUI();
+  return useMutation(client.user.update, {
+    onSuccess: (data) => {
+      if (data?.id) {
+        toast.success(`${t('profile-update-successful')}`);
+        closeModal();
+      }
+    },
+    onError: (error) => {
+      toast.error(`${t('error-something-wrong')}`);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries(API_ENDPOINTS.CUSTOMER);
+    },
+  });
+};

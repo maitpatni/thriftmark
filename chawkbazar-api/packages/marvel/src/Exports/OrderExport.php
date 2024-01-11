@@ -48,6 +48,10 @@ class OrderExport implements FromCollection, WithHeadings
 
         $settings = Settings::getData(request()['language'] ?? DEFAULT_LANGUAGE);
         $currency = $settings->options['currency'] ?? DEFAULT_CURRENCY;
+        $currencyOptions = isset($settings['currencyOptions']) ?
+            $settings['currencyOptions'] :
+            ['formation' => DEFAULT_CURRENCY_FORMATION, 'fractions' => 2];
+        $locale = $currencyOptions['formation'] ?? DEFAULT_CURRENCY_FORMATION;
 
         foreach ($orders as $order) {
 
@@ -60,12 +64,12 @@ class OrderExport implements FromCollection, WithHeadings
                 'tracking_number'    => $order?->tracking_number,
                 'shop'               => $order?->shop?->name,
                 'coupon_id'          => $order?->coupon_id,
-                'amount'             => @money($order?->amount, $currency),
-                'discount'           => @money($order?->discount, $currency),
-                'paid_amount'        => @money($order?->paid_total, $currency),
-                'total'              => @money($order?->total, $currency),
-                'sales_tax'          => @money($order?->sales_tax, $currency),
-                'delivery_fee'       => @money($order?->delivery_fee, $currency),
+                'amount'             => formatCurrency($order?->amount, $currency, $locale),
+                'discount'           => formatCurrency($order?->discount, $currency, $locale),
+                'paid_amount'        => formatCurrency($order?->paid_total, $currency, $locale),
+                'total'              => formatCurrency($order?->total, $currency, $locale),
+                'sales_tax'          => formatCurrency($order?->sales_tax, $currency, $locale),
+                'delivery_fee'       => formatCurrency($order?->delivery_fee, $currency, $locale),
                 'payment_id'         => $order?->payment_id,
                 'payment_gateway'    => $order?->payment_gateway,
                 'billing_address'    => $this->formatAddress($order?->billing_address),

@@ -11,6 +11,7 @@ use App\Listeners\SendReviewNotification;
 use Marvel\Listeners\StoreNoticeListener;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Marvel\Events\FlashSaleProcessed;
+use Marvel\Events\Maintenance;
 use Marvel\Events\MessageSent;
 use Marvel\Events\OrderCancelled;
 use Marvel\Events\OrderCreated;
@@ -33,6 +34,7 @@ use Marvel\Events\RefundUpdate;
 use Marvel\Listeners\AppDataListener;
 use Marvel\Listeners\CheckAndSetDefaultCard;
 use Marvel\Listeners\FlashSaleProductProcess;
+use Marvel\Listeners\MaintenanceNotification;
 use Marvel\Listeners\ProductInventoryDecrement;
 use Marvel\Listeners\ProductInventoryRestore;
 use Marvel\Listeners\ProductReviewApprovedListener;
@@ -123,6 +125,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         ProcessUserData::class => [
             AppDataListener::class
+        ],
+        Maintenance::class => [
+            MaintenanceNotification::class
         ]
     ];
 

@@ -39,6 +39,7 @@ const SwitchInput = ({
               disabled ? 'cursor-not-allowed bg-[#EEF1F4]' : ''
             }`}
             dir="ltr"
+            id={name}
           >
             <span className="sr-only">Enable {label}</span>
             <span

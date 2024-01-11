@@ -17,37 +17,39 @@ const BarChart = ({
   const options = {
     options: {
       chart: {
+        height: 600,
+        type: 'line',
         toolbar: {
           show: false,
         },
       },
       plotOptions: {
         bar: {
-          columnWidth: '65%',
+          borderRadius: 6,
+          columnWidth: '60%',
           endingShape: 'flat',
         },
+      },
+      stroke: {
+        curve: 'smooth',
+        width: [0, 3],
+      },
+      fill: {
+        type: 'solid',
+        opacity: [1, 0],
       },
       dataLabels: {
         enabled: false,
       },
-      stroke: {
-        show: false,
-        width: 2,
-      },
-      grid: {
-        borderColor: '#F7F7F7',
-        xaxis: {
-          lines: {
-            show: false,
-          },
-        },
+      markers: {
+        size: [0, 0],
       },
       colors: colors,
       xaxis: {
         labels: {
           show: true,
           style: {
-            colors: '#161F6A',
+            colors: '#1F2937',
             fontSize: '14px',
             fontFamily: "'Lato', sans-serif",
           },
@@ -65,25 +67,51 @@ const BarChart = ({
         labels: {
           show: true,
           style: {
-            color: '#161F6A',
+            color: '#1F2937',
             fontSize: '14px',
             fontFamily: "'Lato', sans-serif",
           },
         },
       },
+      tooltip: {
+        custom: function ({
+          series,
+          seriesIndex,
+          dataPointIndex,
+          w,
+        }: {
+          dataPointIndex: number;
+          seriesIndex: number;
+          series: string[];
+          w: any;
+        }) {
+          return (
+            '<div class="arrow_box flex flex-col text-center">' +
+            '<span class="border-b border-b-slate-200 p-1">' +
+            w?.globals?.labels[dataPointIndex] +
+            '</span>' +
+            '<span class="p-1">' +
+            series[seriesIndex][dataPointIndex] +
+            '</span>' +
+            '</div>'
+          );
+        },
+      },
     },
     series: [
       {
-        name: 'Sale',
+        type: 'column',
         data: series,
       },
     ],
   };
 
   return (
-    <div className="h-full w-full rounded bg-light shadow-sm">
-      <div className="flex items-center justify-between p-8">
-        <h3 className="text-sm text-heading">{widgetTitle}</h3>
+    <div className="h-full w-full overflow-hidden rounded-lg bg-white p-6 shadow-sm md:p-7">
+      <div className="mb-5 flex items-center justify-between">
+        <h3 className="before:content-'' relative mt-1 bg-light text-lg font-semibold text-heading before:absolute before:-top-px before:h-7 before:w-1 before:rounded-tr-md before:rounded-br-md before:bg-accent ltr:before:-left-6 rtl:before:-right-6 md:before:-top-0.5 md:ltr:before:-left-7 md:rtl:before:-right-7 lg:before:h-8">
+          {widgetTitle}
+        </h3>
 
         <div className="flex flex-col">
           <span className="text-lg font-semibold text-green-500">
@@ -102,7 +130,7 @@ const BarChart = ({
                 <ArrowDown />
               </span>
             )}
-            <span className="ms-1 text-sm text-heading">
+            <span className="text-sm text-heading ms-1">
               <span
                 className={cn(
                   position === 'down' ? 'text-red-400' : 'text-green-500'

@@ -1,3 +1,5 @@
+/** @type {import('next-i18next').UserConfig} */
+
 const invariant = require('tiny-invariant');
 const path = require('path');
 
@@ -26,7 +28,6 @@ module.exports = {
   i18n: {
     defaultLocale: process.env.NEXT_PUBLIC_DEFAULT_LANGUAGE ?? "en",
     locales: generateLocales(),
-    localeDetection: isMultilangEnable,
   },
   localePath: path.resolve('./public/locales'),
   reloadOnPrerender: process.env.NODE_ENV === 'development',

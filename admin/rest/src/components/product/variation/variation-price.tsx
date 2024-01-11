@@ -8,10 +8,10 @@ export default function VariationPrice({
 }: any) {
   const { price, basePrice } = usePrice(
     selectedVariation && {
-      amount: selectedVariation.sale_price
-        ? selectedVariation.sale_price
-        : selectedVariation.price,
-      baseAmount: selectedVariation.price,
+      amount: selectedVariation?.sale_price
+        ? Number(selectedVariation?.sale_price)
+        : Number(selectedVariation?.price),
+      baseAmount: Number(selectedVariation?.price),
     }
   );
   const { price: min_price } = usePrice({
@@ -28,7 +28,7 @@ export default function VariationPrice({
           : `${min_price} - ${max_price}`}
       </ins>
       {basePrice && (
-        <del className="ms-2 text-sm font-normal text-muted md:text-base">
+        <del className="text-sm font-normal text-muted ms-2 md:text-base">
           {basePrice}
         </del>
       )}

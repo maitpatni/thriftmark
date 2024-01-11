@@ -80,7 +80,7 @@ const UserList = ({ className, filterText, permission, ...rest }: Props) => {
   if (loading && isEmpty(conversations)) {
     return (
       <Loader
-        className="!h-auto flex-grow"
+        className="!h-full flex-grow"
         showText={false}
         text={t('common:text-loading')}
       />
@@ -116,7 +116,7 @@ const UserList = ({ className, filterText, permission, ...rest }: Props) => {
                   {isLoadingMore ? (
                     <Loader className="mt-4 !h-auto" showText={false} />
                   ) : (
-                    <div className="hidden">No search left</div>
+                    <div className="hidden">{t('text-no-search')}</div>
                   )}
                 </div>
               ) : (
